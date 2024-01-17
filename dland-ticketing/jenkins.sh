@@ -1,4 +1,3 @@
-cd dland-ticketing
 npm install
 npm i @quasar/cli
 quasar build

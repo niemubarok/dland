@@ -13,7 +13,7 @@ import {
 
 const print = process.platform === "win32" ? printWindows : printUnix;
 const printerOption = {
-  printer: "iware",
+  printer: "POS-80C",
 };
 
 import jsPDF from "jspdf";
@@ -44,7 +44,7 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   const pdf = new jsPDF({
     unit: "mm",
     format: [80, 100],
-    autoPaging: true,
+    // autoPaging: true,
     plugins: [autoTable],
   });
 
@@ -58,11 +58,13 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   });
 
   pdf.line(5, 12, pdf.internal.pageSize.width - 5, 12); // Draw a line at y = 12 mm from the left margin to the right margin
-  const headers = ["Wahana", "Qty", "Harga"];
+  const headers = ["Wahana", "Qty", "Harga", "        "];
   const rows = Object.values(JSON.parse(transaksi)).map((item) => [
     item.nama,
     item.qty,
     formatCurrency(item.total_bayar),
+    '..............',
+
   ]);
 
   // console.log(transaksi);
@@ -72,15 +74,16 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     startY: 13,
     head: [headers],
     body: rows,
-    tableWidth: "80",
+    tableWidth: "auto",
     theme: "plain",
     columnStyles: {
       0: { halign: "left", cellWidth: "auto" },
       1: { halign: "center" },
       2: { halign: "right", cellWidth: "auto" },
+      3: { halign: "right", cellWidth: "auto" },
     },
     styles: {
-      fontSize: 7, // Set the font size to 6
+      fontSize: 10, // Set the font size to 6
       cellPadding: { top: 0, right: 0, bottom: 0, left: 0 },
       minCellHeight: 4,
       // fillColor: [255, 255, 255],
@@ -120,7 +123,7 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   const pageWidth = pdf.internal.pageSize.width;
 
   pdf.setFont("helvetica");
-  pdf.setFontSize(8);
+  pdf.setFontSize(10);
   pdf.text(totalBayarText, 10, pdf.autoTable.previous.finalY + 5, {
     align: "left",
   });
@@ -191,26 +194,34 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   });
 };
 async function printStruk() {
-  console.log(process.platform);
-  if (process.platform === "win32") {
-    getWindowsDefaultPrinter().then((printer) => console.log(printer));
-  } else {
-    getUnixDefaultPrinter().then((printer) => console.log(printer));
-  }
-  return;
+  getWindowsPrinters().then(console.log)
+  // return
+
   const outputFilePath = path.resolve(
     __dirname,
     process.env.QUASAR_PUBLIC_FOLDER + "/struk/struk.pdf"
   );
 
-  console.log(outputFilePath);
-  try {
+
+  console.log(process.platform);
+  if (process.platform === "win32") {
     await fs.promises.access(outputFilePath, fs.constants.F_OK);
-    await print(outputFilePath, printerOption);
-    console.log("Printing done");
-  } catch (error) {
-    console.error("Error during printing:", error);
+    await printWindows(outputFilePath,printerOption ).then(console.log);
+    // getWindowsDefaultPrinter().then((printer) => console.log(printer));
+  } else {
+    getUnixDefaultPrinter().then((printer) => console.log(printer));
   }
+  // return;
+  
+
+  // console.log(outputFilePath);
+  // try {
+  //   await fs.promises.access(outputFilePath, fs.constants.F_OK);
+  //   await print(outputFilePath, printerOption);
+  //   console.log("Printing done");
+  // } catch (error) {
+  //   console.error("Error during printing:", error);
+  // }
 }
 
 contextBridge.exposeInMainWorld("electron", {

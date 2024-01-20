@@ -192,7 +192,11 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
 };
 async function printStruk() {
   console.log(process.platform);
-  getUnixDefaultPrinter().then((printer) => console.log(printer));
+  if (process.platform === "win32") {
+    getWindowsDefaultPrinter().then((printer) => console.log(printer));
+  } else {
+    getUnixDefaultPrinter().then((printer) => console.log(printer));
+  }
   return;
   const outputFilePath = path.resolve(
     __dirname,

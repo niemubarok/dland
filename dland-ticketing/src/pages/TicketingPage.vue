@@ -61,9 +61,9 @@
             :key="wahana"
           >
             <WahanaCard
-              :id="wahana.id.toString()"
-              :name="wahana.name"
-              :tarif="wahana.tarif"
+              :id="wahana.id_wahana.toString()"
+              :nama="wahana.nama"
+              :tarif="parseInt(wahana.harga_tiket)"
             />
             <!-- <TicketCard /> -->
           </div>
@@ -131,8 +131,10 @@ import WahanaCard from "src/components/WahanaCard.vue";
 import TicketCard from "src/components/TicketCard.vue";
 import PaymentDialog from "src/components/PaymentDialog.vue";
 import { transaksiStore } from "src/stores/transaksi-store";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onBeforeMount } from "vue";
 import { useQuasar } from "quasar";
+import ls from "localstorage-slim";
+import LoginDialog from "src/components/LoginDialog.vue";
 
 const $q = useQuasar();
 const qtyDialog = ref(false);
@@ -142,15 +144,15 @@ const selectAllWahana = () => {
   wahanaStore().daftarWahana.forEach((wahana) => {
     const data = ref({
       id: "",
-      name: "",
+      nama: "",
       qty: qty.value,
       tarif: "",
-      totalTarif: "",
+      total_bayar: "",
     });
-    data.value.id = wahana.id?.toString();
-    data.value.name = wahana.name;
-    data.value.tarif = wahana.tarif;
-    data.value.totalTarif = wahana.tarif * qty.value;
+    data.value.id = wahana.id_wahana?.toString();
+    data.value.nama = wahana.nama;
+    data.value.tarif = wahana.harga_tiket;
+    data.value.total_bayar = wahana.harga_tiket * qty.value;
 
     transaksiStore().detailTransaksi.push(data.value);
     qtyDialog.value = false;
@@ -169,7 +171,21 @@ const selectAllWahana = () => {
 //   // transaksiStore().addTransaksi();
 // };
 
+onBeforeMount(() => {
+  if (!ls.get("petugas")) {
+    const _loginDialog = $q.dialog({
+      component: LoginDialog,
+      persistent: true,
+      props: {
+        type: "login",
+      },
+    });
+    _loginDialog.update();
+  }
+});
+
 onMounted(async () => {
+  await wahanaStore().getWahanaFromDB();
   const handleKeyDown = async (event) => {
     if (event.key === "Enter" && !qtyDialog.value) {
       // await onSaveSettings();

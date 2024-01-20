@@ -4,7 +4,7 @@ const routes = [
     component: () => import("layouts/MainLayout.vue"),
     children: [
       {
-        path: "",
+        path: "/dashboard",
         component: () => import("pages/IndexPage.vue"),
         meta: {
           requireHeader: true,
@@ -12,7 +12,7 @@ const routes = [
         },
       },
       {
-        path: "/ticketing",
+        path: "",
         meta: {
           requireHeader: false,
           requireSideNav: false,
@@ -34,6 +34,14 @@ const routes = [
           requireSideNav: false,
         },
         component: () => import("pages/QrScannerPage.vue"),
+      },
+      {
+        path: "/print",
+        meta: {
+          requireHeader: false,
+          requireSideNav: false,
+        },
+        component: () => import("pages/PrintPage.vue"),
       },
     ],
   },

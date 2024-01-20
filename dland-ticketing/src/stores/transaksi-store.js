@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import { api } from "boot/axios";
 // import { wahanaStore } from "./wahana-store";
 
 export const transaksiStore = defineStore("transaksi", {
@@ -13,6 +14,7 @@ export const transaksiStore = defineStore("transaksi", {
     totalBayar: ref(0),
     no_whatsapp: ref(0),
     saldo: ref(),
+    isShowPaymentDialog: ref(false),
   }),
 
   getters: {
@@ -32,8 +34,9 @@ export const transaksiStore = defineStore("transaksi", {
     qty(id) {
       if (this.detailTransaksi.length) {
         return (
-          this.detailTransaksi.detailTransaksi.find((data) => data.id === id)
-            .qty || 0
+          this.detailTransaksi.detailTransaksi.find(
+            (data) => data.id_wahana === id
+          ).qty || 0
         );
       }
     },
@@ -46,7 +49,7 @@ export const transaksiStore = defineStore("transaksi", {
         if (wahana.qty > 1) {
           wahana.qty--;
           this.qty = wahana.qty;
-          wahana.totalTarif = wahana.tarif * wahana.qty; // Assuming each wahana object has tarifPerQty indicating the price per single quantity
+          wahana.total_bayar = wahana.tarif * wahana.qty; // Assuming each wahana object has tarifPerQty indicating the price per single quantity
         } else {
           this.detailTransaksi.splice(wahanaIndex, 1);
         }
@@ -54,14 +57,16 @@ export const transaksiStore = defineStore("transaksi", {
     },
 
     addTransaksi(data) {
-      console.log(data);
-      const wahana = this.detailTransaksi.find((item) => item.id === data.id);
+      const wahana = this.detailTransaksi.find(
+        (item) => item.id_wahana === data.id_wahana
+      );
       if (wahana) {
         wahana.qty++;
         this.qty = wahana.qty;
-        wahana.totalTarif = data.tarif * wahana.qty;
+        wahana.total_bayar = data.tarif * wahana.qty;
       } else {
-        this.detailTransaksi.push({ ...data, qty: 1, totalTarif: data.tarif });
+        this.detailTransaksi.push({ ...data, qty: 1, total_bayar: data.tarif });
+        console.log(this.detailTransaksi);
       }
     },
 
@@ -76,7 +81,30 @@ export const transaksiStore = defineStore("transaksi", {
     resetTransaksi() {
       this.detailTransaksi.splice(0);
     },
-    bayar() {
+    async insertIntoDB() {
+      const status = "1";
+      const cara_bayar = "cash";
+      const petugas = "Husni";
+
+      if (this.detailTransaksi.length) {
+        api
+          .post("transaksi", {
+            data: {
+              cara_bayar,
+              status,
+              petugas,
+              transaksi: this.detailTransaksi,
+            },
+          })
+          .then((response) => {
+            console.log(response.data);
+          })
+          .catch((error) => {
+            console.error("There was an error!", error);
+          });
+      }
+
+      this.totalBayar = 0;
       this.detailTransaksi.splice(0);
     },
   },

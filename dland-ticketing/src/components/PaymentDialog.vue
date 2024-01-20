@@ -8,8 +8,8 @@
     transition-show="scale"
     class="q-pa-xl"
     :content-css="{ 'background-color': 'rgba(0, 0, 0, 0.9)' }"
+    @hide="onDialogHide"
   >
-    <!-- @hide="onDialogHide" -->
     <!-- <struk-card /> -->
     <div>
       <q-card
@@ -59,7 +59,7 @@
             ref="strukRef"
             autofocus
             @update:model-value="() => onInputChange()"
-            @keydown.enter.prevent="onSaveSettings()"
+            @keydown.enter.prevent="onEnter()"
           >
             <template v-slot:prepend>
               <q-chip
@@ -74,6 +74,7 @@
                 :size="'xl'"
                 class="q-mt-xl q-mr-lg bg-white text-dark"
                 icon="keyboard_return"
+                @click="onEnter()"
               />
             </template>
           </q-input>
@@ -119,6 +120,7 @@ import { useDialogPluginComponent, useQuasar } from "quasar";
 import { onMounted, onBeforeUnmount, onBeforeMount, ref, inject } from "vue";
 import { transaksiStore } from "src/stores/transaksi-store";
 const $q = useQuasar();
+import { removeDot } from "src/utils/helpers";
 
 const props = defineProps({
   title: String,
@@ -141,12 +143,17 @@ defineEmits([...useDialogPluginComponent.emits]);
 
 // let pressedKeys = "";
 // const targetKeys = "TABAROKTA";
-const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent();
+const { dialogRef, onDialogOK } = useDialogPluginComponent();
+
+onMounted(() => {
+  transaksiStore().bayar = transaksiStore().totalBayar.toLocaleString("id-ID");
+  bayarModel.value = transaksiStore().totalBayar.toLocaleString("id-ID");
+});
 
 // onMounted(async () => {
 // const handleKeyDown = async (event) => {
 //   if (event.key === "Enter") {
-//     await onSaveSettings();
+//     await onEnter();
 //   }
 //   // Add the pressed key to the string of pressed keys
 //   pressedKeys += event.key.toUpperCase();
@@ -162,17 +169,29 @@ const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent();
 // window.addEventListener("keydown", handleKeyDown);
 // });
 
-const onSaveSettings = async () => {
+const onDialogHide = () => {
+  transaksiStore().isShowPaymentDialog = false;
+};
+
+const onEnter = async () => {
+  console.log(removeDot(transaksiStore().bayar));
   if (
-    transaksiStore().bayar > 0 &&
-    transaksiStore().bayar >= transaksiStore().totalBayar
+    removeDot(transaksiStore().bayar) > 0 &&
+    removeDot(transaksiStore().bayar) >= removeDot(transaksiStore().totalBayar)
   ) {
-    onDialogOK();
-    transaksiStore().resetTransaksi();
+    await transaksiStore().insertIntoDB();
+    // console.log(transaksiStore().detailTransaksi);
+    window.electron.createPDFStruk(
+      "DLAND",
+      JSON.stringify(transaksiStore().detailTransaksi)
+    );
+    window.electron.print();
     transaksiStore().bayar = 0;
     transaksiStore().totalBayar = 0;
     transaksiStore().kembalian = 0;
+    transaksiStore().resetTransaksi();
 
+    onDialogOK();
     dialogRef.value.hide();
   } else {
     $q.notify({
@@ -181,6 +200,44 @@ const onSaveSettings = async () => {
     });
   }
 };
+
+// const handleKeyDownOnDialogPayment = (event) => {
+//   // console.log(event.key);
+
+//   if (event.key === "Escape") {
+//     event.preventDefault();
+//     dialogRef.value.hide();
+//   }
+//   // if (event.shiftKey === true && event.key === "Escape") {
+//   //   event.preventDefault();
+//   //   if (componentStore.isPaymentDialogMounted === false) {
+//   //     onClosePaymentCard();
+//   //   }
+//   //   pressedKeys = "";
+//   // } else {
+//   //   // Add the pressed key to the string of pressed keys
+//   //   pressedKeys += event ?? event.key.toUpperCase();
+
+//   //   // Check if the pressed keys match the target keys
+//   //   // if (pressedKeys === targetKeys) {
+//   //   //   // Call the function to execute
+//   //   //   console.log("Buka Manual");
+//   //   // }
+
+//   //   // Reset the pressed keys string if it doesn't match the target keys
+//   //   if (!targetKeys.startsWith(pressedKeys)) {
+//   //     pressedKeys = "";
+//   //   }
+//   // }
+// };
+
+// onMounted(() => {
+//   window.addEventListener("keydown", handleKeyDownOnDialogPayment);
+// });
+
+// onBeforeUnmount(() => {
+//   window.removeEventListener("keydown", handleKeyDownOnDialogPayment);
+// });
 </script>
 
 <style scoped>

@@ -39,7 +39,7 @@
       <template v-slot="{ item: row, index }">
         <tr :key="index">
           <td align="left">
-            <span class="text-subtitle2">{{ row.name }}</span>
+            <span class="text-subtitle2">{{ row.nama }}</span>
           </td>
           <td align="left">
             <span class="text-center text-subtitle2">{{ row.qty }}</span>
@@ -47,7 +47,7 @@
           <td align="right">
             <span class="text-subtitle2">
               {{
-                row.totalTarif
+                row.total_bayar
                   .toLocaleString("id-ID", {
                     style: "currency",
                     currency: "IDR",
@@ -56,7 +56,7 @@
               }}</span
             >
             <q-badge
-              @click="transaksiStore().removeTransaksi(row.id)"
+              @click="transaksiStore().removeTransaksi(row.id_wahana)"
               text-color="white"
               class="q-ml-md cursor-pointer bg-transparent"
             >
@@ -79,21 +79,21 @@
     </div>
     <!-- </q-card-section> -->
     <q-card-actions align="center">
-      <q-btn
+      <!-- <q-btn
         size="lg"
         push
         :label="'QRIS'"
         class="col bg-brown-9 text-white text-weight-bolder q-mt-sm"
         @click="onClickBayar('qris')"
-      />
+      /> -->
       <q-btn
         size="lg"
         push
-        :label="'CASH'"
+        :label="'Bayar'"
         class="col bg-green-9 text-white text-weight-bolder q-mt-sm"
         @click="onClickBayar('cash')"
-        @keydown.enter.prevent=""
       />
+      <!-- @keydown.enter.prevent="onClickBayar('cash')" -->
       <!-- <q-btn flat label="Action 2" /> -->
     </q-card-actions>
   </q-card>
@@ -101,14 +101,15 @@
 
 <script setup>
 import { transaksiStore } from "src/stores/transaksi-store";
-import { computed } from "vue";
+import { computed, onMounted, ref, onBeforeUnmount } from "vue";
 import { useQuasar } from "quasar";
 import PaymentDialog from "src/components/PaymentDialog.vue";
+import { userStore } from "src/stores/user-store";
 
 const $q = useQuasar();
 const totalBayar = computed(() => {
   const total = transaksiStore().detailTransaksi.reduce(
-    (a, b) => a + b.totalTarif,
+    (a, b) => a + b.total_bayar,
     0
   );
   transaksiStore().totalBayar = total;
@@ -118,7 +119,9 @@ const totalBayar = computed(() => {
 const onClickBayar = (method) => {
   // transaksiStore().bayar();
 
-  if (method == "cash") {
+  if (method == "cash" && !transaksiStore().isShowPaymentDialog) {
+    // console.log(transaksiStore().detailTransaksi);
+    transaksiStore().isShowPaymentDialog = true;
     const dialog = $q.dialog({
       component: PaymentDialog,
     });
@@ -126,6 +129,63 @@ const onClickBayar = (method) => {
     dialog.update();
   }
 };
+
+const handleKeyDownOnDetailTransaksi = (event) => {
+  console.log(transaksiStore().isShowPaymentDialog);
+
+  if (
+    event.key === "Enter" &&
+    !transaksiStore().isShowPaymentDialog &&
+    userStore().isLogin
+  ) {
+    if (totalBayar.value > 0) {
+      event.preventDefault();
+      onClickBayar("cash");
+    } else {
+      $q.notify({
+        message: "Tidak ada transaksi yang harus dibayar",
+        color: "red",
+        position: "top",
+        icon: "warning",
+      });
+    }
+    // transaksiStore().isShowPaymentDialog = true;
+    // const dialog = $q.dialog({
+    //   component: PaymentDialog,
+    // });
+
+    // dialog.update();
+  }
+  // if (event.shiftKey === true && event.key === "Escape") {
+  //   event.preventDefault();
+  //   if (componentStore.isPaymentDialogMounted === false) {
+  //     onClosePaymentCard();
+  //   }
+  //   pressedKeys = "";
+  // } else {
+  //   // Add the pressed key to the string of pressed keys
+  //   pressedKeys += event ?? event.key.toUpperCase();
+
+  //   // Check if the pressed keys match the target keys
+  //   // if (pressedKeys === targetKeys) {
+  //   //   // Call the function to execute
+  //   //   console.log("Buka Manual");
+  //   // }
+
+  //   // Reset the pressed keys string if it doesn't match the target keys
+  //   if (!targetKeys.startsWith(pressedKeys)) {
+  //     pressedKeys = "";
+  //   }
+  // }
+};
+
+onMounted(() => {
+  window.addEventListener("keydown", handleKeyDownOnDetailTransaksi);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("keydown", handleKeyDownOnDetailTransaksi);
+});
 // const columns = ["Nama", "Qty", "Tarif"];
 </script>
 

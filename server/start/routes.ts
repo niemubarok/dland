@@ -18,8 +18,25 @@
 |
 */
 
-import Route from '@ioc:Adonis/Core/Route'
+import Route from "@ioc:Adonis/Core/Route";
 
-Route.get('/', async () => {
-  return { hello: 'world' }
-})
+Route.get("/", async () => {
+  return { hello: "world" };
+});
+
+Route.group(() => {
+  Route.group(() => {
+    Route.get("/", "WahanaController.index");
+    Route.get("/:id", "WahanaController.show");
+    Route.post("/", "WahanaController.store");
+    Route.put("/:id", "WahanaController.update");
+    Route.delete("//:id", "WahanaController.destroy");
+  }).prefix("wahana");
+
+  Route.group(() => {
+    Route.get("/all", "UsersController.index");
+    Route.post("/login", "UsersController.login");
+  }).prefix("petugas");
+
+  Route.post("/transaksi", "TransactionsController.create");
+}).prefix("api");

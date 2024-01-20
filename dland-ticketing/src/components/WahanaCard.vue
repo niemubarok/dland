@@ -8,7 +8,7 @@
         ? 'width: 80vw;margin-top: 10px'
         : props.length > 9
         ? 'width: 19vw;height: 15%; margin-top:10px'
-        : 'width: 19vw;height: 20%; margin-top:10px'
+        : 'width: 19vw;height: 20%; margin-top:10px;min-height: 200px;'
     "
   >
     <div>
@@ -23,7 +23,7 @@
     <!-- style="width: 400px; " -->
     <q-card-section>
       <div class="text-h6 text-weight-bolder">
-        {{ props.name }}
+        {{ props.nama }}
       </div>
 
       <q-separator />
@@ -47,9 +47,9 @@ import { ref, computed } from "vue";
 
 const props = defineProps({
   id: String,
-  name: String,
+  nama: String,
   tarif: Number,
-  totalTarif: Number,
+  total_bayar: Number,
   qty: Number,
   length: Number,
 });
@@ -61,10 +61,10 @@ const qty = computed(() => {
 });
 const onClickWahana = () => {
   const data = ref({
-    id: props.id,
-    name: props.name,
+    id_wahana: props.id,
+    nama: props.nama,
     tarif: props.tarif,
-    totalTarif: props.tarif,
+    total_bayar: props.tarif,
   });
   transaksiStore().addTransaksi(data.value);
 };
@@ -84,7 +84,7 @@ const onRightClick = () => {
   position: relative;
   box-sizing: border-box;
   /* width: 300px; */
-  height: 450px;
+  height: 750px;
   /* margin: 150px auto 0; */
   padding: 20px;
   border-radius: 10px;

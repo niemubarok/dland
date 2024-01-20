@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { api } from "boot/axios";
+import ls from "localstorage-slim"
 // import { wahanaStore } from "./wahana-store";
 
 export const transaksiStore = defineStore("transaksi", {
@@ -42,7 +43,7 @@ export const transaksiStore = defineStore("transaksi", {
     },
     decreaseQty(id) {
       const wahanaIndex = this.detailTransaksi.findIndex(
-        (item) => item.id === id
+        (item) => item.id_wahana === id
       );
       if (wahanaIndex !== -1) {
         const wahana = this.detailTransaksi[wahanaIndex];
@@ -84,7 +85,8 @@ export const transaksiStore = defineStore("transaksi", {
     async insertIntoDB() {
       const status = "1";
       const cara_bayar = "cash";
-      const petugas = "Husni";
+      const petugas = ls.get("petugas")?.nama;
+      let isSuccess = false
 
       if (this.detailTransaksi.length) {
         api
@@ -97,15 +99,18 @@ export const transaksiStore = defineStore("transaksi", {
             },
           })
           .then((response) => {
-            console.log(response.data);
+            isSuccess = true
           })
           .catch((error) => {
+            isSuccess = false
             console.error("There was an error!", error);
           });
       }
 
       this.totalBayar = 0;
       this.detailTransaksi.splice(0);
+
+      return isSuccess
     },
   },
 });

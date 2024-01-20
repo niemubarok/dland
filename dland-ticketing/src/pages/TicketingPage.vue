@@ -16,7 +16,7 @@
           Depok Fantasy Land
         </div>
         <div class="text-body text-weight-bolder text-white text-start q-px-md">
-          Administrator | Shift 1 |
+          {{ ls.get("petugas")?.nama }} 
           <Clock />
         </div>
       </q-card>
@@ -77,8 +77,8 @@
             @click="qtyDialog = true"
             class="q-mx-xs"
           />
-          <q-btn push color="brown-9" label="Paket 1" class="q-mx-xs" />
-          <q-btn push color="brown-9" label="Paket 2" class="q-mx-xs" />
+          <!-- <q-btn push color="brown-9" label="Paket 1" class="q-mx-xs" />
+          <q-btn push color="brown-9" label="Paket 2" class="q-mx-xs" /> -->
           <!-- class="rounded-10" -->
         </div>
       </q-card>
@@ -143,13 +143,13 @@ const qty = ref();
 const selectAllWahana = () => {
   wahanaStore().daftarWahana.forEach((wahana) => {
     const data = ref({
-      id: "",
+      id_wahana: "",
       nama: "",
       qty: qty.value,
       tarif: "",
       total_bayar: "",
     });
-    data.value.id = wahana.id_wahana?.toString();
+    data.value.id_wahana = wahana.id_wahana?.toString();
     data.value.nama = wahana.nama;
     data.value.tarif = wahana.harga_tiket;
     data.value.total_bayar = wahana.harga_tiket * qty.value;
@@ -172,6 +172,10 @@ const selectAllWahana = () => {
 // };
 
 onBeforeMount(() => {
+
+});
+
+onMounted(async () => {
   if (!ls.get("petugas")) {
     const _loginDialog = $q.dialog({
       component: LoginDialog,
@@ -182,9 +186,6 @@ onBeforeMount(() => {
     });
     _loginDialog.update();
   }
-});
-
-onMounted(async () => {
   await wahanaStore().getWahanaFromDB();
   const handleKeyDown = async (event) => {
     if (event.key === "Enter" && !qtyDialog.value) {

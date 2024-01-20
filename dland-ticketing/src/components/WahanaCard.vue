@@ -7,8 +7,8 @@
       $q.screen.lt.sm
         ? 'width: 80vw;margin-top: 10px'
         : props.length > 9
-        ? 'width: 19vw;height: 15%; margin-top:10px'
-        : 'width: 19vw;height: 20%; margin-top:10px;min-height: 200px;'
+        ? 'width: 14vw;height: 15%; margin-top:10px'
+        : 'width: 14vw;height: 20%; margin-top:10px;height: 150px;'
     "
   >
     <div>
@@ -22,12 +22,12 @@
     </div>
     <!-- style="width: 400px; " -->
     <q-card-section>
-      <div class="text-h6 text-weight-bolder">
+      <div class="text-subtitle1 text-weight-bolder">
         {{ props.nama }}
       </div>
 
       <q-separator />
-      <div class="text-h6">
+      <div class="text-subtitle1">
         {{
           props.tarif
             .toLocaleString("id-ID", {
@@ -84,7 +84,7 @@ const onRightClick = () => {
   position: relative;
   box-sizing: border-box;
   /* width: 300px; */
-  height: 750px;
+  /* height: 750px; */
   /* margin: 150px auto 0; */
   padding: 20px;
   border-radius: 10px;
@@ -98,7 +98,7 @@ const onRightClick = () => {
     left: 10px;
     /* right: 5px; */
     height: 6px;
-    width: 93%;
+    width: 91%;
   }
 
   &:before {
@@ -134,7 +134,7 @@ const onRightClick = () => {
 .ticket__text {
   width: 400px;
   font-family: "Helvetica", "Arial", sans-serif;
-  font-size: 3rem;
+  font-size: 1rem;
   font-weight: 900;
   text-transform: uppercase;
   color: #c6dede;

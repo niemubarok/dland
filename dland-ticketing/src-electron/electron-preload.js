@@ -3,6 +3,9 @@ import { print as printUnix, getPrinters } from "unix-print";
 import { print as printWindows } from "pdf-to-printer"; // Replace 'windows-print' with the actual package for Windows printing
 
 const print = process.platform === "win32" ? printWindows : printUnix;
+const printerOption={
+  printer:'iware'
+}
 
 import jsPDF from "jspdf";
 const QRCode = require("qrcode");
@@ -48,10 +51,13 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   pdf.line(5, 12, pdf.internal.pageSize.width - 5, 12); // Draw a line at y = 12 mm from the left margin to the right margin
   const headers = ["Wahana", "Qty", "Harga"];
   const rows = Object.values(JSON.parse(transaksi)).map((item) => [
-    item.name,
+    item.nama,
     item.qty,
-    formatCurrency(item.totalTarif),
+    formatCurrency(item.total_bayar),
   ]);
+
+  console.log(transaksi);
+  return
 
   const autoTableOptions = {
     startY: 13,
@@ -96,9 +102,10 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
 
   // pdf.setFontSize(8);
   const totalBayar = Object.values(JSON.parse(transaksi)).reduce(
-    (total, item) => total + item.totalTarif,
+    (total, item) => total + item.total_bayar,
     0
   );
+  console.log(totalBayar);
   const totalBayarText = `Total Bayar `;
   const totalBayarValue = `${formatCurrency(totalBayar)}`;
   const pageWidth = pdf.internal.pageSize.width;
@@ -189,7 +196,7 @@ async function printStruk() {
       return;
     }
 
-    await print(outputFilePath)
+    await print(outputFilePath, printerOption)
       .then(() => {
         console.log("Printing done");
       })

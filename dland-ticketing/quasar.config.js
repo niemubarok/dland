@@ -172,7 +172,14 @@ module.exports = configure(function (/* ctx */) {
         // osxSign: '',
         // protocol: 'myapp://path',
         // Windows only
-        // win32metadata: { ... }
+        win32metadata: { 
+          CompanyName: "DLAND",
+    FileDescription: "string",
+    // InternalName: "string",
+    // OriginalFilename: "string",
+    ProductName: "dland"
+        }
+        
       },
 
       builder: {

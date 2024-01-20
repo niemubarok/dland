@@ -52,11 +52,13 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   const pageWidth = pdf.internal.pageSize.width;
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(10);
-  pdf.text(nama_perusahaan, pdf.internal.pageSize.width / 2, 5, {
+  pdf.text(nama_perusahaan, pdf.internal.pageSize.width / 2, 3, {
     align: "center",
   });
 
-  pdf.text("Tiket", pdf.internal.pageSize.width / 2, 9, {
+  pdf.setFont("helvetica");
+  pdf.setFontSize(8);
+  pdf.text("Tiket", pdf.internal.pageSize.width / 2, 8, {
     align: "center",
   });
 
@@ -88,6 +90,7 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     tableWidth: pdf.internal.pageSize.getWidth() - 5,
     margin: { left: 5, right: 10 },
     theme: "plain",
+    overflow: "ellipsis",
     didParseCell: (hookData) => {
       if (hookData.section === "head") {
         if (hookData.column.dataKey === "qty") {

@@ -181,11 +181,11 @@ const onEnter = async () => {
   ) {
     console.log(transaksiStore().detailTransaksi);
     window.electron.createPDFStruk(
-      "DLAND",
+      "Depok Fantasy Land",
       JSON.stringify(transaksiStore().detailTransaksi)
     );
     const store = await transaksiStore().insertIntoDB();
-    console.log("store", store);
+    // console.log("store", store);
     //  if(store){
     window.electron.print();
     $q.notify({

@@ -13,6 +13,7 @@
         <div
           class="text-subtitle2 text-weight-bolder text-white text-start q-px-md"
         >
+          <q-btn flat icon="dashboard" @click="$router.push('/dashboard')" />
           Depok Fantasy Land
         </div>
         <div class="text-body text-weight-bolder text-white text-start q-px-md">

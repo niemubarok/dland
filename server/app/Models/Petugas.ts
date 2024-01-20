@@ -1,6 +1,8 @@
 import { DateTime } from "luxon";
 import { BaseModel, column } from "@ioc:Adonis/Lucid/Orm";
 export default class Petugas extends BaseModel {
+  public static table = "petugas";
+
   @column({ isPrimary: true })
   public idPetugas: number;
 

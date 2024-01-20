@@ -23,12 +23,19 @@ export default class extends BaseSeeder {
         deskripsi: "-",
         hargaTiket: 20000,
       },
-      {
-        idWahana: 4,
-        nama: "Rainbow Slide 2X Main",
-        deskripsi: "-",
-        hargaTiket: 15000,
-      },
+      // {
+      //   idWahana: 1,
+      //   nama: "Tiket Masuk",
+      //   deskripsi: "-",
+      //   hargaTiket: 0,
+      // },
+
+      // {
+      //   idWahana: 4,
+      //   nama: "Rainbow Slide 2X Main",
+      //   deskripsi: "-",
+      //   hargaTiket: 15000,
+      // },
       {
         idWahana: 5,
         nama: "Bombom Car",
@@ -79,19 +86,25 @@ export default class extends BaseSeeder {
       },
       {
         idWahana: 14,
-        nama: "Game Coin",
-        deskripsi: "-",
-        hargaTiket: 5000,
-      },
-      {
-        idWahana: 15,
-        nama: "Keranjang Sultan (weekday)",
+        nama: "Wisata Berkuda",
         deskripsi: "-",
         hargaTiket: 15000,
       },
+      // {
+      //   idWahana: 14,
+      //   nama: "Game Coin",
+      //   deskripsi: "-",
+      //   hargaTiket: 5000,
+      // },
+      // {
+      //   idWahana: 15,
+      //   nama: "Keranjang Sultan (weekday)",
+      //   deskripsi: "-",
+      //   hargaTiket: 15000,
+      // },
       {
         idWahana: 16,
-        nama: "Keranjang Sultan (weekend)",
+        nama: "Keranjang Sultan ",
         deskripsi: "-",
         hargaTiket: 20000,
       },

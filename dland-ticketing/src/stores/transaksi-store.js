@@ -73,7 +73,7 @@ export const transaksiStore = defineStore("transaksi", {
 
     removeTransaksi(id) {
       const wahanaIndex = this.detailTransaksi.findIndex(
-        (item) => item.id === id
+        (item) => item.id_wahana === id
       );
       if (wahanaIndex !== -1) {
         this.detailTransaksi.splice(wahanaIndex, 1);

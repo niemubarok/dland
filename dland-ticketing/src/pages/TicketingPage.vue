@@ -78,8 +78,9 @@
             @click="qtyDialog = true"
             class="q-mx-xs"
           />
-          <!-- <q-btn push color="brown-9" label="Paket 1" class="q-mx-xs" />
-          <q-btn push color="brown-9" label="Paket 2" class="q-mx-xs" /> -->
+          <q-btn push color="brown-9" label="Tiket Terusan" class="q-mx-xs" />
+          <q-btn push color="brown-9" label="Paket Anak" class="q-mx-xs" />
+          <q-btn push color="brown-9" label="Paket Dewasa" class="q-mx-xs" />
           <!-- class="rounded-10" -->
         </div>
       </q-card>

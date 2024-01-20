@@ -1,11 +1,20 @@
 import { contextBridge } from "electron";
-import { print as printUnix, getPrinters } from "unix-print";
+import {
+  print as printUnix,
+  getPrinters as getUnixPrinters,
+  getDefaultPrinter as getUnixDefaultPrinter,
+} from "unix-print";
 import { print as printWindows } from "pdf-to-printer"; // Replace 'windows-print' with the actual package for Windows printing
 
+import {
+  getPrinters as getWindowsPrinters,
+  getDefaultPrinter as getWindowsDefaultPrinter,
+} from "pdf-to-printer";
+
 const print = process.platform === "win32" ? printWindows : printUnix;
-const printerOption={
-  printer:'iware'
-}
+const printerOption = {
+  printer: "iware",
+};
 
 import jsPDF from "jspdf";
 const QRCode = require("qrcode");
@@ -56,8 +65,8 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     formatCurrency(item.total_bayar),
   ]);
 
-  console.log(transaksi);
-  return
+  // console.log(transaksi);
+  // return
 
   const autoTableOptions = {
     startY: 13,
@@ -182,26 +191,22 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   });
 };
 async function printStruk() {
-  // createPdfStruk();
-
+  console.log(process.platform);
+  getUnixDefaultPrinter().then((printer) => console.log(printer));
+  return;
   const outputFilePath = path.resolve(
     __dirname,
     process.env.QUASAR_PUBLIC_FOLDER + "/struk/struk.pdf"
   );
 
   console.log(outputFilePath);
-  fs.access(outputFilePath, fs.constants.F_OK, async (err) => {
-    if (err) {
-      console.error("Struk file does not exist:", outputFilePath);
-      return;
-    }
-
-    await print(outputFilePath, printerOption)
-      .then(() => {
-        console.log("Printing done");
-      })
-      .catch(console.error);
-  });
+  try {
+    await fs.promises.access(outputFilePath, fs.constants.F_OK);
+    await print(outputFilePath, printerOption);
+    console.log("Printing done");
+  } catch (error) {
+    console.error("Error during printing:", error);
+  }
 }
 
 contextBridge.exposeInMainWorld("electron", {

@@ -118,9 +118,13 @@ const totalBayar = computed(() => {
 
 const onClickBayar = (method) => {
   // transaksiStore().bayar();
+  // console.log(method == "cash" && !transaksiStore().isShowPaymentDialog);
 
   if (method == "cash" && !transaksiStore().isShowPaymentDialog) {
-    // console.log(transaksiStore().detailTransaksi);
+    console.log(
+      "detail transaksi di detailtransaksi:",
+      transaksiStore().detailTransaksi
+    );
     transaksiStore().isShowPaymentDialog = true;
     const dialog = $q.dialog({
       component: PaymentDialog,

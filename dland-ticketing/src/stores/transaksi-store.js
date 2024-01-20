@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { api } from "boot/axios";
-import ls from "localstorage-slim"
+import ls from "localstorage-slim";
 // import { wahanaStore } from "./wahana-store";
 
 export const transaksiStore = defineStore("transaksi", {
@@ -86,31 +86,29 @@ export const transaksiStore = defineStore("transaksi", {
       const status = "1";
       const cara_bayar = "cash";
       const petugas = ls.get("petugas")?.nama;
-      let isSuccess = false
+      let isSuccess = false;
 
-      if (this.detailTransaksi.length) {
-        api
-          .post("transaksi", {
+      try {
+        if (this.detailTransaksi.length) {
+          const response = await api.post("transaksi", {
             data: {
               cara_bayar,
               status,
               petugas,
               transaksi: this.detailTransaksi,
             },
-          })
-          .then((response) => {
-            isSuccess = true
-          })
-          .catch((error) => {
-            isSuccess = false
-            console.error("There was an error!", error);
           });
+          isSuccess = true;
+        }
+      } catch (error) {
+        isSuccess = false;
+        console.error("There was an error!", error);
       }
 
       this.totalBayar = 0;
       this.detailTransaksi.splice(0);
 
-      return isSuccess
+      return isSuccess;
     },
   },
 });

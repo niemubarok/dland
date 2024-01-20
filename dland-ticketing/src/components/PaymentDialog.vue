@@ -174,19 +174,25 @@ const onDialogHide = () => {
 };
 
 const onEnter = async () => {
-  // console.log(removeDot(transaksiStore().bayar));
+  console.log(transaksiStore().detailTransaksi);
   if (
     removeDot(transaksiStore().bayar) > 0 &&
     removeDot(transaksiStore().bayar) >= removeDot(transaksiStore().totalBayar)
   ) {
-     const store = await transaksiStore().insertIntoDB();
-     console.log(store);
+    console.log(transaksiStore().detailTransaksi);
+    window.electron.createPDFStruk(
+      "DLAND",
+      JSON.stringify(transaksiStore().detailTransaksi)
+    );
+    const store = await transaksiStore().insertIntoDB();
+    console.log("store", store);
     //  if(store){
-      $q.notify({
-        message:"Pembayaran Berhasil",
-        color:'green',
-        position:'top'
-      })
+    window.electron.print();
+    $q.notify({
+      message: "Pembayaran Berhasil",
+      color: "green",
+      position: "top",
+    });
     //  }
     //  else{
     //   $q.notify({
@@ -195,12 +201,6 @@ const onEnter = async () => {
     //     position:'top'
     //   })
     //  }
-    console.log(transaksiStore().detailTransaksi);
-    window.electron.createPDFStruk(
-      "DLAND",
-      JSON.stringify(transaksiStore().detailTransaksi)
-    );
-    window.electron.print();
     transaksiStore().bayar = 0;
     transaksiStore().totalBayar = 0;
     transaksiStore().kembalian = 0;

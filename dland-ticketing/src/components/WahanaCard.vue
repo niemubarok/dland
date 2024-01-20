@@ -66,7 +66,11 @@ const onClickWahana = () => {
     tarif: props.tarif,
     total_bayar: props.tarif,
   });
+
+  console.log("data di wahanacard", data.value);
   transaksiStore().addTransaksi(data.value);
+
+  transaksiStore().detailTransaksi;
 };
 
 // onUpdated(() => {

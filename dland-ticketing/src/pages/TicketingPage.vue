@@ -16,7 +16,7 @@
           Depok Fantasy Land
         </div>
         <div class="text-body text-weight-bolder text-white text-start q-px-md">
-          {{ ls.get("petugas")?.nama }} 
+          {{ ls.get("petugas")?.nama }}
           <Clock />
         </div>
       </q-card>
@@ -154,6 +154,7 @@ const selectAllWahana = () => {
     data.value.tarif = wahana.harga_tiket;
     data.value.total_bayar = wahana.harga_tiket * qty.value;
 
+    console.log("test", data.value);
     transaksiStore().detailTransaksi.push(data.value);
     qtyDialog.value = false;
   });
@@ -171,9 +172,7 @@ const selectAllWahana = () => {
 //   // transaksiStore().addTransaksi();
 // };
 
-onBeforeMount(() => {
-
-});
+onBeforeMount(() => {});
 
 onMounted(async () => {
   if (!ls.get("petugas")) {

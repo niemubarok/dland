@@ -1,4 +1,5 @@
 import { contextBridge } from "electron";
+import ls from "localstorage-slim";
 import {
   print as printUnix,
   getPrinters as getUnixPrinters,
@@ -48,58 +49,64 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     plugins: [autoTable],
   });
 
+  const pageWidth = pdf.internal.pageSize.width;
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(10);
   pdf.text(nama_perusahaan, pdf.internal.pageSize.width / 2, 5, {
     align: "center",
   });
-  pdf.text("Depok Fantasy Land", pdf.internal.pageSize.width / 2, 10, {
+
+  pdf.text("Tiket", pdf.internal.pageSize.width / 2, 9, {
     align: "center",
   });
 
+  pdf.setFontSize(6);
+  const petugas = ls.get("petugas").nama;
+  const waktu = new Date().toLocaleString("id-ID");
+  pdf.text(`petugas:${petugas}`, 5, 11, { align: "left" });
+  pdf.text(waktu, pageWidth - 5, 11, { align: "right" });
+
   pdf.line(5, 12, pdf.internal.pageSize.width - 5, 12); // Draw a line at y = 12 mm from the left margin to the right margin
-  const headers = ["Wahana", "Qty", "Harga", "        "];
+  const headers = {
+    wahana: "Wahana",
+    qty: "Qty",
+    harga: "Harga",
+    ceklis: "Ceklis",
+  };
   const rows = Object.values(JSON.parse(transaksi)).map((item) => [
     item.nama,
     item.qty,
     formatCurrency(item.total_bayar),
-    '..............',
-
+    ".............", // Ganti dengan data sesuai kebutuhan
   ]);
-
-  // console.log(transaksi);
-  // return
 
   const autoTableOptions = {
     startY: 13,
     head: [headers],
     body: rows,
-    tableWidth: "auto",
+    showFoot: "never",
+    tableWidth: pdf.internal.pageSize.getWidth() - 5,
+    margin: { left: 5, right: 10 },
     theme: "plain",
+    didParseCell: (hookData) => {
+      if (hookData.section === "head") {
+        if (hookData.column.dataKey === "qty") {
+          hookData.cell.styles.halign = "center";
+        }
+      }
+    },
+    headStyles: { halign: "left", cellWidth: "auto", fontSize: 8 },
     columnStyles: {
       0: { halign: "left", cellWidth: "auto" },
-      1: { halign: "center" },
-      2: { halign: "right", cellWidth: "auto" },
-      3: { halign: "right", cellWidth: "auto" },
+      1: { halign: "center", cellWidth: "auto" },
+      2: { halign: "left", cellWidth: "auto" },
+      3: { halign: "left", cellWidth: "auto" },
     },
     styles: {
-      fontSize: 10, // Set the font size to 6
+      fontSize: 10,
       cellPadding: { top: 0, right: 0, bottom: 0, left: 0 },
       minCellHeight: 4,
-      // fillColor: [255, 255, 255],
-      // textColor: [0, 0, 0],
-      // margin: { top: 0, left: -5, right: 20, bottom: 0 },
-      // valign: "middle",
-      // halign: "left",
-      // marginLeft: 0,
-      // marginRight: 10,
     },
-    // headStyles: {
-    //   fillColor: [0, 0, 0],
-    //   textColor: [255, 255, 255],
-    //   fontSize: 7,
-    //   halign: "center",
-    // },
   };
 
   pdf.autoTable(autoTableOptions);
@@ -120,11 +127,10 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   console.log(totalBayar);
   const totalBayarText = `Total Bayar `;
   const totalBayarValue = `${formatCurrency(totalBayar)}`;
-  const pageWidth = pdf.internal.pageSize.width;
 
   pdf.setFont("helvetica");
   pdf.setFontSize(10);
-  pdf.text(totalBayarText, 10, pdf.autoTable.previous.finalY + 5, {
+  pdf.text(totalBayarText, 5, pdf.autoTable.previous.finalY + 5, {
     align: "left",
   });
   pdf.setFont("helvetica", "bold");
@@ -132,7 +138,7 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     totalBayarValue,
     pageWidth -
       pdf.getStringUnitWidth(totalBayarValue) * pdf.internal.getFontSize() +
-      17,
+      20,
     pdf.autoTable.previous.finalY + 5,
     {
       align: "right",
@@ -194,7 +200,7 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   });
 };
 async function printStruk() {
-  getWindowsPrinters().then(console.log)
+  getWindowsPrinters().then(console.log);
   // return
 
   const outputFilePath = path.resolve(
@@ -202,17 +208,15 @@ async function printStruk() {
     process.env.QUASAR_PUBLIC_FOLDER + "/struk/struk.pdf"
   );
 
-
   console.log(process.platform);
   if (process.platform === "win32") {
     await fs.promises.access(outputFilePath, fs.constants.F_OK);
-    await printWindows(outputFilePath,printerOption ).then(console.log);
+    await printWindows(outputFilePath, printerOption).then(console.log);
     // getWindowsDefaultPrinter().then((printer) => console.log(printer));
   } else {
     getUnixDefaultPrinter().then((printer) => console.log(printer));
   }
   // return;
-  
 
   // console.log(outputFilePath);
   // try {

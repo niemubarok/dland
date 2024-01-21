@@ -173,6 +173,7 @@ const selectAllWahana = () => {
 const pilihPaket = async (paket) => {
   wahanaStore().pilihPaket(paket, wahanaStore().daftarWahana);
   const store = await transaksiStore().insertIntoDB();
+  transaksiStore().isPaket = true;
 
   const data = {
     transaksi: transaksiStore().detailTransaksi,

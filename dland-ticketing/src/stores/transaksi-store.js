@@ -18,6 +18,7 @@ export const transaksiStore = defineStore("transaksi", {
     no_whatsapp: ref(0),
     saldo: ref(),
     isShowPaymentDialog: ref(false),
+    isPaket: ref(false),
   }),
 
   getters: {

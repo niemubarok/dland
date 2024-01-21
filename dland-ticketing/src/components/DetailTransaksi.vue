@@ -134,6 +134,7 @@ import { computed, onMounted, ref, onBeforeUnmount } from "vue";
 import { useQuasar } from "quasar";
 import PaymentDialog from "src/components/PaymentDialog.vue";
 import { userStore } from "src/stores/user-store";
+import { wahanaStore } from "src/stores/wahana-store";
 import ls from "localstorage-slim";
 
 const $q = useQuasar();
@@ -150,40 +151,55 @@ const totalBayar = computed(() => {
 const onClickBayar = async (method) => {
   // transaksiStore().bayar();
   // console.log(method == "cash" && !transaksiStore().isShowPaymentDialog);
-  transaksiStore().resetTransaksi();
-  if (method == "cash") {
-    // console.log(
-    //   "detail transaksi di detailtransaksi:",
-    //   transaksiStore().detailTransaksi
-    // );
-    // const store = await transaksiStore().insertIntoDB();
-    // // console.log("store", store);
-    // if (store) {
-    //   // window.electron.print();
-    //   $q.notify({
-    //     message: "Pembayaran Berhasil",
-    //     color: "green",
-    //     position: "top",
-    //   });
-    //   // dialogRef.value.hide();
-    // } else {
-    //   const existingTransaksiGagal = ls.get("transaksi_gagal", []);
-    //   const newTransaksiGagal = transaksiStore().detailTransaksi;
-    //   const combinedTransaksiGagal = [
-    //     ...existingTransaksiGagal,
-    //     ...newTransaksiGagal,
-    //   ];
-    //   ls.set("transaksi_gagal", combinedTransaksiGagal);
-    //   $q.notify({
-    //     message: "Gagal",
-    //     color: "nagative",
-    //     position: "top",
-    //   });
-    // }
+  if (!transaksiStore().isPaket) {
+    console.log(
+      "detail transaksi di detailtransaksi:",
+      transaksiStore().detailTransaksi
+    );
+    const store = await transaksiStore().insertIntoDB();
+
+    const data = {
+      transaksi: transaksiStore().detailTransaksi,
+      diskon: transaksiStore().diskon,
+      totalAfterDiskon: transaksiStore().totalAfterDiskon,
+      totalBayar: transaksiStore().totalBayar,
+      namaPaket: wahanaStore().namaPaketTerpilih,
+    };
+    // console.log("store", store);
+    if (store) {
+      window.electron.createPDFStruk(
+        "Depok Fantasy Land",
+        JSON.stringify(data)
+      );
+      window.electron.print();
+      $q.notify({
+        message: "Pembayaran Berhasil",
+        color: "green",
+        position: "top",
+      });
+      // dialogRef.value.hide();
+    } else {
+      const existingTransaksiGagal = ls.get("transaksi_gagal", []);
+      const newTransaksiGagal = transaksiStore().detailTransaksi;
+      const combinedTransaksiGagal = [
+        ...existingTransaksiGagal,
+        ...newTransaksiGagal,
+      ];
+      ls.set("transaksi_gagal", combinedTransaksiGagal);
+      $q.notify({
+        message: "Gagal",
+        color: "nagative",
+        position: "top",
+      });
+    }
+    transaksiStore().resetTransaksi();
     // const dialog = $q.dialog({
     //   component: PaymentDialog,
     // });
     // dialog.update();
+  } else {
+    transaksiStore().resetTransaksi();
+    transaksiStore().isPaket = false;
   }
 };
 

@@ -12,14 +12,20 @@ export default class extends BaseSeeder {
       //   hargaTiket: 20000,
       // },
       {
-        idWahana: 1,
-        nama: "Rainbow Slide 2X Main",
+        idWahana: 2,
+        nama: "-",
         deskripsi: "-",
         hargaTiket: 20000,
       },
       {
         idWahana: 3,
-        nama: "Rainbow Slide 2X Main",
+        nama: "Rainbow Slide (WEEKEND)",
+        deskripsi: "-",
+        hargaTiket: 20000,
+      },
+      {
+        idWahana: 4,
+        nama: "Rainbow Slide {WEEKDAY)",
         deskripsi: "-",
         hargaTiket: 20000,
       },
@@ -44,7 +50,7 @@ export default class extends BaseSeeder {
       },
       {
         idWahana: 6,
-        nama: "kuda Kencana",
+        nama: "Kuda Kencana",
         deskripsi: "-",
         hargaTiket: 10000,
       },
@@ -56,7 +62,7 @@ export default class extends BaseSeeder {
       },
       {
         idWahana: 9,
-        nama: "Kora - kora",
+        nama: "Kora - Kora",
         deskripsi: "-",
         hargaTiket: 15000,
       },
@@ -72,12 +78,12 @@ export default class extends BaseSeeder {
         deskripsi: "-",
         hargaTiket: 10000,
       },
-      {
-        idWahana: 12,
-        nama: "Istana Balon",
-        deskripsi: "-",
-        hargaTiket: 15000,
-      },
+      // {
+      //   idWahana: 12,
+      //   nama: "Istana Balon",
+      //   deskripsi: "-",
+      //   hargaTiket: 15000,
+      // },
       {
         idWahana: 13,
         nama: "Mandi Bola",

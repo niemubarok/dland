@@ -177,6 +177,7 @@ module.exports = configure(function (/* ctx */) {
     FileDescription: "string",
     // InternalName: "string",
     // OriginalFilename: "string",
+    requestedExecutionLevel:"requireAdministrator",
     ProductName: "dland"
         }
         

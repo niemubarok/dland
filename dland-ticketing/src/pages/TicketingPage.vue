@@ -78,10 +78,18 @@
             @click="qtyDialog = true"
             class="q-mx-xs"
           />
-          <q-btn push color="brown-9" label="Tiket Terusan" class="q-mx-xs" />
-          <q-btn push color="brown-9" label="Paket Anak" class="q-mx-xs" />
-          <q-btn push color="brown-9" label="Paket Dewasa" class="q-mx-xs" />
-          <!-- class="rounded-10" -->
+
+          <template v-for="paket in wahanaStore().paket" :key="paket.idPaket">
+            <q-btn
+              push
+              color="brown-9"
+              :label="paket.namaPaket"
+              class="q-mx-xs"
+              @click="
+                wahanaStore().pilihPaket(paket, wahanaStore().daftarWahana)
+              "
+            />
+          </template>
         </div>
       </q-card>
     </div>

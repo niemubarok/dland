@@ -86,6 +86,7 @@ export const transaksiStore = defineStore("transaksi", {
       this.detailTransaksi.splice(0);
       this.diskon = 0;
       this.totalAfterDiskon = 0;
+      this.totalBayar = 0;
     },
     async insertIntoDB() {
       const status = "1";
@@ -107,8 +108,7 @@ export const transaksiStore = defineStore("transaksi", {
             },
           });
           isSuccess = true;
-          this.totalBayar = 0;
-          this.detailTransaksi.splice(0);
+          // this.detailTransaksi.splice(0);
           return isSuccess;
         }
       } catch (error) {

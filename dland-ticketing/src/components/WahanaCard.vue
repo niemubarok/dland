@@ -56,7 +56,9 @@ const props = defineProps({
 
 const qty = computed(() => {
   return transaksiStore().detailTransaksi.length
-    ? transaksiStore().detailTransaksi.find((item) => item.id === props.id)?.qty
+    ? transaksiStore().detailTransaksi.find(
+        (item) => item.id_wahana === props.id
+      )?.qty
     : 0;
 });
 const onClickWahana = () => {

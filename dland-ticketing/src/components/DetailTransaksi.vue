@@ -134,6 +134,7 @@ import { computed, onMounted, ref, onBeforeUnmount } from "vue";
 import { useQuasar } from "quasar";
 import PaymentDialog from "src/components/PaymentDialog.vue";
 import { userStore } from "src/stores/user-store";
+import ls from "localstorage-slim";
 
 const $q = useQuasar();
 const totalBayar = computed(() => {
@@ -146,21 +147,43 @@ const totalBayar = computed(() => {
   return total;
 });
 
-const onClickBayar = (method) => {
+const onClickBayar = async (method) => {
   // transaksiStore().bayar();
   // console.log(method == "cash" && !transaksiStore().isShowPaymentDialog);
-
-  if (method == "cash" && !transaksiStore().isShowPaymentDialog) {
-    console.log(
-      "detail transaksi di detailtransaksi:",
-      transaksiStore().detailTransaksi
-    );
-    transaksiStore().isShowPaymentDialog = true;
-    const dialog = $q.dialog({
-      component: PaymentDialog,
-    });
-
-    dialog.update();
+  transaksiStore().resetTransaksi();
+  if (method == "cash") {
+    // console.log(
+    //   "detail transaksi di detailtransaksi:",
+    //   transaksiStore().detailTransaksi
+    // );
+    // const store = await transaksiStore().insertIntoDB();
+    // // console.log("store", store);
+    // if (store) {
+    //   // window.electron.print();
+    //   $q.notify({
+    //     message: "Pembayaran Berhasil",
+    //     color: "green",
+    //     position: "top",
+    //   });
+    //   // dialogRef.value.hide();
+    // } else {
+    //   const existingTransaksiGagal = ls.get("transaksi_gagal", []);
+    //   const newTransaksiGagal = transaksiStore().detailTransaksi;
+    //   const combinedTransaksiGagal = [
+    //     ...existingTransaksiGagal,
+    //     ...newTransaksiGagal,
+    //   ];
+    //   ls.set("transaksi_gagal", combinedTransaksiGagal);
+    //   $q.notify({
+    //     message: "Gagal",
+    //     color: "nagative",
+    //     position: "top",
+    //   });
+    // }
+    // const dialog = $q.dialog({
+    //   component: PaymentDialog,
+    // });
+    // dialog.update();
   }
 };
 

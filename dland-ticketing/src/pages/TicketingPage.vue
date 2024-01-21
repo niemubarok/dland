@@ -85,9 +85,7 @@
               color="brown-9"
               :label="paket.namaPaket"
               class="q-mx-xs"
-              @click="
-                wahanaStore().pilihPaket(paket, wahanaStore().daftarWahana)
-              "
+              @click="pilihPaket(paket)"
             />
           </template>
         </div>
@@ -170,6 +168,44 @@ const selectAllWahana = () => {
   });
   // console.log(data.value);
   // transaksiStore().addTransaksi(data.value);
+};
+
+const pilihPaket = async (paket) => {
+  wahanaStore().pilihPaket(paket, wahanaStore().daftarWahana);
+  const store = await transaksiStore().insertIntoDB();
+
+  const data = {
+    transaksi: transaksiStore().detailTransaksi,
+    diskon: transaksiStore().diskon,
+    totalAfterDiskon: transaksiStore().totalAfterDiskon,
+    totalBayar: transaksiStore().totalBayar,
+    namaPaket: wahanaStore().namaPaketTerpilih,
+  };
+  // console.log("store", store);
+  if (store) {
+    window.electron.createPDFStruk("Depok Fantasy Land", JSON.stringify(data));
+    window.electron.print();
+    $q.notify({
+      message: "Berhasil",
+      color: "green",
+      position: "top",
+    });
+
+    // dialogRef.value.hide();
+  } else {
+    const existingTransaksiGagal = ls.get("transaksi_gagal", []);
+    const newTransaksiGagal = transaksiStore().detailTransaksi;
+    const combinedTransaksiGagal = [
+      ...existingTransaksiGagal,
+      ...newTransaksiGagal,
+    ];
+    ls.set("transaksi_gagal", combinedTransaksiGagal);
+    $q.notify({
+      message: "Gagal",
+      color: "nagative",
+      position: "top",
+    });
+  }
 };
 
 // const onClickCash = () => {

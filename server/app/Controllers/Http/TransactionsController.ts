@@ -13,40 +13,71 @@ export default class TransactionsController {
       .replace(/-/g, "/");
     // Retrieve the last transaction number for today and increment it
     const lastTransaction = await Database.query()
-      .from("transactions")
+      .from("transaksi_penjualan")
       .whereRaw("no_transaksi LIKE ?", [`${datePrefix}/%`])
       .orderBy("no_transaksi", "desc")
       .first();
 
-    const transactionNumber = lastTransaction
-      ? parseInt(lastTransaction.no_transaksi.split("/")[2]) + 1
-      : 1;
+    let transactionNumber: number;
+
+    if (lastTransaction) {
+      const lastNumberStr = lastTransaction.no_transaksi.split("/").pop();
+      const lastNumber = lastNumberStr ? parseInt(lastNumberStr) : NaN;
+
+      if (!isNaN(lastNumber)) {
+        transactionNumber = lastNumber + 1;
+      } else {
+        throw new Error("Failed to parse the last transaction number.");
+      }
+    } else {
+      transactionNumber = 1;
+    }
 
     const no_transaksi = `${datePrefix}/${String(transactionNumber).padStart(
       5,
       "0"
     )}`;
-    // return data;
-    const { status, cara_bayar, petugas } = data;
-    const transactionsData = data.transaksi.map((item) => ({
-      no_transaksi,
-      id_wahana: item.id_wahana,
-      qty: item.qty,
-      id_cara_bayar: cara_bayar,
-      total_bayar: item.total_bayar,
-      petugas,
-      status,
-      created_at: new Date(),
-      updated_at: new Date(),
-    }));
+    // console.log(transactionNumber);
+
+    // return no_transaksi;
+    const { status, cara_bayar, petugas, diskon, totalAfterDiskon, total } =
+      data;
+    const transactionsData = data.transaksi.map(
+      (item: { id_wahana: any; qty: any; total_bayar: any }) => ({
+        no_transaksi,
+        id_wahana: item.id_wahana,
+        qty: item.qty,
+        // id_cara_bayar: cara_bayar,
+        // total: item.total_bayar,
+        // status,
+        // diskon,
+        // total_bayar: totalAfterDiskon,
+        // petugas,
+        created_at: new Date(),
+        updated_at: new Date(),
+      })
+    );
+
+    // const dataDetailTransaksi = data.transaksi.map(item=>{
+    //   no_transaksi,
+
+    // })
 
     // return transactionsData;
     try {
-      const transactions = await Database.table("transactions").multiInsert(
-        transactionsData
+      const transaksi_penjualan = await Database.rawQuery(
+        `INSERT INTO transaksi_penjualan (no_transaksi, cara_bayar, total, diskon, total_bayar, petugas,status) VALUES ('${no_transaksi}', '${cara_bayar}','${total}','${diskon}', '${totalAfterDiskon}', '${petugas}', '${status}')`
       );
+
+      const detail_transaksi = await Database.table(
+        "detail_transaksi"
+      ).multiInsert(transactionsData);
       // Handle the successful insertion
-      response.status(201).json(transactions);
+      response.status(201).json({
+        message: "Transaction created successfully",
+        transaksi_penjualan,
+        detail_transaksi,
+      });
     } catch (error) {
       // Handle the error
       console.log(error);

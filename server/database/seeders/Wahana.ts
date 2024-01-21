@@ -6,6 +6,12 @@ export default class extends BaseSeeder {
   public async run() {
     await Wahana.createMany([
       {
+        idWahana: 2,
+        nama: "-",
+        deskripsi: "-",
+        hargaTiket: 20000,
+      },
+      {
         idWahana: 3,
         nama: "Rainbow Slide (WEEKEND)",
         deskripsi: "-",
@@ -13,7 +19,7 @@ export default class extends BaseSeeder {
       },
       {
         idWahana: 4,
-        nama: "Rainbow Slide (WEEKDAY)",
+        nama: "Rainbow Slide {WEEKDAY)",
         deskripsi: "-",
         hargaTiket: 15000,
       },
@@ -25,7 +31,7 @@ export default class extends BaseSeeder {
       },
       {
         idWahana: 6,
-        nama: "Komedi Putar",
+        nama: "Kuda Kencana",
         deskripsi: "-",
         hargaTiket: 10000,
       },
@@ -37,13 +43,13 @@ export default class extends BaseSeeder {
       },
       {
         idWahana: 8,
-        nama: "Bungee Jumping",
+        nama: "Trampolin",
         deskripsi: "-",
         hargaTiket: 10000,
       },
       {
         idWahana: 9,
-        nama: "Zampela Flying Boat",
+        nama: "Kora - Kora",
         deskripsi: "-",
         hargaTiket: 15000,
       },
@@ -59,12 +65,12 @@ export default class extends BaseSeeder {
         deskripsi: "-",
         hargaTiket: 10000,
       },
-      {
-        idWahana: 12,
-        nama: "Istana Balon",
-        deskripsi: "-",
-        hargaTiket: 15000,
-      },
+      // {
+      //   idWahana: 12,
+      //   nama: "Istana Balon",
+      //   deskripsi: "-",
+      //   hargaTiket: 15000,
+      // },
       {
         idWahana: 13,
         nama: "Mandi Bola",
@@ -73,7 +79,7 @@ export default class extends BaseSeeder {
       },
       {
         idWahana: 14,
-        nama: "Game Coin",
+        nama: "Wisata Berkuda",
         deskripsi: "-",
         hargaTiket: 5000,
       },

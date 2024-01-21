@@ -179,35 +179,45 @@ const onEnter = async () => {
     removeDot(transaksiStore().bayar) > 0 &&
     removeDot(transaksiStore().bayar) >= removeDot(transaksiStore().totalBayar)
   ) {
-    console.log(transaksiStore().detailTransaksi);
-    window.electron.createPDFStruk(
-      "Depok Fantasy Land",
-      JSON.stringify(transaksiStore().detailTransaksi)
-    );
+    // console.log(transaksiStore().detailTransaksi);
+    const data = {
+      transaksi: transaksiStore().detailTransaksi,
+      diskon: transaksiStore().diskon,
+      totalAfterDiskon: transaksiStore().totalAfterDiskon,
+      totalBayar: transaksiStore().totalBayar,
+    };
+    window.electron.createPDFStruk("Depok Fantasy Land", JSON.stringify(data));
     const store = await transaksiStore().insertIntoDB();
-    // console.log("store", store);
-    //  if(store){
-    window.electron.print();
-    $q.notify({
-      message: "Pembayaran Berhasil",
-      color: "green",
-      position: "top",
-    });
-    //  }
-    //  else{
-    //   $q.notify({
-    //     message:"Gagal",
-    //     color:'nagative',
-    //     position:'top'
-    //   })
-    //  }
+    console.log("store", store);
+    if (store) {
+      window.electron.print();
+      $q.notify({
+        message: "Pembayaran Berhasil",
+        color: "green",
+        position: "top",
+      });
+      dialogRef.value.hide();
+    } else {
+      const existingTransaksiGagal = ls.get("transaksi_gagal", []);
+      const newTransaksiGagal = transaksiStore().detailTransaksi;
+      const combinedTransaksiGagal = [
+        ...existingTransaksiGagal,
+        ...newTransaksiGagal,
+      ];
+      ls.set("transaksi_gagal", combinedTransaksiGagal);
+      $q.notify({
+        message: "Gagal",
+        color: "nagative",
+        position: "top",
+      });
+      dialogRef.value.hide();
+    }
+
     transaksiStore().bayar = 0;
     transaksiStore().totalBayar = 0;
     transaksiStore().kembalian = 0;
     transaksiStore().resetTransaksi();
-
     onDialogOK();
-    dialogRef.value.hide();
   } else {
     $q.notify({
       type: "negative",

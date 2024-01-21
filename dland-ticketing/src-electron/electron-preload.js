@@ -18,6 +18,7 @@ const printerOption = {
 };
 
 import jsPDF from "jspdf";
+import { log } from "console";
 const QRCode = require("qrcode");
 const autoTable = require("jspdf-autotable");
 const fs = require("fs");
@@ -36,12 +37,13 @@ const formatCurrency = (amount) => {
     .replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 
   // Tambahkan simbol mata uang dan hapus desimal
-  formattedAmount = "Rp " + formattedAmount;
+  formattedAmount = formattedAmount;
 
   return formattedAmount;
 };
 
 const createPDFStruk = async (nama_perusahaan, transaksi) => {
+  log(transaksi.totalAfterDiskon);
   const pdf = new jsPDF({
     unit: "mm",
     format: [80, 100],
@@ -75,7 +77,7 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     harga: "Harga",
     ceklis: "Ceklis",
   };
-  const rows = Object.values(JSON.parse(transaksi)).map((item) => [
+  const rows = Object.values(JSON.parse(transaksi).transaksi).map((item) => [
     item.nama,
     item.qty,
     formatCurrency(item.total_bayar),
@@ -90,7 +92,7 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     tableWidth: pdf.internal.pageSize.getWidth() - 5,
     margin: { left: 5, right: 10 },
     theme: "plain",
-    overflow: "ellipsis",
+
     didParseCell: (hookData) => {
       if (hookData.section === "head") {
         if (hookData.column.dataKey === "qty") {
@@ -100,7 +102,7 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     },
     headStyles: { halign: "left", cellWidth: "auto", fontSize: 8 },
     columnStyles: {
-      0: { halign: "left", cellWidth: "auto" },
+      0: { halign: "left", cellWidth: 30 },
       1: { halign: "center", cellWidth: "auto" },
       2: { halign: "left", cellWidth: "auto" },
       3: { halign: "left", cellWidth: "auto" },
@@ -109,6 +111,7 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
       fontSize: 10,
       cellPadding: { top: 0, right: 0, bottom: 0, left: 0 },
       minCellHeight: 4,
+      overflow: "ellipsize",
     },
   };
 
@@ -123,26 +126,71 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   );
 
   // pdf.setFontSize(8);
-  const totalBayar = Object.values(JSON.parse(transaksi)).reduce(
-    (total, item) => total + item.total_bayar,
-    0
-  );
-  console.log(totalBayar);
-  const totalBayarText = `Total Bayar `;
-  const totalBayarValue = `${formatCurrency(totalBayar)}`;
+  // const totalBayar = Object.values(JSON.parse(transaksi)).reduce(
+  //   (total, item) => total + item.total_bayar,
+  //   0
+  // );
+  // console.log(totalBayar);
+  const totalText = `Total`;
+  const totalValue = `${formatCurrency(JSON.parse(transaksi).totalBayar)}`;
+  const diskonText = "Diskon";
+  const diskonTextValue = `${formatCurrency(JSON.parse(transaksi).diskon)}`;
+  const totalBayarText = "Total Bayar";
+  const totalBayarValue = `${formatCurrency(
+    JSON.parse(transaksi).totalAfterDiskon
+  )}`;
 
   pdf.setFont("helvetica");
-  pdf.setFontSize(10);
-  pdf.text(totalBayarText, 5, pdf.autoTable.previous.finalY + 5, {
+  pdf.setFontSize(8);
+  pdf.text(totalText, 5, pdf.autoTable.previous.finalY + 5, {
     align: "left",
   });
+  pdf.text(diskonText, 5, pdf.autoTable.previous.finalY + 9, {
+    align: "left",
+  });
+  pdf.text(totalBayarText, 5, pdf.autoTable.previous.finalY + 14, {
+    align: "left",
+  });
+
   pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(8);
+
+  //RP
+  pdf.text("Rp", pageWidth - 40, pdf.autoTable.previous.finalY + 5, {
+    align: "right",
+    styles: { "text-decoration": "line-through" },
+  });
+  pdf.text("Rp", pageWidth - 40, pdf.autoTable.previous.finalY + 9, {
+    align: "right",
+  });
+  pdf.setFontSize(10);
+  pdf.text("Rp", pageWidth - 40, pdf.autoTable.previous.finalY + 14, {
+    align: "right",
+  });
+
+  //value
+  pdf.text(totalValue, pageWidth - 25, pdf.autoTable.previous.finalY + 5, {
+    align: "right",
+  });
+
+  if (JSON.parse(transaksi).diskon > 0) {
+    pdf.setDrawColor(0);
+    pdf.setLineWidth(0.3);
+    pdf.line(
+      pageWidth - 25,
+      pdf.autoTable.previous.finalY + 4,
+      pageWidth - 45,
+      pdf.autoTable.previous.finalY + 4
+    ); // Draw line through text
+  }
+  pdf.text(diskonTextValue, pageWidth - 25, pdf.autoTable.previous.finalY + 9, {
+    align: "right",
+  });
+  pdf.setFontSize(10);
   pdf.text(
     totalBayarValue,
-    pageWidth -
-      pdf.getStringUnitWidth(totalBayarValue) * pdf.internal.getFontSize() +
-      20,
-    pdf.autoTable.previous.finalY + 5,
+    pageWidth - 25,
+    pdf.autoTable.previous.finalY + 14,
     {
       align: "right",
     }
@@ -185,7 +233,7 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   pdf.text(
     "Terimakasih atas kunjungan anda",
     pdf.internal.pageSize.width / 2,
-    pdf.autoTable.previous.finalY + 15,
+    pdf.autoTable.previous.finalY + 18,
     { align: "center" }
   );
 

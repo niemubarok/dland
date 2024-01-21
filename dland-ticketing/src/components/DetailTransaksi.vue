@@ -66,17 +66,46 @@
         </tr>
       </template>
     </q-virtual-scroll>
-    <div class="flex row justify-between q-px-sm glass-dark q-py-md">
-      <span class="text-weight-bolder text-h6 text-white"> Total Bayar </span>
-      <span class="text-weight-bolder text-h5 text-white q-mr-sm">{{
-        totalBayar
-          .toLocaleString("id-ID", {
+    <div class="flex row justify-between q-px-sm glass-dark">
+      <span class="text-h6 text-white"> Total </span>
+      <span
+        class="text-weight-bolder text-h6 text-white q-mr-sm"
+        :style="
+          transaksiStore().diskon > 0 ? 'text-decoration:line-through' : ''
+        "
+        >{{
+          totalBayar
+            .toLocaleString("id-ID", {
+              style: "currency",
+              currency: "IDR",
+            })
+            .split(",")[0]
+        }}</span
+      >
+    </div>
+    <div class="flex row justify-between q-px-sm glass-dark q-py-sm">
+      <span class="text-h6 text-white"> Diskon </span>
+      <span class="text-h6 text-white q-mr-sm">{{
+        transaksiStore()
+          .diskon.toLocaleString("id-ID", {
             style: "currency",
             currency: "IDR",
           })
           .split(",")[0]
       }}</span>
     </div>
+    <div class="flex row justify-between q-px-sm glass-dark">
+      <span class="text-h6 text-white"> Total Bayar </span>
+      <span class="text-weight-bolder text-h5 text-white q-mr-sm">{{
+        transaksiStore()
+          .totalAfterDiskon.toLocaleString("id-ID", {
+            style: "currency",
+            currency: "IDR",
+          })
+          .split(",")[0]
+      }}</span>
+    </div>
+
     <!-- </q-card-section> -->
     <q-card-actions align="center">
       <!-- <q-btn
@@ -113,6 +142,7 @@ const totalBayar = computed(() => {
     0
   );
   transaksiStore().totalBayar = total;
+  transaksiStore().totalAfterDiskon = total - transaksiStore().diskon;
   return total;
 });
 

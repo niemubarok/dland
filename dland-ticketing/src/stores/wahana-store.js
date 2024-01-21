@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { api } from "boot/axios";
 import { ref } from "vue";
+import { transaksiStore } from "./transaksi-store";
 
 export const wahanaStore = defineStore("wahana", {
   state: () => ({
@@ -73,6 +74,40 @@ export const wahanaStore = defineStore("wahana", {
     // ],
 
     daftarWahana: ref([]),
+    paket: ref([
+      {
+        idPaket: 1,
+        namaPaket: "Paket Terusan",
+        hargaPaket: 75000,
+        diskon: 35000,
+        status: true,
+        idWahana: [0, 3, 5, 6, 7, 8, 9, 10, 11, 13],
+      },
+      // {
+      //   idPaket: 2,
+      //   namaPaket: "Paket Terusan (WeekDay)",
+      //   hargaPaket: 75000,
+      //   diskon: 30000,
+      //   status: true,
+      //   idWahana: [0,4, 5, 6, 7, 8, 9, 10, 11, 13],
+      // },
+      {
+        idPaket: 3,
+        namaPaket: "Paket Anak",
+        hargaPaket: 50000,
+        diskon: 15000,
+        status: true,
+        idWahana: [0, 6, 8, 10, 11, 7, 13],
+      },
+      {
+        idPaket: 4,
+        namaPaket: "Paket Dewasa",
+        hargaPaket: 30000,
+        diskon: 5000,
+        status: true,
+        idWahana: [0, 4, 5, 6, 7, 8, 9, 10, 11, 13],
+      },
+    ]),
   }),
 
   getters: {
@@ -84,11 +119,58 @@ export const wahanaStore = defineStore("wahana", {
   actions: {
     async getWahanaFromDB() {
       const res = await api.get("wahana");
-      this.daftarWahana.splice(0,...res.data);
-      // console.log(res.data);
+      this.daftarWahana.splice(0, ...res.data);
+      console.log(res.data);
     },
-    increment() {
-      this.counter++;
+    pilihPaket(paket, daftarWahana) {
+      console.log("paket", paket);
+      // Mendapatkan array wahana yang sesuai dengan paket dari daftarWahana
+      const wahanaTerpilih = daftarWahana.filter((wahana) =>
+        paket.idWahana.includes(wahana.id_wahana)
+      );
+
+      console.log("wahana terpilih", wahanaTerpilih);
+
+      // Menghitung total harga tiket untuk paket
+      const totalHarga = wahanaTerpilih.reduce(
+        (total, wahana) => total + parseFloat(wahana.harga_tiket),
+        0
+      );
+
+      // Menentukan diskon
+      const diskon = paket.diskon;
+      transaksiStore().diskon = diskon;
+
+      // Menentukan status (misalnya, status selalu true)
+      const status = true;
+
+      // Membuat objek paket
+      const paketObj = {
+        idPaket: 2,
+        namaPaket: "Paket Terusan (WeekDay)",
+        hargaPaket: totalHarga,
+        diskon: diskon,
+        status: status,
+        idWahana: paket,
+      };
+
+      // Membuat array detail transaksi berdasarkan wahana terpilih
+      const pushWahana = wahanaTerpilih.map((wahana) => {
+        return {
+          id_wahana: wahana.id_wahana.toString(),
+          nama: wahana.nama,
+          tarif: parseFloat(wahana.harga_tiket),
+          total_bayar: parseFloat(wahana.harga_tiket),
+          qty: 1,
+        };
+      });
+
+      transaksiStore().detailTransaksi.push(...pushWahana);
+
+      // return {
+      //   paket: paket,
+      //   detailTransaksi: detailTransaksi,
+      // };
     },
   },
 });

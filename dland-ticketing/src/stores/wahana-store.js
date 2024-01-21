@@ -120,7 +120,8 @@ export const wahanaStore = defineStore("wahana", {
   actions: {
     async getWahanaFromDB() {
       const res = await api.get("wahana");
-      this.daftarWahana.splice(0, ...res.data);
+      this.daftarWahana.splice(0, this.daftarWahana.length, ...res.data);
+
       console.log(res.data);
     },
     pilihPaket(paket, daftarWahana) {

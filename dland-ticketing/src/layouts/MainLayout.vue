@@ -79,21 +79,21 @@ const essentialLinks = [
     title: "Ticketing",
     caption: "Penjualan Tiket",
     icon: "receipt",
-    to: "/ticketing",
+    to: "/",
   },
 
-  {
-    title: "Top Up",
-    caption: "Top Up Saldo Tiket",
-    icon: "add",
-    link: "/topup",
-  },
-  {
-    title: "QRCode Scanner",
-    caption: "Scan QrCode Tiket ",
-    icon: "qr_code",
-    link: "/qrcode",
-  },
+  // {
+  //   title: "Top Up",
+  //   caption: "Top Up Saldo Tiket",
+  //   icon: "add",
+  //   link: "/topup",
+  // },
+  // {
+  //   title: "QRCode Scanner",
+  //   caption: "Scan QrCode Tiket ",
+  //   icon: "qr_code",
+  //   link: "/qrcode",
+  // },
   {
     title: "Settings",
     caption: "Konfigurasi aplikasi",

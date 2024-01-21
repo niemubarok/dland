@@ -38,5 +38,11 @@ Route.group(() => {
     Route.post("/login", "UsersController.login");
   }).prefix("petugas");
 
+  Route.group(() => {
+    Route.get("/kunjungan", "ReportsController.kunjungan");
+    Route.get("/pendapatan", "ReportsController.pendapatan");
+    Route.get("/wahana", "ReportsController.wahana");
+  }).prefix("reports");
+
   Route.post("/transaksi", "TransactionsController.create");
 }).prefix("api");

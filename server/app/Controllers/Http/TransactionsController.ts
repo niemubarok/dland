@@ -7,6 +7,7 @@ export default class TransactionsController {
   public async create({ request, response }: HttpContextContract) {
     const data = request.body().data;
     // return data;
+    // const datePrefix = "2024/01/20";
     const datePrefix = new Date()
       .toISOString()
       .split("T")[0]

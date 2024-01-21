@@ -9,18 +9,17 @@
         <CardNumber
           :caption="data.caption"
           :number="data.number"
+          :icon="data.icon"
           class="col-md col-xs-11 q-my-sm q-mx-sm"
           style="height: 20vh"
         />
       </template>
     </div>
     <div class="row">
-      <!-- style="width: 60vw" -->
       <BarChart
         class="col q-ma-md"
         :chart-data="chartStore().kunjunganPerBulan"
       />
-      <!-- style="width: 60vw" -->
       <BarChart
         class="col q-ma-md"
         :chart-data="chartStore().kunjunganPerMinggu"
@@ -30,13 +29,27 @@
 </template>
 
 <script setup>
-import { defineComponent } from "vue";
+import { ref, onMounted, watch } from "vue";
 import GrowingNumber from "src/components/GrowingNumber.vue";
 import CardNumber from "src/components/CardNumber.vue";
 import BarChart from "src/components/BarChart.vue";
 import { chartStore } from "src/stores/chart-store";
+import { reportStore } from "src/stores/report-store";
 
-const dataPenjualan = [
+const totalPendapatan = ref(0);
+const pendapatanPerHari = ref(0);
+const pendapatanPerBulan = ref(0);
+
+onMounted(async () => {
+  const pendapatan = await reportStore().getPendapatan();
+
+  totalPendapatan.value = pendapatan.totalPendapatan;
+  pendapatanPerHari.value = pendapatan.pendapatanPerHari;
+  pendapatanPerBulan.value = pendapatan.pendapatanPerBulan;
+});
+
+// Menggunakan komputasi dinamis untuk properti number
+const dataPenjualan = ref([
   {
     caption: "Jumlah Wahana",
     number: 10,
@@ -54,13 +67,17 @@ const dataPenjualan = [
   },
   {
     caption: "Pendapatan / Hari ",
-    number: 31000000,
+    get number() {
+      return pendapatanPerHari.value;
+    },
     icon: "trending_up",
   },
   {
     caption: "Pendapatan / Bulan ",
-    number: 5000000000,
+    get number() {
+      return pendapatanPerBulan.value;
+    },
     icon: "trending_up",
   },
-];
+]);
 </script>

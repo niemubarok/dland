@@ -81,7 +81,7 @@ export const wahanaStore = defineStore("wahana", {
         hargaPaket: 75000,
         diskon: 35000,
         status: true,
-        idWahana: [0, 3, 5, 6, 7, 8, 9, 10, 11, 13],
+        idWahana: [0, 3, 5, 6, 7, 8, 9, 10, 11,12, 13],
       },
       // {
       //   idPaket: 2,
@@ -94,10 +94,10 @@ export const wahanaStore = defineStore("wahana", {
       {
         idPaket: 3,
         namaPaket: "Paket Anak",
-        hargaPaket: 50000,
+        hargaPaket: 65000,
         diskon: 15000,
         status: true,
-        idWahana: [ 6, 8, 10, 11, 7, 13],
+        idWahana: [ 6, 8, 10, 11, 7, 12, 13],
       },
       {
         idPaket: 4,

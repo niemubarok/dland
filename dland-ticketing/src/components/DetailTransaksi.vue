@@ -165,7 +165,7 @@ const onClickBayar = (method) => {
 };
 
 const handleKeyDownOnDetailTransaksi = (event) => {
-  console.log(transaksiStore().isShowPaymentDialog);
+  // console.log(transaksiStore().isShowPaymentDialog);
 
   if (
     event.key === "Enter" &&

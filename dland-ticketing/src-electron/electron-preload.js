@@ -59,7 +59,7 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   });
 
   pdf.setFont("helvetica");
-  pdf.setFontSize(8);
+  pdf.setFontSize(13);
 
   console.log();
   if(JSON.parse(transaksi).namaPaket){
@@ -118,10 +118,10 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
       3: { halign: "left", cellWidth: "auto" },
     },
     styles: {
-      fontSize: 10,
+      fontSize: 12,
       cellPadding: { top: 0, right: 0, bottom: 0, left: 0 },
       minCellHeight: 4,
-      overflow: "ellipsize",
+      overflow: "linebreak",
     },
   };
 

@@ -163,7 +163,7 @@ const onClickBayar = async (method) => {
       diskon: transaksiStore().diskon,
       totalAfterDiskon: transaksiStore().totalAfterDiskon,
       totalBayar: transaksiStore().totalBayar,
-      namaPaket: wahanaStore().namaPaketTerpilih,
+      namaPaket:"Tiket",
     };
     // console.log("store", store);
     if (store) {

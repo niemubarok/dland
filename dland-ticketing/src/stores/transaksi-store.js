@@ -88,12 +88,26 @@ export const transaksiStore = defineStore("transaksi", {
       this.diskon = 0;
       this.totalAfterDiskon = 0;
       this.totalBayar = 0;
+      this.isPaket = false;
     },
     async insertIntoDB() {
       const status = "1";
       const cara_bayar = "cash";
       const petugas = ls.get("petugas")?.nama;
       let isSuccess = false;
+      
+    //  const data= {
+    //     cara_bayar,
+    //     status,
+    //     petugas,
+    //     diskon: this.diskon,
+    //     totalAfterDiskon: this.totalAfterDiskon,
+    //     transaksi: this.detailTransaksi,
+    //     total: this.totalBayar,
+    //   }
+
+      // console.log("data",data);
+      // return
 
       try {
         if (this.detailTransaksi.length) {

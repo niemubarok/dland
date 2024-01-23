@@ -1,1 +1,1 @@
-node ace serve
+node ace serve --watch

@@ -189,8 +189,57 @@ export default class ReportsController {
     });
   }
 
-  public async store({}: HttpContextContract) {}
+  public async fix({ response }: HttpContextContract) {
+    const currentDate = "2024-01-22"; 
+    const totalHargaTiketRows = await Database.rawQuery(
+      `
+        SELECT 
+            dt.no_transaksi,
+            SUM(mw.harga_tiket * dt.qty) AS total_harga
+        FROM 
+            detail_transaksi dt
+        JOIN 
+            master_wahana mw ON dt.id_wahana = mw.id_wahana
+        WHERE 
+            TO_DATE(SUBSTRING(dt.no_transaksi FROM 1 FOR 10), 'YYYY/MM/DD') = ?
+        GROUP BY 
+            dt.no_transaksi
+    `,
+      [currentDate]
+    );
 
+    for (const row of totalHargaTiketRows.rows) {
+      const noTransaksi = row.no_transaksi;
+      const totalHarga = parseFloat(row.total_harga);
+
+      // Ambil nilai diskon dari tabel transaksi_penjualan
+      const diskonResult = await Database.rawQuery(
+        `
+            SELECT diskon
+            FROM transaksi_penjualan
+            WHERE no_transaksi = ?
+        `,
+        [noTransaksi]
+      );
+
+      if (diskonResult.rows.length > 0) {
+        const diskon = parseFloat(diskonResult.rows[0].diskon);
+
+        // Hitung total_bayar (total_harga - diskon)
+        const totalBayar = totalHarga - diskon;
+
+        // Update tabel transaksi_penjualan
+        await Database.rawQuery(
+          `
+                UPDATE transaksi_penjualan
+                SET total = ?, total_bayar = ?
+                WHERE no_transaksi = ?
+            `,
+          [totalHarga, totalBayar, noTransaksi]
+        );
+      }
+    }
+  }
   public async show({}: HttpContextContract) {}
 
   public async edit({}: HttpContextContract) {}

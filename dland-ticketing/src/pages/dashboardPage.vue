@@ -16,14 +16,14 @@
       </template>
     </div>
     <div class="row">
-      <BarChart
+      <!-- <BarChart
         class="col q-ma-md"
-        :chart-data="chartStore().kunjunganPerBulan"
+        :chart-data="reportStore().kunjunganPerBulan"
       />
       <BarChart
         class="col q-ma-md"
-        :chart-data="chartStore().kunjunganPerMinggu"
-      />
+        :chart-data="reportStore().kunjunganPerMinggu"
+      /> -->
     </div>
   </q-page>
 </template>
@@ -41,11 +41,8 @@ const pendapatanPerHari = ref(0);
 const pendapatanPerBulan = ref(0);
 
 onMounted(async () => {
-  const pendapatan = await reportStore().getPendapatan();
-
-  totalPendapatan.value = pendapatan.totalPendapatan;
-  pendapatanPerHari.value = pendapatan.pendapatanPerHari;
-  pendapatanPerBulan.value = pendapatan.pendapatanPerBulan;
+  await reportStore().getPendapatan();
+  await reportStore().getKunjungan();
 });
 
 // Menggunakan komputasi dinamis untuk properti number
@@ -57,25 +54,29 @@ const dataPenjualan = ref([
   },
   {
     caption: "Pengunjung / Hari",
-    number: 1000,
+    get number() {
+      return reportStore().kunjunganPerHari;
+    },
     icon: "trending_up",
   },
   {
     caption: "Pengunjung / Bulan",
-    number: 1000000,
+    get number() {
+      return reportStore().kunjunganPerBulan;
+    },
     icon: "trending_up",
   },
   {
     caption: "Pendapatan / Hari ",
     get number() {
-      return pendapatanPerHari.value;
+      return reportStore().pendapatanPerHari;
     },
     icon: "trending_up",
   },
   {
     caption: "Pendapatan / Bulan ",
     get number() {
-      return pendapatanPerBulan.value;
+      return reportStore().pendapatanPerBulan;
     },
     icon: "trending_up",
   },

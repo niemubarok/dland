@@ -27,7 +27,20 @@ export const reportStore = defineStore("report", {
         const res = await api.get("reports/pendapatan");
         const pendapatan = res.data;
         // console.log(pendapatan);
-        return pendapatan;
+        // return pendapatan;
+        this.totalPendapatan = pendapatan.totalPendapatan;
+        this.pendapatanPerHari = pendapatan.pendapatanPerHari;
+        this.pendapatanPerBulan = pendapatan.pendapatanPerBulan;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async getKunjungan() {
+      try {
+        const res = await api.get("reports/kunjungan");
+        this.totalKunjungan = res.data.totalKunjungan;
+        this.kunjunganPerHari = res.data.kunjunganPerHari;
+        this.kunjunganPerBulan = res.data.kunjunganPerBulan;
       } catch (err) {
         console.log(err);
       }

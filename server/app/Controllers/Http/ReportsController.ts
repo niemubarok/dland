@@ -83,7 +83,22 @@ export default class ReportsController {
   //   });
   // }
 
-  public async pendapatan({ response }: HttpContextContract) {
+  public async pendapatan({ request, response }: HttpContextContract) {
+    const { startDate: startDateParam, endDate: endDateParam } = request.body();
+    const today = new Date();
+    const startDate = startDateParam ? new Date(startDateParam) : today;
+    const endDate = endDateParam ? new Date(endDateParam) : today;
+
+    // Convert start and end dates to the desired format
+    const formatStartDate = startDate
+      .toISOString()
+      .split("T")[0]
+      .replace(/-/g, "/");
+    const formatEndDate = endDate
+      .toISOString()
+      .split("T")[0]
+      .replace(/-/g, "/");
+
     const currentDate = new Date();
     const yearMonthDay = currentDate.toISOString().split("T")[0];
     const yearMonth = yearMonthDay.slice(0, 7);
@@ -95,14 +110,10 @@ export default class ReportsController {
 
     // Get the revenue per day
     const pendapatanPerHari = await Database.from("transaksi_penjualan")
-      .whereRaw(
-        "EXTRACT(YEAR FROM CAST(substr(no_transaksi, 1, 10) AS DATE)) = ? AND EXTRACT(MONTH FROM CAST(substr(no_transaksi, 1, 10) AS DATE)) = ? AND EXTRACT(DAY FROM CAST(substr(no_transaksi, 1, 10) AS DATE)) = ?",
-        [
-          currentDate.getFullYear(),
-          currentDate.getMonth() + 1,
-          currentDate.getDate(),
-        ]
-      )
+      .whereBetween(Database.raw("CAST(substr(no_transaksi, 1, 10) AS DATE)"), [
+        formatStartDate,
+        formatEndDate,
+      ])
       .sum("total_bayar as total")
       .then((result) => result[0].total || 0);
 
@@ -121,76 +132,203 @@ export default class ReportsController {
       pendapatanPerBulan,
     });
   }
-  public async wahana({ response }: HttpContextContract) {
-    const currentDate = new Date();
-    const yearMonthDay = currentDate.toISOString().split("T")[0];
-    const yearMonth = yearMonthDay.slice(0, 7);
+  // public async wahana({ response }: HttpContextContract) {
+  //   const currentDate = new Date();
+  //   const yearMonthDay = currentDate.toISOString().split("T")[0];
+  //   const yearMonth = yearMonthDay.slice(0, 7);
 
-    const formatForDay = yearMonthDay.replace(/-/g, "/");
-    const formatForMonth = yearMonth.replace(/-/g, "/");
+  //   const formatForDay = yearMonthDay.replace(/-/g, "/");
+  //   const formatForMonth = yearMonth.replace(/-/g, "/");
 
-    const kunjunganWahana = await Promise.all([
-      Database.from("detail_transaksi")
-        .innerJoin(
-          "master_wahana",
-          "detail_transaksi.id_wahana",
-          "master_wahana.id_wahana"
-        )
-        .whereRaw("SUBSTRING(detail_transaksi.no_transaksi, 1, 10) = ?", [
-          formatForDay,
-        ])
-        .groupBy("master_wahana.nama")
-        .countDistinct("detail_transaksi.no_transaksi as total")
-        .select("master_wahana.nama"),
-      Database.from("detail_transaksi")
-        .innerJoin(
-          "master_wahana",
-          "detail_transaksi.id_wahana",
-          "master_wahana.id_wahana"
-        )
-        .whereRaw("SUBSTRING(detail_transaksi.no_transaksi, 1, 7) = ?", [
-          formatForMonth,
-        ])
-        .groupBy("master_wahana.nama")
-        .countDistinct("detail_transaksi.no_transaksi as total")
-        .select("master_wahana.nama"),
-    ]);
+  //   const kunjunganWahana = await Promise.all([
+  //     Database.from("detail_transaksi")
+  //       .innerJoin(
+  //         "master_wahana",
+  //         "detail_transaksi.id_wahana",
+  //         "master_wahana.id_wahana"
+  //       )
+  //       .whereRaw("SUBSTRING(detail_transaksi.no_transaksi, 1, 10) = ?", [
+  //         formatForDay,
+  //       ])
+  //       .groupBy("master_wahana.nama")
+  //       .countDistinct("detail_transaksi.no_transaksi as total")
+  //       .select("master_wahana.nama"),
+  //     Database.from("detail_transaksi")
+  //       .innerJoin(
+  //         "master_wahana",
+  //         "detail_transaksi.id_wahana",
+  //         "master_wahana.id_wahana"
+  //       )
+  //       .whereRaw("SUBSTRING(detail_transaksi.no_transaksi, 1, 7) = ?", [
+  //         formatForMonth,
+  //       ])
+  //       .groupBy("master_wahana.nama")
+  //       .countDistinct("detail_transaksi.no_transaksi as total")
+  //       .select("master_wahana.nama"),
+  //   ]);
 
-    const kunjunganWahanaPerHari = kunjunganWahana[0].reduce((acc, row) => {
-      acc[row.nama] = row.total;
-      return acc;
-    }, {});
+  //   const kunjunganWahanaPerHari = kunjunganWahana[0].reduce((acc, row) => {
+  //     acc[row.nama] = row.total;
+  //     return acc;
+  //   }, {});
 
-    const kunjunganWahanaPerBulan = kunjunganWahana[1].reduce((acc, row) => {
-      acc[row.nama] = row.total;
-      return acc;
-    }, {});
+  //   const kunjunganWahanaPerBulan = kunjunganWahana[1].reduce((acc, row) => {
+  //     acc[row.nama] = row.total;
+  //     return acc;
+  //   }, {});
 
-    const totalKunjunganWahana = await Database.from("detail_transaksi")
-      .innerJoin(
-        "master_wahana",
-        "detail_transaksi.id_wahana",
-        "master_wahana.id_wahana"
-      )
-      .groupBy("master_wahana.nama")
-      .countDistinct("detail_transaksi.no_transaksi as total")
-      .select("master_wahana.nama")
-      .then((results) =>
-        results.reduce((acc, row) => {
-          acc[row.nama] = row.total;
-          return acc;
-        }, {})
-      );
+  //   const totalKunjunganWahana = await Database.from("detail_transaksi")
+  //     .innerJoin(
+  //       "master_wahana",
+  //       "detail_transaksi.id_wahana",
+  //       "master_wahana.id_wahana"
+  //     )
+  //     .groupBy("master_wahana.nama")
+  //     .countDistinct("detail_transaksi.no_transaksi as total")
+  //     .select("master_wahana.nama")
+  //     .then((results) =>
+  //       results.reduce((acc, row) => {
+  //         acc[row.nama] = row.total;
+  //         return acc;
+  //       }, {})
+  //     );
 
-    response.status(200).json({
+  //   response.status(200).json({
+  //     kunjunganWahanaPerHari,
+  //     kunjunganWahanaPerBulan,
+  //     totalKunjunganWahana,
+  //   });
+  // }
+  public async wahana({ request, response }: HttpContextContract) {
+    const { startDate: startDateParam, endDate: endDateParam } = request.body();
+    const today = new Date();
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    const startDate = startDateParam ? new Date(startDateParam) : today;
+    const endDate = endDateParam ? new Date(endDateParam) : today;
+
+    // return startDate;
+
+    const formatStartDate = startDate
+      .toISOString()
+      .split("T")[0]
+      .replace(/-/g, "/");
+    const formatEndDate = endDate
+      .toISOString()
+      .split("T")[0]
+      .replace(/-/g, "/");
+
+    console.log("start", formatStartDate);
+    console.log("end", formatEndDate);
+
+    const [
       kunjunganWahanaPerHari,
       kunjunganWahanaPerBulan,
       totalKunjunganWahana,
+    ] = await Promise.all([
+      Database.from("detail_transaksi")
+        .innerJoin(
+          "transaksi_penjualan",
+          "detail_transaksi.no_transaksi",
+          "transaksi_penjualan.no_transaksi"
+        )
+        .innerJoin(
+          "master_wahana",
+          "detail_transaksi.id_wahana",
+          "master_wahana.id_wahana"
+        )
+        .whereBetween(
+          Database.raw(
+            "SUBSTRING(detail_transaksi.no_transaksi FROM 1 FOR 10)"
+          ),
+          [formatStartDate, formatEndDate]
+        )
+        .groupBy("master_wahana.nama")
+        .select(
+          "master_wahana.nama",
+          Database.raw(
+            "count(distinct transaksi_penjualan.no_transaksi) as total_kunjungan"
+          ),
+          Database.raw(
+            "sum(master_wahana.harga_tiket * detail_transaksi.qty) as pendapatan_per_wahana"
+          )
+        ),
+
+      Database.from("detail_transaksi")
+        .innerJoin(
+          "transaksi_penjualan",
+          "detail_transaksi.no_transaksi",
+          "transaksi_penjualan.no_transaksi"
+        )
+        .innerJoin(
+          "master_wahana",
+          "detail_transaksi.id_wahana",
+          "master_wahana.id_wahana"
+        )
+        .whereBetween(
+          Database.raw("SUBSTRING(detail_transaksi.no_transaksi FROM 1 FOR 7)"),
+          [formatStartDate.slice(0, 7), formatEndDate.slice(0, 7)]
+        )
+        .groupBy("master_wahana.nama")
+        .select(
+          "master_wahana.nama",
+          Database.raw(
+            "count(distinct transaksi_penjualan.no_transaksi) as total_kunjungan"
+          )
+        ),
+
+      Database.from("detail_transaksi")
+        .innerJoin(
+          "transaksi_penjualan",
+          "detail_transaksi.no_transaksi",
+          "transaksi_penjualan.no_transaksi"
+        )
+        .innerJoin(
+          "master_wahana",
+          "detail_transaksi.id_wahana",
+          "master_wahana.id_wahana"
+        )
+        .groupBy("master_wahana.nama")
+        .countDistinct("transaksi_penjualan.no_transaksi as total")
+        .select("master_wahana.nama")
+        .then((results) =>
+          results.map(
+            (row) => ({
+              nama_wahana: row.nama,
+              jumlah: row.total,
+            }),
+            {}
+          )
+        ),
+    ]);
+
+    const kunjunganWahanaPerHariResult = kunjunganWahanaPerHari.map((row) => ({
+      nama_wahana: row.nama,
+      jumlah: row.total_kunjungan,
+      pendapatan: row.pendapatan_per_wahana,
+    }));
+
+    const kunjunganWahanaPerBulanResult = kunjunganWahanaPerBulan.map(
+      (row) => ({
+        nama_wahana: row.nama,
+        jumlah: row.total_kunjungan,
+      }),
+      {}
+    );
+
+    const totalPendapatan = kunjunganWahanaPerHari.reduce(
+      (total, row) => parseInt(total) + parseInt(row.pendapatan_per_wahana),
+      0
+    );
+    response.status(200).json({
+      kunjunganWahanaPerHari: kunjunganWahanaPerHariResult,
+      kunjunganWahanaPerBulan: kunjunganWahanaPerBulanResult,
+      totalKunjunganWahana,
+      totalPendapatan,
     });
   }
 
   public async fix({ response }: HttpContextContract) {
-    const currentDate = "2024-01-22"; 
+    const currentDate = "2024-01-22";
     const totalHargaTiketRows = await Database.rawQuery(
       `
         SELECT 

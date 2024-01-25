@@ -82,12 +82,12 @@ const essentialLinks = [
     to: "/",
   },
 
-  // {
-  //   title: "Top Up",
-  //   caption: "Top Up Saldo Tiket",
-  //   icon: "add",
-  //   link: "/topup",
-  // },
+  {
+    title: "Laporan",
+    // caption: "Top Up Saldo Tiket",
+    icon: "bar_chart",
+    link: "/laporan",
+  },
   // {
   //   title: "QRCode Scanner",
   //   caption: "Scan QrCode Tiket ",

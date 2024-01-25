@@ -13,6 +13,10 @@ export const reportStore = defineStore("report", {
     totalKunjungan: ref(0),
     kunjunganPerHari: ref(0),
     kunjunganPerBulan: ref(0),
+    startDate: ref(),
+    endDate: ref(),
+    laporanWahana: ref(),
+    totalPendapatanWahana: ref(0),
   }),
 
   getters: {
@@ -22,11 +26,14 @@ export const reportStore = defineStore("report", {
   },
 
   actions: {
-    async getPendapatan() {
+    async getLaporanPendapatan() {
       try {
-        const res = await api.get("reports/pendapatan");
+        const res = await api.post("reports/pendapatan", {
+          startDate: this.startDate,
+          endDate: this.endData,
+        });
         const pendapatan = res.data;
-        // console.log(pendapatan);
+        console.log(pendapatan);
         // return pendapatan;
         this.totalPendapatan = pendapatan.totalPendapatan;
         this.pendapatanPerHari = pendapatan.pendapatanPerHari;
@@ -35,12 +42,36 @@ export const reportStore = defineStore("report", {
         console.log(err);
       }
     },
-    async getKunjungan() {
+    async getLaporanKunjungan() {
       try {
         const res = await api.get("reports/kunjungan");
         this.totalKunjungan = res.data.totalKunjungan;
         this.kunjunganPerHari = res.data.kunjunganPerHari;
         this.kunjunganPerBulan = res.data.kunjunganPerBulan;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async getLaporanKunjunganWahana() {
+      try {
+        const res = await api.post("reports/wahana", {
+          startDate: this.startDate,
+          endDate: this.endDate,
+        });
+        if (res.data) {
+          console.log(res.data);
+          this.totalKunjunganWahana = res.data.totalKunjunganWahana;
+          this.kunjunganWahanaPerHari = res.data.kunjunganWahanaPerHari;
+          this.kunjunganWahanaPerBulan = res.data.kunjunganWahanaPerBulan;
+          this.totalPendapatanWahana = res.data.totalPendapatan;
+          this.laporanWahana = res.data.kunjunganWahanaPerHari;
+
+          console.log(this.startDate);
+          console.log(this.endDate);
+
+          // console.log("laporanKunjunganWahana", laporanKunjunganWahana);
+          console.log(res.data.kunjunganWahanaPerHari);
+        }
       } catch (err) {
         console.log(err);
       }

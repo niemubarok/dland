@@ -20,12 +20,12 @@ const routes = [
         component: () => import("pages/TicketingPage.vue"),
       },
       {
-        path: "/topup",
+        path: "/laporan",
         meta: {
           requireHeader: false,
-          requireSideNav: false,
+          requireSideNav: true,
         },
-        component: () => import("pages/TopUpPage.vue"),
+        component: () => import("pages/LaporanPage.vue"),
       },
       {
         path: "/qrcode",

@@ -36,13 +36,10 @@ import BarChart from "src/components/BarChart.vue";
 import { chartStore } from "src/stores/chart-store";
 import { reportStore } from "src/stores/report-store";
 
-const totalPendapatan = ref(0);
-const pendapatanPerHari = ref(0);
-const pendapatanPerBulan = ref(0);
-
 onMounted(async () => {
-  await reportStore().getPendapatan();
-  await reportStore().getKunjungan();
+  await reportStore().getLaporanPendapatan();
+  await reportStore().getLaporanKunjungan();
+  await reportStore().getLaporanKunjunganWahana();
 });
 
 // Menggunakan komputasi dinamis untuk properti number

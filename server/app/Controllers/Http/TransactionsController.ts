@@ -8,10 +8,9 @@ export default class TransactionsController {
     const data = request.body().data;
     // return data;
     // const datePrefix = "2024/01/20";
-    const datePrefix = new Date()
-      .toISOString()
-      .split("T")[0]
-      .replace(/-/g, "/");
+    const today = new Date();
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    const datePrefix = today.toISOString().split("T")[0].replace(/-/g, "/");
     // Retrieve the last transaction number for today and increment it
     const lastTransaction = await Database.query()
       .from("transaksi_penjualan")
@@ -55,7 +54,7 @@ export default class TransactionsController {
         // total_bayar: totalAfterDiskon,
         // petugas,
         created_at: new Date(),
-        updated_at: new Date(),
+        // updated_at: new Date(),
       })
     );
 
@@ -66,8 +65,21 @@ export default class TransactionsController {
 
     // return transactionsData;
     try {
+      const currentDate = new Date();
       const transaksi_penjualan = await Database.rawQuery(
-        `INSERT INTO transaksi_penjualan (no_transaksi, cara_bayar, total, diskon, total_bayar, petugas,status) VALUES ('${no_transaksi}', '${cara_bayar}','${total}','${diskon}', '${totalAfterDiskon}', '${petugas}', '${status}')`
+        `INSERT INTO transaksi_penjualan (no_transaksi, cara_bayar, total, diskon, total_bayar, petugas, status, created_at) 
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          no_transaksi,
+          cara_bayar,
+          total,
+          diskon,
+          totalAfterDiskon,
+          petugas,
+          status,
+          currentDate.toISOString(),
+          // currentDate.toISOString(),
+        ]
       );
 
       const detail_transaksi = await Database.table(

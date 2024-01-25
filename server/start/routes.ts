@@ -40,8 +40,8 @@ Route.group(() => {
 
   Route.group(() => {
     Route.get("/kunjungan", "ReportsController.kunjungan");
-    Route.get("/pendapatan", "ReportsController.pendapatan");
-    Route.get("/wahana", "ReportsController.wahana");
+    Route.post("/pendapatan", "ReportsController.pendapatan");
+    Route.post("/wahana", "ReportsController.wahana");
     Route.get("/fix", "ReportsController.fix");
   }).prefix("reports");
 

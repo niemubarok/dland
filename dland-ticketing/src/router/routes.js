@@ -20,12 +20,12 @@ const routes = [
         component: () => import("pages/TicketingPage.vue"),
       },
       {
-        path: "/laporan",
+        path: "/laporan/transaksi",
         meta: {
-          requireHeader: false,
+          requireHeader: true,
           requireSideNav: true,
         },
-        component: () => import("pages/LaporanPage.vue"),
+        component: () => import("pages/LaporanTransaksiPage.vue"),
       },
       {
         path: "/qrcode",
@@ -42,6 +42,22 @@ const routes = [
           requireSideNav: false,
         },
         component: () => import("pages/PrintPage.vue"),
+      },
+      {
+        path: "/settings",
+        meta: {
+          requireHeader: true,
+          requireSideNav: true,
+        },
+        component: () => import("pages/SettingsPage.vue"),
+      },
+      {
+        path: "/laporan/kunjungan-per-wahana",
+        meta: {
+          requireHeader: true,
+          requireSideNav: true,
+        },
+        component: () => import("pages/LaporanKunjunganPerWahanaPage.vue"),
       },
     ],
   },

@@ -79,9 +79,9 @@ export const wahanaStore = defineStore("wahana", {
         idPaket: 1,
         namaPaket: "Paket Terusan",
         hargaPaket: 75000,
-        diskon: 0,
+        diskon: 35000,
         status: true,
-        idWahana: [0, 3, 5, 6, 7, 8, 9, 10, 11,12, 13],
+        idWahana: [0, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13],
       },
       // {
       //   idPaket: 2,
@@ -97,7 +97,7 @@ export const wahanaStore = defineStore("wahana", {
         hargaPaket: 65000,
         diskon: 0,
         status: true,
-        idWahana: [ 5,12,8],
+        idWahana: [5, 12, 8],
       },
       {
         idPaket: 4,
@@ -105,7 +105,7 @@ export const wahanaStore = defineStore("wahana", {
         hargaPaket: 65000,
         diskon: 5000,
         status: true,
-        idWahana: [ 13,6, 10, 11],
+        idWahana: [13, 6, 10, 11],
       },
       // {
       //   idPaket: 4,
@@ -124,7 +124,7 @@ export const wahanaStore = defineStore("wahana", {
       //   idWahana: [ 3, 9],
       // },
     ]),
-    namaPaketTerpilih:ref("")
+    namaPaketTerpilih: ref(""),
   }),
 
   getters: {
@@ -143,14 +143,12 @@ export const wahanaStore = defineStore("wahana", {
     pilihPaket(paket, daftarWahana) {
       // console.log("paket", paket);
 
-    
       // Mendapatkan array wahana yang sesuai dengan paket dari daftarWahana
       const wahanaTerpilih = daftarWahana.filter((wahana) =>
         paket.idWahana.includes(wahana.id_wahana)
       );
 
-
-      this.namaPaketTerpilih = paket.namaPaket
+      this.namaPaketTerpilih = paket.namaPaket;
 
       console.log("wahana terpilih", wahanaTerpilih);
 
@@ -159,15 +157,13 @@ export const wahanaStore = defineStore("wahana", {
         (total, wahana) => total + parseFloat(wahana.harga_tiket),
         0
       );
-      
-      
+
       // Menentukan diskon
       const diskon = paket.diskon;
-      const totalAfterDiskon = parseInt(totalHarga) - parseInt(diskon)
+      const totalAfterDiskon = parseInt(totalHarga) - parseInt(diskon);
       transaksiStore().totalBayar = totalHarga;
       transaksiStore().diskon = diskon;
       transaksiStore().totalAfterDiskon = totalAfterDiskon;
-     
 
       // Menentukan status (misalnya, status selalu true)
       const status = true;
@@ -197,8 +193,8 @@ export const wahanaStore = defineStore("wahana", {
       //  return
 
       transaksiStore().detailTransaksi.push(...pushWahana);
-      console.log(transaksiStore().detailTransaksi)
-      return 
+      console.log(transaksiStore().detailTransaksi);
+      return;
 
       // return {
       //   paket: paket,

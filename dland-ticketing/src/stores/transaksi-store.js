@@ -19,6 +19,7 @@ export const transaksiStore = defineStore("transaksi", {
     saldo: ref(),
     isShowPaymentDialog: ref(false),
     isPaket: ref(false),
+    daftarTransaksi: ref([]),
   }),
 
   getters: {
@@ -95,23 +96,23 @@ export const transaksiStore = defineStore("transaksi", {
       const cara_bayar = "cash";
       const petugas = ls.get("petugas")?.nama;
       let isSuccess = false;
-      
-    //  const data= {
-    //     cara_bayar,
-    //     status,
-    //     petugas,
-    //     diskon: this.diskon,
-    //     totalAfterDiskon: this.totalAfterDiskon,
-    //     transaksi: this.detailTransaksi,
-    //     total: this.totalBayar,
-    //   }
+
+      //  const data= {
+      //     cara_bayar,
+      //     status,
+      //     petugas,
+      //     diskon: this.diskon,
+      //     totalAfterDiskon: this.totalAfterDiskon,
+      //     transaksi: this.detailTransaksi,
+      //     total: this.totalBayar,
+      //   }
 
       // console.log("data",data);
       // return
 
       try {
         if (this.detailTransaksi.length) {
-          const response = await api.post("transaksi", {
+          const response = await api.post("transaksi/create", {
             data: {
               cara_bayar,
               status,
@@ -131,5 +132,19 @@ export const transaksiStore = defineStore("transaksi", {
         console.error("There was an error!", error);
       }
     },
+
+    // async getTransaksiFromDB() {
+    //   try {
+    //     const res = await api.post("transaksi/all", {
+    //       startDate: this.startDate,
+    //       endDate: this.endDate,
+    //     });
+    //     if (res.data) {
+    //       this.daftarTransaksi = res.data;
+    //     }
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // },
   },
 });

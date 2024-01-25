@@ -1,11 +1,11 @@
 <template>
-  <card-component mb="" >
+  <card-component mb="">
     <level mobile>
       <div>
-        <h3 class="text-lg leading-tight text-gray-500">
-          {{ label }}
+        <h3 class="text-gray-500">
+          <!-- {{ label }} -->
         </h3>
-        <h1 class="text-3xl leading-tight font-semibold">
+        <h1 class="text-body">
           <growing-number :value="number" :prefix="prefix" :suffix="suffix" />
         </h1>
       </div>
@@ -34,35 +34,35 @@ export default {
   props: {
     icon: {
       type: String,
-      default: null
+      default: null,
     },
     number: {
       type: Number,
-      default: 0
+      default: 0,
     },
     prefix: {
       type: String,
-      default: null
+      default: null,
     },
     suffix: {
       type: String,
-      default: null
+      default: null,
     },
     label: {
       type: String,
-      default: null
+      default: null,
     },
     color: {
       type: String,
-      default: null
-    }
+      default: null,
+    },
   },
   setup() {
     const store = useStore();
 
     return {
-      store
+      store,
     };
-  }
+  },
 };
 </script>

@@ -163,7 +163,7 @@ const onClickBayar = async (method) => {
       diskon: transaksiStore().diskon,
       totalAfterDiskon: transaksiStore().totalAfterDiskon,
       totalBayar: transaksiStore().totalBayar,
-      namaPaket:"Tiket",
+      namaPaket: "Tiket",
     };
     // console.log("store", store);
     if (store) {
@@ -171,7 +171,8 @@ const onClickBayar = async (method) => {
         "Depok Fantasy Land",
         JSON.stringify(data)
       );
-      window.electron.print();
+      const namaPrinter = ls.get("namaPrinter");
+      window.electron.print(namaPrinter);
       $q.notify({
         message: "Pembayaran Berhasil",
         color: "green",

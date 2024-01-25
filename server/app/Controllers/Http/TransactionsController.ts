@@ -2,7 +2,46 @@ import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Database from "@ioc:Adonis/Lucid/Database";
 
 export default class TransactionsController {
-  public async index({ request, response }: HttpContextContract) {}
+  public async index({ request, response }: HttpContextContract) {
+    const { startDate: startDateParam, endDate: endDateParam } = request.body();
+    const today = new Date();
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    const startDate = startDateParam ? new Date(startDateParam) : today;
+    const endDate = endDateParam ? new Date(endDateParam) : today;
+
+    // return startDate;
+
+    const formatStartDate = startDate
+      .toISOString()
+      .split("T")[0]
+      .replace(/-/g, "/");
+    const formatEndDate = endDate
+      .toISOString()
+      .split("T")[0]
+      .replace(/-/g, "/");
+
+    const transaksi = await Database.from("transaksi_penjualan")
+      // .innerJoin(
+      //   "transaksi_penjualan",
+      //   "detail_transaksi.no_transaksi",
+      //   "transaksi_penjualan.no_transaksi"
+      // )
+      // .innerJoin(
+      //   "master_wahana",
+      //   "detail_transaksi.id_wahana",
+      //   "master_wahana.id_wahana"
+      // )
+      .whereBetween(
+        Database.raw(
+          "SUBSTRING(transaksi_penjualan.no_transaksi FROM 1 FOR 10)"
+        ),
+        [formatStartDate, formatEndDate]
+      )
+      // .groupBy("detail_transaksi.id_detail_transaksi", "master_wahana.nama")
+      .select("*");
+
+    response.status(200).json(transaksi);
+  }
 
   public async create({ request, response }: HttpContextContract) {
     const data = request.body().data;
@@ -97,7 +136,44 @@ export default class TransactionsController {
     }
   }
 
-  public async store({}: HttpContextContract) {}
+  public async delete({ request, response }: HttpContextContract) {
+    try {
+      const { no_transaksi } = request.body();
+
+      if (!no_transaksi) {
+        response
+          .status(400)
+          .json({ message: "No transaction number provided" });
+        return;
+      }
+
+      await Database.transaction(async (trx) => {
+        // Delete detail transaksi first
+        await trx
+          .from("detail_transaksi")
+          .where("no_transaksi", no_transaksi)
+          .delete();
+
+        // Then delete transaksi_penjualan
+        const deletedRows = await trx
+          .from("transaksi_penjualan")
+          .where("no_transaksi", no_transaksi)
+          .delete();
+
+        if (Array.isArray(deletedRows) && deletedRows.length === 0) {
+          response.status(404).json({ message: "Transaction not found" });
+          return;
+        }
+
+        response.status(200).json({
+          message: `Deleted ${deletedRows} rows from transaksi_penjualan and detail_transaksi`,
+        });
+      });
+    } catch (error) {
+      // If error occurs, the transaction is automatically rolled back
+      response.status(500).json({ message: "Internal Server Error", error });
+    }
+  }
 
   public async show({}: HttpContextContract) {}
 

@@ -13,12 +13,10 @@ import {
 } from "pdf-to-printer";
 
 const print = process.platform === "win32" ? printWindows : printUnix;
-const printerOption = {
-  printer: "POS-80C",
-};
 
 import jsPDF from "jspdf";
 import { log } from "console";
+import { platform } from "os";
 const QRCode = require("qrcode");
 const autoTable = require("jspdf-autotable");
 const fs = require("fs");
@@ -62,13 +60,16 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   pdf.setFontSize(13);
 
   console.log();
-  if(JSON.parse(transaksi).namaPaket){
-    pdf.text(JSON.parse(transaksi).namaPaket, pdf.internal.pageSize.width / 2, 8, {
-      align: "center",
-    });
-
-  }else{
-
+  if (JSON.parse(transaksi).namaPaket) {
+    pdf.text(
+      JSON.parse(transaksi).namaPaket,
+      pdf.internal.pageSize.width / 2,
+      8,
+      {
+        align: "center",
+      }
+    );
+  } else {
     pdf.text("Tiket", pdf.internal.pageSize.width / 2, 8, {
       align: "center",
     });
@@ -260,22 +261,32 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     }
   });
 };
-async function printStruk() {
-  getWindowsPrinters().then(console.log);
+async function printStruk(namaPrinter) {
+  // getWindowsPrinters().then(console.log);
   // return
+  console.log("print", namaPrinter);
+  const printerOption = {
+    printer: namaPrinter,
+  };
 
   const outputFilePath = path.resolve(
     __dirname,
     process.env.QUASAR_PUBLIC_FOLDER + "/struk/struk.pdf"
   );
 
-  console.log(process.platform);
-  if (process.platform === "win32") {
+  try {
     await fs.promises.access(outputFilePath, fs.constants.F_OK);
-    await printWindows(outputFilePath, printerOption).then(console.log);
-    // getWindowsDefaultPrinter().then((printer) => console.log(printer));
-  } else {
-    getUnixDefaultPrinter().then((printer) => console.log(printer));
+
+    const printResult =
+      process.platform === "win32"
+        ? await printWindows(outputFilePath, printerOption.printer)
+        : await printUnix(outputFilePath, printerOption.printer);
+
+    console.log(printResult);
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    console.error(`Error during printing: ${errorMessage}`);
   }
   // return;
 
@@ -289,11 +300,24 @@ async function printStruk() {
   // }
 }
 
+async function getPrinters() {
+  // let namaPrinter = ""
+  if (process.platform === "win32") {
+    return getWindowsPrinters().then((printers) => {
+      return printers.map((each) => each.printer);
+    });
+  } else {
+    return getUnixPrinters().then((printers) => {
+      return printers.map((each) => each.printer);
+    });
+  }
+}
+
 contextBridge.exposeInMainWorld("electron", {
   // serialport: createSerialPort,
   print: printStruk,
   createPDFStruk,
-  // getSnapshot: getSnapshot,
+  getPrinters,
   // detectLicensePlateArea: detectLicensePlateArea,
   // getSerialPortList: getSerialPortList,
 });

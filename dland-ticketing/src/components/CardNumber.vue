@@ -4,19 +4,17 @@
       <q-card class="card glass-light">
         <q-card-section class="q-pa-md full-height flex flex-center">
           <div class="column justify-start">
+            <div class="text-body text-weight-bolder q-mb-sm text-grey-7">
+              {{ props.caption }}
+            </div>
             <GrowingNumber
               :value="props.number"
               class="text-weight-bolder text-green-9"
               :class="{
-                ' text-h4': props.number < 1000000000,
-                'text-h6': props.number >= 1000000000,
+                ' text-h6': props.number < 1000000000,
+                'text-body': props.number >= 1000000000,
               }"
             />
-            <div
-              class="text-body text-weight-bolder q-mb-sm q-mt-md text-grey-7"
-            >
-              {{ props.caption }}
-            </div>
           </div>
         </q-card-section>
       </q-card>

@@ -76,6 +76,12 @@ import { componentStore } from "src/stores/component-store";
 
 const essentialLinks = [
   {
+    title: "Dashboard",
+    caption: "Dashboard",
+    icon: "dashboard",
+    to: "/dashboard",
+  },
+  {
     title: "Ticketing",
     caption: "Penjualan Tiket",
     icon: "receipt",
@@ -86,19 +92,19 @@ const essentialLinks = [
     title: "Laporan",
     // caption: "Top Up Saldo Tiket",
     icon: "bar_chart",
-    link: "/laporan",
+    link: "/laporan/kunjungan-per-wahana",
   },
-  // {
-  //   title: "QRCode Scanner",
-  //   caption: "Scan QrCode Tiket ",
-  //   icon: "qr_code",
-  //   link: "/qrcode",
-  // },
+  {
+    title: "Data Transaksi",
+    caption: "Data Penjualan",
+    icon: "fact_check",
+    link: "/laporan/transaksi",
+  },
   {
     title: "Settings",
     caption: "Konfigurasi aplikasi",
     icon: "settings",
-    link: "",
+    link: "/settings",
   },
   // {
   //   title: "Twitter",

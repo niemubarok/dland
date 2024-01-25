@@ -16,6 +16,7 @@ export const reportStore = defineStore("report", {
     startDate: ref(),
     endDate: ref(),
     laporanWahana: ref(),
+    daftarTransaksi: ref([]),
     totalPendapatanWahana: ref(0),
   }),
 
@@ -74,6 +75,41 @@ export const reportStore = defineStore("report", {
         }
       } catch (err) {
         console.log(err);
+      }
+    },
+    async getLaporanTransaksiFromDB() {
+      try {
+        const res = await api.post("transaksi/all", {
+          startDate: this.startDate,
+          endDate: this.endDate,
+        });
+        if (res.data) {
+          this.daftarTransaksi = res.data;
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async deleteTransaksiFromDB(no_transaksi) {
+      try {
+        const res = await api.post("transaksi/delete", {
+          no_transaksi,
+        });
+
+        console.log(res);
+
+        if (res.status === 200) {
+          const index = this.daftarTransaksi.findIndex(
+            (transaksi) => transaksi.no_transaksi === no_transaksi
+          );
+          if (index !== -1) {
+            this.daftarTransaksi.splice(index, 1);
+          }
+
+          return true;
+        }
+      } catch (error) {
+        return false;
       }
     },
   },

@@ -173,7 +173,6 @@ const selectAllWahana = () => {
 const pilihPaket = async (paket) => {
   wahanaStore().pilihPaket(paket, wahanaStore().daftarWahana);
   transaksiStore().isPaket = true;
-  
 
   // console.log(wahanaStore().daftarWahana)
   const data = {
@@ -188,7 +187,7 @@ const pilihPaket = async (paket) => {
   const store = await transaksiStore().insertIntoDB();
   if (store) {
     window.electron.createPDFStruk("Depok Fantasy Land", JSON.stringify(data));
-    window.electron.print();
+    window.electron.print(ls.get("namaPrinter"));
     $q.notify({
       message: "Berhasil",
       color: "green",

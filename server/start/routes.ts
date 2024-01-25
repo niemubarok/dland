@@ -45,5 +45,9 @@ Route.group(() => {
     Route.get("/fix", "ReportsController.fix");
   }).prefix("reports");
 
-  Route.post("/transaksi", "TransactionsController.create");
+  Route.group(() => {
+    Route.post("/create", "TransactionsController.create");
+    Route.post("/all", "TransactionsController.index");
+    Route.post("/delete", "TransactionsController.delete");
+  }).prefix("transaksi");
 }).prefix("api");

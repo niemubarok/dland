@@ -140,7 +140,7 @@ const onRightClick = () => {
 .ticket__text {
   width: 400px;
   font-family: "Helvetica", "Arial", sans-serif;
-  font-size: 1rem;
+  font-size: 0.5rem;
   font-weight: 900;
   text-transform: uppercase;
   color: #c6dede;

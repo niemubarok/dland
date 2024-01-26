@@ -75,53 +75,29 @@ export const wahanaStore = defineStore("wahana", {
 
     daftarWahana: ref([]),
     paket: ref([
-      {
-        idPaket: 1,
-        namaPaket: "Paket Terusan",
-        hargaPaket: 75000,
-        diskon: 35000,
-        status: true,
-        idWahana: [0, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13],
-      },
       // {
-      //   idPaket: 2,
-      //   namaPaket: "Paket Terusan (WeekDay)",
+      //   idPaket: 1,
+      //   namaPaket: "Paket Terusan",
       //   hargaPaket: 75000,
-      //   diskon: 30000,
+      //   diskon: 35000,
       //   status: true,
-      //   idWahana: [0,4, 5, 6, 7, 8, 9, 10, 11, 13],
+      //   idWahana: [0, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13],
       // },
-      {
-        idPaket: 3,
-        namaPaket: "Paket Anak A",
-        hargaPaket: 65000,
-        diskon: 0,
-        status: true,
-        idWahana: [5, 12, 8],
-      },
-      {
-        idPaket: 4,
-        namaPaket: "Paket Anak B",
-        hargaPaket: 65000,
-        diskon: 5000,
-        status: true,
-        idWahana: [13, 6, 10, 11],
-      },
       // {
-      //   idPaket: 4,
-      //   namaPaket: "Paket Dewasa A",
-      //   hargaPaket: 30000,
-      //   diskon: 5000,
+      //   idPaket: 3,
+      //   namaPaket: "Paket Anak A",
+      //   hargaPaket: 65000,
+      //   diskon: 0,
       //   status: true,
-      //   idWahana: [ 3, 9],
+      //   idWahana: [5, 12, 8],
       // },
       // {
       //   idPaket: 4,
-      //   namaPaket: "Paket Dewasa B",
-      //   hargaPaket: 30000,
+      //   namaPaket: "Paket Anak B",
+      //   hargaPaket: 65000,
       //   diskon: 5000,
       //   status: true,
-      //   idWahana: [ 3, 9],
+      //   idWahana: [13, 6, 10, 11],
       // },
     ]),
     namaPaketTerpilih: ref(""),
@@ -138,6 +114,12 @@ export const wahanaStore = defineStore("wahana", {
       const res = await api.get("wahana");
       this.daftarWahana.splice(0, this.daftarWahana.length, ...res.data);
 
+      console.log(res.data);
+    },
+
+    async getPaketFromDB() {
+      const res = await api.get("paket/all");
+      this.paket.splice(0, this.paket.length, ...res.data);
       console.log(res.data);
     },
     pilihPaket(paket, daftarWahana) {

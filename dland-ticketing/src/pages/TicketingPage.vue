@@ -224,6 +224,7 @@ const pilihPaket = async (paket) => {
 onBeforeMount(() => {});
 
 onMounted(async () => {
+  await wahanaStore().getPaketFromDB();
   if (!ls.get("petugas")) {
     const _loginDialog = $q.dialog({
       component: LoginDialog,

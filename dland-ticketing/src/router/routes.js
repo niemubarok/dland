@@ -52,6 +52,14 @@ const routes = [
         component: () => import("pages/SettingsPage.vue"),
       },
       {
+        path: "/wahana",
+        meta: {
+          requireHeader: true,
+          requireSideNav: true,
+        },
+        component: () => import("pages/MasterWahanaPage.vue"),
+      },
+      {
         path: "/laporan/kunjungan-per-wahana",
         meta: {
           requireHeader: true,

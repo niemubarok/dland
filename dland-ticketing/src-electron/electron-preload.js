@@ -21,7 +21,12 @@ const QRCode = require("qrcode");
 const autoTable = require("jspdf-autotable");
 const fs = require("fs");
 const path = require("path");
-
+const os = require("os");
+const directoryPath = path.join(os.homedir(), "struk");
+if (!fs.existsSync(directoryPath)) {
+  fs.mkdirSync(directoryPath, { recursive: true });
+}
+const filePath = path.join(directoryPath, "struk.pdf");
 const formatCurrency = (amount) => {
   // Pemisah ribuan
   const separator = ".";
@@ -248,10 +253,7 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     { align: "center" }
   );
 
-  const filePath = path.resolve(
-    __dirname,
-    process.env.QUASAR_PUBLIC_FOLDER + "/struk/struk.pdf"
-  );
+  console.log(filePath);
 
   fs.writeFile(filePath, pdf.output(), (err) => {
     if (err) {
@@ -269,18 +271,18 @@ async function printStruk(namaPrinter) {
     printer: namaPrinter,
   };
 
-  const outputFilePath = path.resolve(
-    __dirname,
-    process.env.QUASAR_PUBLIC_FOLDER + "/struk/struk.pdf"
-  );
+  // const outputFilePath = path.resolve(
+  //   __dirname,
+  //   process.env.QUASAR_PUBLIC_FOLDER + "/struk/struk.pdf"
+  // );
 
   try {
-    await fs.promises.access(outputFilePath, fs.constants.F_OK);
+    await fs.promises.access(filePath, fs.constants.F_OK);
 
     const printResult =
       process.platform === "win32"
-        ? await printWindows(outputFilePath, printerOption.printer)
-        : await printUnix(outputFilePath, printerOption.printer);
+        ? await printWindows(filePath, printerOption.printer)
+        : await printUnix(filePath, printerOption.printer);
 
     console.log(printResult);
   } catch (error) {

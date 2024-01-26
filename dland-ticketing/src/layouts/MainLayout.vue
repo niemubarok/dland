@@ -106,12 +106,12 @@ const essentialLinks = [
     icon: "settings",
     link: "/settings",
   },
-  // {
-  //   title: "Twitter",
-  //   caption: "@quasarframework",
-  //   icon: "rss_feed",
-  //   link: "https://twitter.quasar.dev",
-  // },
+  {
+    title: "Master Wahana",
+    caption: "Master Data Wahana",
+    icon: "",
+    link: "/wahana",
+  },
   // {
   //   title: "Facebook",
   //   caption: "@QuasarFramework",

@@ -122,16 +122,19 @@ export const wahanaStore = defineStore("wahana", {
       const res = await api.get("paket/detail");
       this.detailPaket.splice(0, this.paket.length, ...res.data);
       console.log(res.data);
+      return res.data;
     },
     pilihPaket(paket, daftarWahana) {
       // Mendapatkan array wahana yang sesuai dengan paket dari daftarWahana
       const wahanaTerpilih = daftarWahana.filter((wahana) =>
         paket.idWahana?.includes(wahana.id_wahana)
       );
+      // console.log(daftarWahana);
+      // return;
 
       this.namaPaketTerpilih = paket.namaPaket;
 
-      console.log("wahana terpilih", wahanaTerpilih);
+      console.log("paket", paket);
 
       // Menghitung total harga tiket untuk paket
       const totalHarga = wahanaTerpilih.reduce(
@@ -169,9 +172,6 @@ export const wahanaStore = defineStore("wahana", {
           qty: 1,
         };
       });
-
-      // console.log("paket", pushWahana);
-      // return;
 
       //  console.log(pushWahana)
       //  return

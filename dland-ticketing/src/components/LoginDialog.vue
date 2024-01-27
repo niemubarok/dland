@@ -4,6 +4,9 @@
       class="q-px-md q-pt-sm glass relative"
       style="width: 500px; height: fit-content"
     >
+      <q-card-section class="text-h6 text-brown">
+        Login Dulu Ya..!
+      </q-card-section>
       <q-card-section>
         <q-input
           v-model="username"

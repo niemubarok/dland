@@ -20,27 +20,16 @@ export default class TransactionsController {
       .split("T")[0]
       .replace(/-/g, "/");
 
-    const transaksi = await Database.from("transaksi_penjualan")
-      // .innerJoin(
-      //   "transaksi_penjualan",
-      //   "detail_transaksi.no_transaksi",
-      //   "transaksi_penjualan.no_transaksi"
-      // )
-      // .innerJoin(
-      //   "master_wahana",
-      //   "detail_transaksi.id_wahana",
-      //   "master_wahana.id_wahana"
-      // )
-      .whereBetween(
-        Database.raw(
-          "SUBSTRING(transaksi_penjualan.no_transaksi FROM 1 FOR 10)"
-        ),
-        [formatStartDate, formatEndDate]
-      )
-      // .groupBy("detail_transaksi.id_detail_transaksi", "master_wahana.nama")
-      .select("*");
+    const transaksi = await Database.rawQuery(
+      `SELECT transaksi_penjualan.*, paket_tiket.nama_paket 
+FROM transaksi_penjualan 
+LEFT JOIN paket_tiket ON transaksi_penjualan.id_paket = paket_tiket.id_paket 
+WHERE SUBSTRING(transaksi_penjualan.no_transaksi, 1, 10) BETWEEN ? AND ?
+`,
+      [formatStartDate, formatEndDate]
+    );
 
-    response.status(200).json(transaksi);
+    response.status(200).json(transaksi.rows);
   }
 
   public async create({ request, response }: HttpContextContract) {
@@ -79,8 +68,15 @@ export default class TransactionsController {
     // console.log(transactionNumber);
 
     // return no_transaksi;
-    const { status, cara_bayar, petugas, diskon, totalAfterDiskon, total } =
-      data;
+    const {
+      status,
+      cara_bayar,
+      petugas,
+      diskon,
+      totalAfterDiskon,
+      total,
+      idPaket,
+    } = data;
     const transactionsData = data.transaksi.map(
       (item: { id_wahana: any; qty: any; total_bayar: any }) => ({
         no_transaksi,
@@ -101,25 +97,24 @@ export default class TransactionsController {
     //   no_transaksi,
 
     // })
+    console.log(idPaket);
 
-    // return transactionsData;
     try {
+      // return transactionsData;
       const currentDate = new Date();
-      const transaksi_penjualan = await Database.rawQuery(
-        `INSERT INTO transaksi_penjualan (no_transaksi, cara_bayar, total, diskon, total_bayar, petugas, status, created_at) 
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          no_transaksi,
-          cara_bayar,
-          total,
-          diskon,
-          totalAfterDiskon,
-          petugas,
-          status,
-          currentDate.toISOString(),
-          // currentDate.toISOString(),
-        ]
-      );
+      const transaksi_penjualan = await Database.table(
+        "transaksi_penjualan"
+      ).insert({
+        no_transaksi,
+        cara_bayar,
+        total,
+        diskon,
+        total_bayar: totalAfterDiskon,
+        petugas,
+        status,
+        created_at: currentDate.toISOString(),
+        id_paket: idPaket,
+      });
 
       const detail_transaksi = await Database.table(
         "detail_transaksi"

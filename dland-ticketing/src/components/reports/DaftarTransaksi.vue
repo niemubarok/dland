@@ -141,10 +141,10 @@
           <td width="30px">
             <span class="text-subtitle2">{{ index + 1 }}</span>
           </td>
-          <td align="left">
+          <td align="left" width="140px">
             <span class="text-subtitle2">{{ row.no_transaksi }}</span>
           </td>
-          <td align="center">
+          <td align="center" width="140px">
             <span class="text-center text-subtitle2">{{ row.cara_bayar }}</span>
           </td>
           <td align="center" width="140px">
@@ -201,6 +201,13 @@
               >
             </div>
           </td>
+          <td align="center" width="140px">
+            <div class="row justify-between">
+              <span class="text-body">
+                {{ row.nama_paket }}
+              </span>
+            </div>
+          </td>
           <!-- <td align="right">
             <q-badge
               @click="reportStore().deleteTransaksiFromDB(row.no_transaksi)"
@@ -213,7 +220,13 @@
 
           <q-menu touch-position context-menu @hide="onMenuHide(index)">
             <q-list dense style="min-width: 100px">
-              <q-item clickable v-close-popup>
+              <q-item
+                clickable
+                v-close-popup
+                @click="
+                  onClickPrint(row.diskon, row.no_transaksi, row.nama_paket)
+                "
+              >
                 <q-item-section>
                   <q-chip class="bg-transparent">
                     <q-avatar icon="print" color="brown" text-color="white" />
@@ -275,9 +288,11 @@
 <script setup>
 import { reportStore } from "src/stores/report-store";
 import { transaksiStore } from "src/stores/transaksi-store";
+import { wahanaStore } from "src/stores/wahana-store";
 import { onMounted, ref } from "vue";
 import { date, useQuasar } from "quasar";
 import DetailTransaksiDialog from "src/components/dialogues/DetailTransaksiDialog.vue";
+import ls from "localstorage-slim";
 
 const $q = useQuasar();
 const todaySelected = ref(false);
@@ -300,6 +315,7 @@ const columns = [
   { name: "Total", prop: "total", align: "center" },
   { name: "Diskon", prop: "diskon", align: "center" },
   { name: "TotalBayar", prop: "total_bayar", align: "center" },
+  { name: "Keterangan", prop: "nama_paket", align: "left" },
   // { name: "Hapus", prop: "hapus", align: "right" },
 ];
 
@@ -326,6 +342,39 @@ const onClickDetail = async (no_transaksi) => {
   detailDialog.update();
 };
 
+const onClickPrint = async (diskon, no_transaksi, namaPaket) => {
+  const detailTransaksi = await transaksiStore().getDetailTransaksi(
+    no_transaksi
+  );
+
+  await wahanaStore().getWahanaFromDB();
+  let paket = {
+    diskon,
+    namaPaket: namaPaket,
+    idWahana: detailTransaksi.map((item) => item.id_wahana),
+  };
+
+  wahanaStore().pilihPaket(paket, wahanaStore().daftarWahana);
+
+  const data = {
+    transaksi: transaksiStore().detailTransaksi,
+    diskon: transaksiStore().diskon,
+    totalAfterDiskon: transaksiStore().totalAfterDiskon,
+    totalBayar: transaksiStore().totalBayar,
+    namaPaket: wahanaStore().namaPaketTerpilih,
+  };
+
+  // console.log(data.namaPaket);
+  // return;
+  window.electron.createPDFStruk("Depok Fantasy Land", JSON.stringify(data));
+  window.electron.print(ls.get("namaPrinter"));
+  $q.notify({
+    message: "Berhasil",
+    color: "green",
+    position: "top",
+  });
+  transaksiStore().resetTransaksi();
+};
 const todayBtn = async () => {
   isToday.value = !isToday.value;
   startDateSelected.value = false;

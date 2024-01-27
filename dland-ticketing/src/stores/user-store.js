@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import ls from "localstorage-slim";
 import { api } from "src/boot/axios";
 import { ref } from "vue";
+import { Notify } from "quasar";
 
 export const userStore = defineStore("user", {
   state: () => ({
@@ -43,13 +44,13 @@ export const userStore = defineStore("user", {
         console.log(error);
         if (error.response && error.response.status === 401) {
           // Handle 401 error here
-          console.log("Invalid username or password");
-          $q.notify({
-            type: "negative",
-            message: "Cek kembali username dan password anda",
-            position: "top",
-            timeout: 1000,
-          });
+          // console.log("Invalid username or password");
+          // Notify.create({
+          //   type: "negative",
+          //   message: "Cek kembali username dan password anda",
+          //   position: "top",
+          //   timeout: 2000,
+          // });
         }
       }
     },

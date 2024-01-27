@@ -20,6 +20,7 @@ export const transaksiStore = defineStore("transaksi", {
     saldo: ref(),
     isShowPaymentDialog: ref(false),
     isPaket: ref(false),
+    idPaket: ref(""),
     daftarTransaksi: ref([]),
   }),
 
@@ -118,6 +119,7 @@ export const transaksiStore = defineStore("transaksi", {
               cara_bayar,
               status,
               petugas,
+              idPaket: this.isPaket ? this.idPaket : null,
               diskon: this.diskon,
               totalAfterDiskon: this.totalAfterDiskon,
               transaksi: this.detailTransaksi,
@@ -143,7 +145,17 @@ export const transaksiStore = defineStore("transaksi", {
         this.detailDataTransaksi.length,
         ...res.data
       );
-      console.log(res.data);
+
+      return res.data;
+
+      // const data = {
+      //   transaksi: transaksiStore().detailTransaksi,
+      //   diskon: transaksiStore().diskon,
+      //   totalAfterDiskon: transaksiStore().totalAfterDiskon,
+      //   totalBayar: transaksiStore().totalBayar,
+      //   namaPaket: wahanaStore().namaPaketTerpilih,
+      // };
+      // console.log(res.data);
     },
 
     // async getTransaksiFromDB() {

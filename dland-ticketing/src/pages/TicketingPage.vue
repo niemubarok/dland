@@ -20,6 +20,15 @@
           {{ ls.get("petugas")?.nama }}
           <Clock />
         </div>
+        <div>
+          <q-btn
+            flat
+            color="white"
+            icon="logout"
+            label="Log Out"
+            @click="onLogOut"
+          />
+        </div>
       </q-card>
     </div>
     <!-- 'q-mt-sm': $q.platform.desktop, -->
@@ -177,6 +186,11 @@ const selectAllWahana = () => {
   // transaksiStore().addTransaksi(data.value);
 };
 
+const onLogOut = () => {
+  ls.remove("petugas");
+  window.location.reload();
+};
+
 const testPrint = () => {
   const data = {
     nama_perusahaan: "Nama Perusahaan Anda",
@@ -198,8 +212,9 @@ const testPrint = () => {
 
 const pilihPaket = async (paket) => {
   wahanaStore().pilihPaket(paket, wahanaStore().daftarWahana);
-  // return;
   transaksiStore().isPaket = true;
+
+  transaksiStore().idPaket = paket.idPaket;
 
   // console.log(wahanaStore().daftarWahana)
   const data = {

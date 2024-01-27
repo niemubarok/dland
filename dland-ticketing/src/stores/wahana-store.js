@@ -100,14 +100,15 @@ export const wahanaStore = defineStore("wahana", {
       //   idWahana: [13, 6, 10, 11],
       // },
     ]),
+    detailPaket: ref([]),
     namaPaketTerpilih: ref(""),
   }),
 
-  getters: {
-    doubleCount(state) {
-      return state.counter * 2;
-    },
-  },
+  // getters: {
+  //   doubleCount(state) {
+  //     return state.counter * 2;
+  //   },
+  // },
 
   actions: {
     async getWahanaFromDB() {
@@ -117,17 +118,15 @@ export const wahanaStore = defineStore("wahana", {
       console.log(res.data);
     },
 
-    async getPaketFromDB() {
-      const res = await api.get("paket/all");
-      this.paket.splice(0, this.paket.length, ...res.data);
+    async getDetailPaketFromDB() {
+      const res = await api.get("paket/detail");
+      this.detailPaket.splice(0, this.paket.length, ...res.data);
       console.log(res.data);
     },
     pilihPaket(paket, daftarWahana) {
-      // console.log("paket", paket);
-
       // Mendapatkan array wahana yang sesuai dengan paket dari daftarWahana
       const wahanaTerpilih = daftarWahana.filter((wahana) =>
-        paket.idWahana.includes(wahana.id_wahana)
+        paket.idWahana?.includes(wahana.id_wahana)
       );
 
       this.namaPaketTerpilih = paket.namaPaket;
@@ -151,14 +150,14 @@ export const wahanaStore = defineStore("wahana", {
       const status = true;
 
       // Membuat objek paket
-      const paketObj = {
-        idPaket: 2,
-        namaPaket: "Paket Terusan (WeekDay)",
-        hargaPaket: totalHarga,
-        diskon: diskon,
-        status: status,
-        idWahana: paket,
-      };
+      // const paketObj = {
+      //   idPaket: 2,
+      //   namaPaket: "Paket Terusan (WeekDay)",
+      //   hargaPaket: totalHarga,
+      //   diskon: diskon,
+      //   status: status,
+      //   idWahana: paket,
+      // };
 
       // Membuat array detail transaksi berdasarkan wahana terpilih
       const pushWahana = wahanaTerpilih.map((wahana) => {
@@ -171,6 +170,9 @@ export const wahanaStore = defineStore("wahana", {
         };
       });
 
+      // console.log("paket", pushWahana);
+      // return;
+
       //  console.log(pushWahana)
       //  return
 
@@ -182,6 +184,72 @@ export const wahanaStore = defineStore("wahana", {
       //   paket: paket,
       //   detailTransaksi: detailTransaksi,
       // };
+    },
+
+    async getPaketFromDB() {
+      const res = await api.get("paket/detail");
+      this.paket.splice(0, this.paket.length, ...res.data);
+      console.log(res.data);
+    },
+    async addMasterWahanaToDB(data) {
+      try {
+        const res = await api.post("wahana/add", data);
+        console.log(res.data);
+        if (res.status === 201) {
+          this.daftarWahana.push(data);
+          return true;
+        } else {
+          return false;
+        }
+      } catch (err) {
+        return err;
+      }
+    },
+    async editMasterWahanaOnDB(id, column, value) {
+      try {
+        const res = await api.post("wahana/edit", { id, column, value });
+
+        if (res.status === 201) {
+          const index = this.daftarWahana.findIndex(
+            (wahana) => wahana.id_wahana === id
+          );
+          if (index !== -1) {
+            Object.assign(this.daftarWahana[index], { [column]: value });
+            console.log(
+              `Wahana with ID ${id} updated:`,
+              this.daftarWahana[index]
+            );
+          } else {
+            console.log(`Wahana with ID ${id} not found.`);
+          }
+          return true;
+        } else {
+          return false;
+        }
+      } catch (err) {
+        return err;
+      }
+    },
+    async deleteMasterWahanaFromDB(id) {
+      try {
+        const res = await api.post("wahana/delete", { id });
+        if (res.status === 201) {
+          const index = this.daftarWahana.findIndex(
+            (wahana) => wahana.id_wahana === id
+          );
+          if (index !== -1) {
+            this.daftarWahana.splice(index, 1);
+            console.log(`Wahana with ID ${id} deleted.`);
+          } else {
+            console.log(`Wahana with ID ${id} not found.`);
+          }
+          return true;
+        } else {
+          return false;
+        }
+      } catch (err) {
+        return err;
+      }
     },
   },
 });

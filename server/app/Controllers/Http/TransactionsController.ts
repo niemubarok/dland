@@ -175,7 +175,26 @@ export default class TransactionsController {
     }
   }
 
-  public async show({}: HttpContextContract) {}
+  public async show({ request, response }: HttpContextContract) {
+    const { no_transaksi } = request.body();
+
+    const detaiTransaksi = await Database.rawQuery(
+      `SELECT detail_transaksi.*, master_wahana.nama 
+   FROM detail_transaksi 
+   INNER JOIN master_wahana ON detail_transaksi.id_wahana = master_wahana.id_wahana 
+   WHERE detail_transaksi.no_transaksi = '${no_transaksi}' `
+    );
+    console.log(detaiTransaksi.rows);
+
+    //  GROUP BY detail_transaksi.id_detail_transaksi, detail_transaksi.no_transaksi, detail_transaksi.id_wahana, detail_transaksi.qty, detail_transaksi.harga, master_wahana.nama`
+    if (detaiTransaksi.rows?.length) {
+      response.status(200).json(detaiTransaksi.rows);
+    } else {
+      response.abort({
+        message: "gagal",
+      });
+    }
+  }
 
   public async edit({}: HttpContextContract) {}
 

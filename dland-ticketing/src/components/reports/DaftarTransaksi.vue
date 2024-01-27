@@ -103,6 +103,7 @@
       :virtual-scroll-sticky-size-start="48"
       :virtual-scroll-sticky-size-end="32"
       :items="reportStore().daftarTransaksi"
+      :loading="isLoading"
     >
       <template v-slot:before>
         <thead class="thead-sticky">
@@ -112,7 +113,7 @@
               :key="'1--' + col.name"
               :align="col.align"
             >
-              {{ col.name }}
+              <span class="text-subtitle2">{{ col.name }}</span>
             </th>
           </tr>
         </thead>
@@ -127,51 +128,80 @@
       </template>
       <!-- class="glass-light" -->
       <template v-slot="{ item: row, index }">
-        <tr :key="index" :class="index % 2 == 0 ? 'bg-white' : 'bg-grey-2'">
-          <td>{{ index + 1 }}</td>
+        <!-- 'bg-white': index % 2 == 0, -->
+        <tr
+          :key="index"
+          :class="{
+            'bg-grey-2': index % 2 !== 0 && selectedRow !== index,
+            'bg-green-9 text-white': selectedRow === index,
+          }"
+          class="cursor-pointer"
+          @click.right.prevent="onRightClick(index)"
+        >
+          <td width="30px">
+            <span class="text-subtitle2">{{ index + 1 }}</span>
+          </td>
           <td align="left">
             <span class="text-subtitle2">{{ row.no_transaksi }}</span>
           </td>
           <td align="center">
             <span class="text-center text-subtitle2">{{ row.cara_bayar }}</span>
           </td>
-          <td align="right">
-            <span class="text-subtitle2">
-              {{
-                parseInt(row.total)
-                  ?.toLocaleString("id-ID", {
-                    style: "currency",
-                    currency: "IDR",
-                  })
-                  .split(",")[0]
-              }}</span
-            >
+          <td align="center" width="140px">
+            <div class="row justify-between">
+              <span class="text-grey-7">Rp</span>
+              <span class="text-subtitle2">
+                {{
+                  parseInt(row.total)
+                    ?.toLocaleString("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                      currencyDisplay: "code",
+                    })
+                    .replace("IDR", "")
+                    .trim()
+                    .split(",")[0]
+                }}</span
+              >
+            </div>
           </td>
-          <td align="right">
-            <span class="text-subtitle2">
-              {{
-                parseInt(row.diskon)
-                  ?.toLocaleString("id-ID", {
-                    style: "currency",
-                    currency: "IDR",
-                  })
-                  .split(",")[0]
-              }}</span
-            >
+          <td align="center" width="140px">
+            <div class="row justify-between">
+              <span class="text-grey-7">Rp</span>
+              <span class="text-subtitle2">
+                {{
+                  parseInt(row.diskon)
+                    ?.toLocaleString("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                      currencyDisplay: "code",
+                    })
+                    .replace("IDR", "")
+                    .trim()
+                    .split(",")[0]
+                }}</span
+              >
+            </div>
           </td>
-          <td align="right">
-            <span class="text-subtitle2">
-              {{
-                parseInt(row.total_bayar)
-                  ?.toLocaleString("id-ID", {
-                    style: "currency",
-                    currency: "IDR",
-                  })
-                  .split(",")[0]
-              }}</span
-            >
+          <td align="center" width="140px">
+            <div class="row justify-between">
+              <span class="text-grey-7">Rp</span>
+              <span class="text-subtitle2">
+                {{
+                  parseInt(row.total_bayar)
+                    ?.toLocaleString("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                      currencyDisplay: "code",
+                    })
+                    .replace("IDR", "")
+                    .trim()
+                    .split(",")[0]
+                }}</span
+              >
+            </div>
           </td>
-          <td align="right">
+          <!-- <td align="right">
             <q-badge
               @click="reportStore().deleteTransaksiFromDB(row.no_transaksi)"
               text-color="white"
@@ -179,7 +209,46 @@
             >
               <q-icon name="delete" color="red" />
             </q-badge>
-          </td>
+          </td> -->
+
+          <q-menu touch-position context-menu @hide="onMenuHide(index)">
+            <q-list dense style="min-width: 100px">
+              <q-item clickable v-close-popup>
+                <q-item-section>
+                  <q-chip class="bg-transparent">
+                    <q-avatar icon="print" color="brown" text-color="white" />
+                    print
+                  </q-chip>
+                </q-item-section>
+              </q-item>
+              <q-separator />
+              <q-item
+                clickable
+                v-close-popup
+                @click="reportStore().deleteTransaksiFromDB(row.no_transaksi)"
+              >
+                <q-item-section>
+                  <q-chip class="bg-transparent text-red">
+                    <q-avatar icon="delete" color="red" text-color="white" />
+                    Hapus
+                  </q-chip>
+                </q-item-section>
+              </q-item>
+              <q-separator />
+              <q-item
+                clickable
+                v-close-popup
+                @click="onClickDetail(row.no_transaksi)"
+              >
+                <q-item-section>
+                  <q-chip class="bg-transparent text-blue">
+                    <q-avatar icon="info" color="blue" text-color="white" />
+                    Detail
+                  </q-chip>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
         </tr>
       </template>
     </q-virtual-scroll>
@@ -187,20 +256,17 @@
     <q-card-section>
       <div class="flex row justify-between q-px-sm glass-dark q-py-md">
         <span class="text-h6 text-white"> Total </span>
-        <span
-          class="text-weight-bolder text-h6 text-white q-mr-sm"
-          :style="
+        <!-- :style="
             reportStore().diskon > 0 ? 'text-decoration:line-through' : ''
-          "
-          >{{
-            reportStore()
-              .totalPendapatanWahana?.toLocaleString("id-ID", {
-                style: "currency",
-                currency: "IDR",
-              })
-              .split(",")[0]
-          }}</span
-        >
+          " -->
+        <span class="text-weight-bolder text-h6 text-white q-mr-sm">{{
+          reportStore()
+            .totalPendapatanTransaksi?.toLocaleString("id-ID", {
+              style: "currency",
+              currency: "IDR",
+            })
+            .split(",")[0]
+        }}</span>
       </div>
     </q-card-section>
   </q-card>
@@ -211,6 +277,7 @@ import { reportStore } from "src/stores/report-store";
 import { transaksiStore } from "src/stores/transaksi-store";
 import { onMounted, ref } from "vue";
 import { date, useQuasar } from "quasar";
+import DetailTransaksiDialog from "src/components/dialogues/DetailTransaksiDialog.vue";
 
 const $q = useQuasar();
 const todaySelected = ref(false);
@@ -230,11 +297,34 @@ const columns = [
   { name: "No", prop: "name", align: "left" },
   { name: "No. Transaksi", prop: "no_transaksi", align: "left" },
   { name: "Cara Bayar", prop: "cara_bayar", align: "center" },
-  { name: "Total", prop: "total", align: "right" },
-  { name: "Diskon", prop: "diskon", align: "right" },
-  { name: "TotalBayar", prop: "total_bayar", align: "right" },
-  { name: "Hapus", prop: "hapus", align: "right" },
+  { name: "Total", prop: "total", align: "center" },
+  { name: "Diskon", prop: "diskon", align: "center" },
+  { name: "TotalBayar", prop: "total_bayar", align: "center" },
+  // { name: "Hapus", prop: "hapus", align: "right" },
 ];
+
+const selectedRow = ref();
+const isLoading = ref(false);
+const showMenu = ref(false);
+
+const onRightClick = (index) => {
+  selectedRow.value = index;
+};
+
+const onMenuHide = (index) => {
+  if (selectedRow.value === index) {
+    selectedRow.value = "";
+  }
+};
+
+const onClickDetail = async (no_transaksi) => {
+  await transaksiStore().getDetailTransaksi(no_transaksi);
+  const detailDialog = $q.dialog({
+    component: DetailTransaksiDialog,
+    props: {},
+  });
+  detailDialog.update();
+};
 
 const todayBtn = async () => {
   isToday.value = !isToday.value;

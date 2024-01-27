@@ -8,6 +8,7 @@ export const transaksiStore = defineStore("transaksi", {
   state: () => ({
     counter: 0,
     detailTransaksi: ref([]),
+    detailDataTransaksi: ref([]),
     totalTransaksi: ref(0),
     qty: ref(1),
     bayar: ref(0),
@@ -131,6 +132,18 @@ export const transaksiStore = defineStore("transaksi", {
         isSuccess = false;
         console.error("There was an error!", error);
       }
+    },
+    async getDetailTransaksi(no_transaksi) {
+      const res = await api.post("transaksi/detail", {
+        no_transaksi,
+      });
+
+      this.detailDataTransaksi.splice(
+        0,
+        this.detailDataTransaksi.length,
+        ...res.data
+      );
+      console.log(res.data);
     },
 
     // async getTransaksiFromDB() {

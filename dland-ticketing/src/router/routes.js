@@ -60,6 +60,14 @@ const routes = [
         component: () => import("pages/MasterWahanaPage.vue"),
       },
       {
+        path: "/paket",
+        meta: {
+          requireHeader: true,
+          requireSideNav: true,
+        },
+        component: () => import("pages/DaftarPaketPage.vue"),
+      },
+      {
         path: "/laporan/kunjungan-per-wahana",
         meta: {
           requireHeader: true,

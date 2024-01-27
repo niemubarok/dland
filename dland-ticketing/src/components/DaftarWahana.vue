@@ -4,7 +4,7 @@
       <div>
         <q-chip
           icon="bar_chart"
-          label="Daftar Transaksi"
+          label="Daftar Wahana"
           class="text-weight-bolder"
         />
       </div>
@@ -98,16 +98,18 @@
 
     <q-virtual-scroll
       type="table"
-      :style="$q.screen.gt.md ? 'height: 70vh' : 'height: 65vh'"
+      :style="$q.screen.gt.md ? 'height: 75vh' : 'height: 70vh'"
       :virtual-scroll-item-size="48"
       :virtual-scroll-sticky-size-start="48"
       :virtual-scroll-sticky-size-end="32"
       :items="wahanaStore().daftarWahana"
+      sort-by="id_wahana"
     >
       <template v-slot:before>
         <thead class="thead-sticky">
-          <tr class="text-left bg-grey-8 text-h5 text-weight-bolder text-white">
+          <tr class="text-left bg-grey-8">
             <th
+              class="text-h4 text-weight-bolder text-white"
               v-for="col in columns"
               :key="'1--' + col.name"
               :align="col.align"
@@ -131,6 +133,36 @@
           <td>{{ index + 1 }}</td>
           <td align="left">
             <span class="text-subtitle2">{{ row.nama }}</span>
+            <!-- v-if="isEditMode" -->
+            <q-popup-edit
+              v-model="row.nama"
+              v-slot="scope"
+              @save="(value) => update(row.id_wahana, 'nama', value)"
+            >
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+              <div class="float-right">
+                <q-btn
+                  size="sm"
+                  color="red-9"
+                  flat
+                  icon="close"
+                  @click="scope.cancel"
+                />
+                <q-btn
+                  size="sm"
+                  color="green-9"
+                  flat
+                  icon="check"
+                  @click="scope.set"
+                />
+              </div>
+            </q-popup-edit>
           </td>
           <!-- <td align="center">
             <span class="text-center text-subtitle2">{{ row.harga_tiket }}</span>
@@ -146,16 +178,102 @@
                   .split(",")[0]
               }}</span
             >
+            <q-popup-edit
+              v-model="row.harga_tiket"
+              v-slot="scope"
+              @save="(value) => update(row.id_wahana, 'harga_tiket', value)"
+            >
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+              <div class="float-right">
+                <q-btn
+                  size="sm"
+                  color="red-9"
+                  flat
+                  icon="close"
+                  @click="scope.cancel"
+                />
+                <q-btn
+                  size="sm"
+                  color="green-9"
+                  flat
+                  icon="check"
+                  @click="scope.set"
+                />
+              </div>
+            </q-popup-edit>
           </td>
           <td align="center">
             <span class="text-subtitle2"> {{ row.jenis }}</span>
+            <q-popup-edit
+              v-model="row.jenis"
+              v-slot="scope"
+              @save="(value) => update(row.id_wahana, 'jenis', value)"
+            >
+              <q-select
+                filled
+                v-model="scope.value"
+                :options="['Weekend', 'Weekday']"
+                label="Jenis Wahana"
+              />
+              <div class="float-right">
+                <q-btn
+                  size="sm"
+                  color="red-9"
+                  flat
+                  icon="close"
+                  @click="scope.cancel"
+                />
+                <q-btn
+                  size="sm"
+                  color="green-9"
+                  flat
+                  icon="check"
+                  @click="scope.set"
+                />
+              </div>
+            </q-popup-edit>
           </td>
           <td align="left">
             <span class="text-subtitle2"> {{ row.deskripsi }}</span>
+            <q-popup-edit
+              v-model="row.deskripsi"
+              v-slot="scope"
+              @save="(value) => update(row.id_wahana, 'deskripsi', value)"
+            >
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+              <div class="float-right">
+                <q-btn
+                  size="sm"
+                  color="red-9"
+                  flat
+                  icon="close"
+                  @click="scope.cancel"
+                />
+                <q-btn
+                  size="sm"
+                  color="green-9"
+                  flat
+                  icon="check"
+                  @click="scope.set"
+                />
+              </div>
+            </q-popup-edit>
           </td>
           <td align="right">
-            <!-- @click="reportStore().deleteTransaksiFromDB(row.no_transaksi)" -->
             <q-badge
+              @click="onDelete(row.id_wahana)"
               text-color="white"
               class="q-ml-md cursor-pointer bg-transparent"
             >
@@ -184,6 +302,49 @@
           }}</span
         >
       </div> -->
+      <add-button title="Tambah Wahana Baru" style="z-index: 2">
+        <template #form>
+          <q-form @reset="onReset" class="q-gutter-md">
+            <q-input filled v-model="newWahana.nama" label="Nama Wahana" />
+            <q-select
+              filled
+              v-model="newWahana.jenis"
+              :options="['Weekend', 'Weekday']"
+              label="Jenis Wahana"
+            />
+            <q-input
+              type="textarea"
+              filled
+              v-model="newWahana.deskripsi"
+              label="Deskripsi Wahana"
+            />
+            <q-input
+              filled
+              v-model="newWahana.harga_tiket"
+              label="Tarif Wahana"
+              prefix="Rp"
+            />
+          </q-form>
+        </template>
+        <template #button>
+          <div class="row">
+            <q-btn
+              label="Simpan"
+              type="submit"
+              color="primary"
+              @click="onSubmit"
+            />
+            <q-btn
+              label="Reset"
+              type="reset"
+              color="secondary"
+              flat
+              class="q-ml-md"
+              @click="onReset"
+            />
+          </div>
+        </template>
+      </add-button>
     </q-card-section>
   </q-card>
 </template>
@@ -193,6 +354,7 @@ import { wahanaStore } from "src/stores/wahana-store";
 import { transaksiStore } from "src/stores/transaksi-store";
 import { onMounted, ref } from "vue";
 import { date, useQuasar } from "quasar";
+import AddButton from "src/components/AddButton.vue";
 
 const $q = useQuasar();
 const todaySelected = ref(false);
@@ -205,60 +367,74 @@ const laporanKunjungan = ref([]);
 const timeStamp = date.formatDate(Date.now(), "YYYY/MM/DD");
 const datePicker = ref(timeStamp);
 const proxyDate = ref(Date.now());
-const isToday = ref(false);
+const isLoading = ref(true);
 const startDate = ref("");
 const endDate = ref("");
 const columns = [
   { name: "No", prop: "name", align: "left" },
   { name: "Nama Wahana", prop: "nama", align: "left" },
   { name: "Harga Tiket", prop: "harga_tiket", align: "center" },
-  { name: "Jenis", prop: "jenis", align: "right" },
+  { name: "Jenis", prop: "jenis", align: "center" },
   { name: "Keterangan", prop: "deskripsi", align: "left" },
   // { name: "TotalBayar", prop: "total_bayar", align: "right" },
   { name: "Hapus", prop: "hapus", align: "right" },
 ];
 
-// const todayBtn = async () => {
-//   isToday.value = !isToday.value;
-//   startDateSelected.value = false;
-//   endDateSelected.value = false;
-//   // Ensure the time zone offset is accounted for so that startDate is set to today's date
-//   const today = new Date();
-//   today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-//   reportStore().startDate = today.toISOString().split("T")[0];
-//   reportStore().endDate = today.toISOString().split("T")[0];
-//   await store.getLaporanTransaksiFromDB();
-// };
+const newWahana = ref({
+  nama: "",
+  jenis: "",
+  deskripsi: "",
+  harga_tiket: 0,
+});
 
-// const dayLabel = (dateValue) => {
-//   const daysInIndonesian = {
-//     Sunday: "Minggu",
-//     Monday: "Senin",
-//     Tuesday: "Selasa",
-//     Wednesday: "Rabu",
-//     Thursday: "Kamis",
-//     Friday: "Jumat",
-//     Saturday: "Sabtu",
-//   };
-//   const dayInEnglish = date.formatDate(dateValue, "dddd");
-//   const dateInIndonesian = daysInIndonesian[dayInEnglish];
+const onSubmit = async () => {
+  try {
+    console.log(newWahana.value);
+    await wahanaStore().addMasterWahanaToDB(newWahana.value);
+    // newWahana.value = { nama: "", jenis: "", deskripsi: "", tarif: 0 };
+    // Notify success
+  } catch (error) {
+    // Notify error
+  }
+};
 
-//   return dateValue
-//     ? `${dateInIndonesian}, ${date.formatDate(dateValue, "DD-MM-YYYY")}`
-//     : "PILIH TANGGAL";
-// };
+const onReset = () => {
+  newWahana.value = { nama: "", jenis: "", deskripsi: "", tarif: 0 };
+};
 
-// const startDateLabel = () => dayLabel(startDate.value);
-// const endDateLabel = () => dayLabel(endDate.value);
+const update = async (id, column, value) => {
+  console.log(id, column, value);
+  const editWahana = await wahanaStore().editMasterWahanaOnDB(
+    id,
+    column,
+    value
+  );
+  if (editWahana) {
+    $q.notify({
+      message: "Berhasil di ubah",
+      type: "positive",
+      position: "top",
+    });
+  }
+};
 
-// const updateProxy = () => {
-//   proxyDate.value = datePicker.value;
-//   // chooseDateSelected.value = true;
-// };
-// const optionFn = (proxyDate) => {
-//   // const aWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-//   return proxyDate <= timeStamp;
-// };
+const onDelete = async (id) => {
+  console.log(id);
+  const deleted = await wahanaStore().deleteMasterWahanaFromDB(id);
+  if (deleted) {
+    $q.notify({
+      message: "Berhasil di hapus",
+      type: "positive",
+      position: "top",
+    });
+  } else {
+    $q.notify({
+      message: "Gagal hapus data",
+      type: "negative",
+      position: "top",
+    });
+  }
+};
 
 const save = async (type) => {
   const isDateAfterToday = new Date(proxyDate.value).getTime() > Date.now();
@@ -297,7 +473,7 @@ const save = async (type) => {
 
 onMounted(async () => {
   await wahanaStore().getWahanaFromDB();
-  // isToday.value = true;
+  isLoading.value = false;
 });
 </script>
 

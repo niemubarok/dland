@@ -28,9 +28,10 @@ Route.group(() => {
   Route.group(() => {
     Route.get("/", "WahanaController.index");
     Route.get("/paket", "WahanaController.paket");
-    Route.post("/", "WahanaController.store");
-    Route.put("/:id", "WahanaController.update");
-    Route.delete("/:id", "WahanaController.destroy");
+    Route.post("/add", "WahanaController.create");
+    Route.post("/edit", "WahanaController.edit");
+    Route.post("/delete", "WahanaController.delete");
+    // Route.post("/add", "WahanaController.create");
   }).prefix("wahana");
 
   Route.group(() => {
@@ -49,9 +50,11 @@ Route.group(() => {
     Route.post("/create", "TransactionsController.create");
     Route.post("/all", "TransactionsController.index");
     Route.post("/delete", "TransactionsController.delete");
+    Route.post("/detail", "TransactionsController.show");
   }).prefix("transaksi");
 
   Route.group(() => {
-    Route.get("/all", "DetailPaketController.index");
+    Route.get("/all", "PaketController.index");
+    Route.get("/detail", "DetailPaketController.index");
   }).prefix("paket");
 }).prefix("api");

@@ -88,6 +88,13 @@
               @click="pilihPaket(paket)"
             />
           </template>
+          <q-btn
+            push
+            color="brown-9"
+            label="tes print"
+            class="q-mx-xs"
+            @click="testPrint"
+          />
         </div>
       </q-card>
     </div>
@@ -170,8 +177,28 @@ const selectAllWahana = () => {
   // transaksiStore().addTransaksi(data.value);
 };
 
+const testPrint = () => {
+  const data = {
+    nama_perusahaan: "Nama Perusahaan Anda",
+    nama_paket: "Paket A",
+    petugas: "Nama Petugas",
+    waktu: new Date().toLocaleString("id-ID"),
+    transaksi: {
+      transaksi: [
+        { nama: "Wahana 1", qty: 2, harga: 50000 },
+        { nama: "Wahana 2", qty: 1, harga: 75000 },
+      ],
+      totalBayar: 175000,
+      diskon: 25000,
+      totalAfterDiskon: 150000,
+    },
+  };
+  window.electron.printDirectlyToPrinter(ls.get("namaPrinter"));
+};
+
 const pilihPaket = async (paket) => {
   wahanaStore().pilihPaket(paket, wahanaStore().daftarWahana);
+  // return;
   transaksiStore().isPaket = true;
 
   // console.log(wahanaStore().daftarWahana)
@@ -183,7 +210,7 @@ const pilihPaket = async (paket) => {
     namaPaket: wahanaStore().namaPaketTerpilih,
   };
   // console.log("data", data);
-  // return
+  // return;
   const store = await transaksiStore().insertIntoDB();
   if (store) {
     window.electron.createPDFStruk("Depok Fantasy Land", JSON.stringify(data));
@@ -196,7 +223,7 @@ const pilihPaket = async (paket) => {
 
     // dialogRef.value.hide();
   } else {
-    const existingTransaksiGagal = ls.get("transaksi_gagal", []);
+    const existingTransaksiGagal = ls.get("transaksi_gagal") || [];
     const newTransaksiGagal = transaksiStore().detailTransaksi;
     const combinedTransaksiGagal = [
       ...existingTransaksiGagal,

@@ -119,7 +119,7 @@
           </tr>
         </thead>
       </template>
-      <template v-if="!reportStore().laporanWahana.length" v-slot:after>
+      <template v-if="!reportStore().laporanWahana?.length" v-slot:after>
         <tr>
           <td align="center" colspan="7" class="text-grey-5">
             <h5>Tidak ada transaksi</h5>

@@ -18,6 +18,7 @@ export const reportStore = defineStore("report", {
     laporanWahana: ref(),
     daftarTransaksi: ref([]),
     totalPendapatanWahana: ref(0),
+    totalPendapatanTransaksi: ref(0),
   }),
 
   getters: {
@@ -84,6 +85,10 @@ export const reportStore = defineStore("report", {
           endDate: this.endDate,
         });
         if (res.data) {
+          this.totalPendapatanTransaksi = res.data.reduce(
+            (acc, transaksi) => parseInt(acc) + parseInt(transaksi.total_bayar),
+            0
+          );
           this.daftarTransaksi = res.data;
         }
       } catch (err) {

@@ -77,53 +77,47 @@ import { componentStore } from "src/stores/component-store";
 const essentialLinks = [
   {
     title: "Dashboard",
-    caption: "Dashboard",
+    caption: "",
     icon: "dashboard",
     to: "/dashboard",
   },
   {
     title: "Ticketing",
-    caption: "Penjualan Tiket",
+    caption: "",
     icon: "receipt",
     to: "/",
   },
 
   {
     title: "Laporan",
-    // caption: "Top Up Saldo Tiket",
+    caption: "",
     icon: "bar_chart",
     link: "/laporan/kunjungan-per-wahana",
   },
   {
     title: "Data Transaksi",
-    caption: "Data Penjualan",
+    caption: "",
     icon: "fact_check",
     link: "/laporan/transaksi",
   },
   {
     title: "Settings",
-    caption: "Konfigurasi aplikasi",
+    caption: "",
     icon: "settings",
     link: "/settings",
   },
   {
     title: "Master Wahana",
-    caption: "Master Data Wahana",
+    caption: "",
     icon: "",
     link: "/wahana",
   },
-  // {
-  //   title: "Facebook",
-  //   caption: "@QuasarFramework",
-  //   icon: "public",
-  //   link: "https://facebook.quasar.dev",
-  // },
-  // {
-  //   title: "Quasar Awesome",
-  //   caption: "Community Quasar projects",
-  //   icon: "favorite",
-  //   link: "https://awesome.quasar.dev",
-  // },
+  {
+    title: "Daftar Paket",
+    caption: "",
+    icon: "",
+    link: "/paket",
+  },
 ];
 const leftDrawerOpen = ref(false);
 

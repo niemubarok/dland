@@ -3,8 +3,9 @@ import Database from "@ioc:Adonis/Lucid/Database";
 
 export default class WahanaController {
   public async index({ response }: HttpContextContract) {
-    const wahana = await Database.query() // 👈 gives an instance of select query builder
+    const wahana = await Database.query()
       .from("master_wahana")
+      .orderBy("id_wahana", "asc")
       .select("*");
     response.status(200).json(wahana);
   }
@@ -48,16 +49,19 @@ export default class WahanaController {
   // }
 
   public async create({ request, response }: HttpContextContract) {
-    const req = request.body().data;
+    const req = request.body();
 
     const data = {
       nama: req.nama,
       deskripsi: req.deskripsi,
-      hargaTiket: req.hargaTiket,
       jenis: req.jenis,
+      harga_tiket: req.harga_tiket,
     };
 
-    const store = await Database.table("wahanas").insert(data);
+    const store = await Database.rawQuery(
+      "INSERT INTO master_wahana (nama, deskripsi, harga_tiket, jenis) VALUES (?, ?, ?, ?)",
+      [data.nama, data.deskripsi, data.harga_tiket, data.jenis]
+    );
 
     if (store) {
       response.status(201).json(store);
@@ -66,9 +70,43 @@ export default class WahanaController {
 
   public async show({}: HttpContextContract) {}
 
-  public async edit({}: HttpContextContract) {}
+  public async edit({ request, response }: HttpContextContract) {
+    const { id, column, value } = request.body();
 
-  public async update({}: HttpContextContract) {}
+    try {
+      await Database.from("master_wahana")
+        .where("id_wahana", id)
+        .update({ [column]: value });
+
+      response.status(201).json({
+        message: "Update berhasil",
+      });
+    } catch (error) {
+      console.log(error);
+
+      response.status(400).json({
+        message: "Update gagal",
+        error: error.message,
+      });
+    }
+  }
+
+  public async delete({ request, response }: HttpContextContract) {
+    const { id } = request.body();
+
+    try {
+      const query = await Database.rawQuery(
+        `DELETE FROM master_wahana WHERE id_wahana = ${id}`
+      );
+
+      response.status(201).json(query);
+    } catch (error) {
+      response.status(400).json({
+        message: "Delete gagal",
+        error: error.message,
+      });
+    }
+  }
 
   public async destroy({}: HttpContextContract) {}
 }

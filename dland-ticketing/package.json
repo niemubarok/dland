@@ -19,6 +19,8 @@
     "bwip-js": "^4.2.0",
     "canvas": "^2.11.2",
     "chart.js": "^4.4.1",
+    "escpos": "^3.0.0-alpha.6",
+    "escpos-buffer": "^4.1.0",
     "howler": "^2.2.4",
     "jsbarcode": "^3.11.6",
     "jspdf": "^2.5.1",

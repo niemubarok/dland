@@ -164,6 +164,7 @@ const onClickBayar = async (method) => {
       totalAfterDiskon: transaksiStore().totalAfterDiskon,
       totalBayar: transaksiStore().totalBayar,
       namaPaket: "Tiket",
+      id_transaksi: store.id_transaksi,
     };
     // console.log("store", store);
     if (store) {

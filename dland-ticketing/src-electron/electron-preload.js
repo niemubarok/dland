@@ -64,7 +64,6 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   pdf.setFont("helvetica");
   pdf.setFontSize(13);
 
-  console.log();
   if (JSON.parse(transaksi).namaPaket) {
     pdf.text(
       JSON.parse(transaksi).namaPaket,
@@ -81,9 +80,14 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   }
 
   pdf.setFontSize(6);
+
   const petugas = ls.get("petugas").nama;
   const waktu = new Date().toLocaleString("id-ID");
-  pdf.text(`petugas:${petugas}`, 5, 11, { align: "left" });
+  const id_transaksi = JSON.parse(transaksi).id_transaksi;
+
+  pdf.text(`Id: ${id_transaksi}`, 5, 8, { align: "left" });
+
+  pdf.text(`petugas: ${petugas}`, 5, 11, { align: "left" });
   pdf.text(waktu, pageWidth - 5, 11, { align: "right" });
 
   pdf.line(5, 12, pdf.internal.pageSize.width - 5, 12); // Draw a line at y = 12 mm from the left margin to the right margin
@@ -94,7 +98,11 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     ceklis: "Ceklis",
   };
   const rows = Object.values(JSON.parse(transaksi).transaksi).map((item) => [
-    item.nama,
+    `${
+      item.deskripsi !== "-"
+        ? item.nama + " - " + item.deskripsi + "....."
+        : item.nama
+    }`, // Ganti dengan data sesuai kebutuhan, contoh: item.nama,
     item.qty,
     formatCurrency(item.total_bayar),
     ".............", // Ganti dengan data sesuai kebutuhan
@@ -357,11 +365,6 @@ async function printDirectlyToPrinter(printerName) {
   // For buffered connection (output to stdout)
   process.stdout.write(connection.buffer());
 }
-
-// Contoh data
-
-// Panggil fungsi untuk mencetak langsung
-// printDirectlyToPrinter("NamaPrinterAnda", data);
 
 async function getPrinters() {
   // let namaPrinter = ""

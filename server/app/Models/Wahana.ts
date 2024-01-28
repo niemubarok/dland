@@ -11,6 +11,9 @@ export default class Wahana extends BaseModel {
   public nama: string;
 
   @column()
+  public jenis: string;
+
+  @column()
   public deskripsi: string | null;
 
   @column()

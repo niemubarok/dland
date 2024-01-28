@@ -29,6 +29,7 @@ export default class extends BaseSchema {
         table.string("deskripsi", 100);
         table.decimal("harga_tiket", 10, 2).notNullable();
         table.string("jenis", 15);
+        table.boolean("status").defaultTo(true);
 
         /**
          * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

@@ -52,6 +52,7 @@ const props = defineProps({
   total_bayar: Number,
   qty: Number,
   length: Number,
+  deskripsi: String,
 });
 
 const qty = computed(() => {
@@ -67,6 +68,7 @@ const onClickWahana = () => {
     nama: props.nama,
     tarif: props.tarif,
     total_bayar: props.tarif,
+    deskripsi: props.deskripsi,
   });
 
   console.log("data di wahanacard", data.value);

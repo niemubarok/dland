@@ -89,7 +89,7 @@ const essentialLinks = [
   },
 
   {
-    title: "Laporan",
+    title: "Kunjungan Per Wahana",
     caption: "",
     icon: "bar_chart",
     link: "/laporan/kunjungan-per-wahana",

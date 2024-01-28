@@ -19,3 +19,15 @@ export const formatCurrency = (amount) => {
 export const removeDot = (number) => {
   return number.toString().replace(/\./g, "");
 };
+
+export const rp = (amount) => {
+  return parseInt(amount)
+    ?.toLocaleString("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      currencyDisplay: "code",
+    })
+    .replace("IDR", "")
+    .trim()
+    .split(",")[0];
+};

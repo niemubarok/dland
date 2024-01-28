@@ -18,7 +18,7 @@ export default class extends BaseSchema {
         //   .inTable("master_wahana");
         // table.integer("qty").notNullable();
         table.string("cara_bayar", 20).notNullable();
-        table.string("id_paket", 100);
+        table.integer("id_paket", 100);
         // .references("id")
         // .inTable("cara_bayar")
         // .withKeyName("transactions_cara_bayar_foreign"); // Add key name

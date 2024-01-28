@@ -56,5 +56,8 @@ Route.group(() => {
   Route.group(() => {
     Route.get("/all", "PaketController.index");
     Route.get("/detail", "DetailPaketController.index");
+    Route.post("/create", "PaketController.create");
+    Route.post("/edit", "PaketController.edit");
+    Route.post("/delete", "PaketController.delete");
   }).prefix("paket");
 }).prefix("api");

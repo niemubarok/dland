@@ -40,7 +40,7 @@
       <div class="q-mt-md">
         <q-item class="glass">
           <q-item-section avatar>
-            <q-avatar color="primary" text-color="white" icon="camera" />
+            <q-avatar color="primary" text-color="white" icon="print" />
           </q-item-section>
           <q-item-section>
             <q-select
@@ -66,19 +66,18 @@
       </div>
 
       <q-card-actions align="right">
-        <q-chip
+        <q-btn
+          push
           text-color="primary"
+          color="white"
           label="Simpan"
           style="padding: 2rem 1rem"
           class="q-mt-lg q-pa-md text-h6 rounded-corner"
+          @click="onSaveSettings"
         >
-          <q-btn
-            push
-            icon="keyboard_return"
-            color="black"
-            class="q-ma-md"
-            @click="onSaveSettings"
-        /></q-chip>
+          <!-- <q-btn push color="black" class="q-ma-md" @click="onSaveSettings" -->
+          <!-- /> -->
+        </q-btn>
       </q-card-actions>
     </q-card>
   </div>

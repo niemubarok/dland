@@ -66,14 +66,12 @@
           style="overflow-y: auto"
           :style="$q.screen.lt.sm ? { height: '40vh' } : { height: '76vh' }"
         >
-          <div
-            v-for="(wahana, index) in wahanaStore().daftarWahana"
-            :key="wahana"
-          >
+          <div v-for="(wahana, index) in daftarWahana" :key="wahana">
             <WahanaCard
               :id="wahana.id_wahana.toString()"
               :nama="wahana.nama"
               :tarif="parseInt(wahana.harga_tiket)"
+              :deskripsi="wahana.deskripsi"
             />
             <!-- <TicketCard /> -->
           </div>
@@ -89,21 +87,25 @@
           />
 
           <template v-for="paket in wahanaStore().paket" :key="paket.idPaket">
+            <!-- :label="paket.namaPaket + ' - ' + paket.hargaPaket" -->
             <q-btn
               push
               color="brown-9"
-              :label="paket.namaPaket"
-              class="q-mx-xs"
+              class="q-mx-xs q-my-xs"
               @click="pilihPaket(paket)"
-            />
+            >
+              {{ paket.namaPaket }}
+              <!-- <span class="text-body2 text-weight-thin">
+                ({{ (paket.hargaPaket) }})</span -->
+            </q-btn>
           </template>
-          <q-btn
+          <!-- <q-btn
             push
             color="brown-9"
             label="tes print"
             class="q-mx-xs"
             @click="testPrint"
-          />
+          /> -->
         </div>
       </q-card>
     </div>
@@ -155,7 +157,7 @@ import WahanaCard from "src/components/WahanaCard.vue";
 import TicketCard from "src/components/TicketCard.vue";
 import PaymentDialog from "src/components/PaymentDialog.vue";
 import { transaksiStore } from "src/stores/transaksi-store";
-import { ref, onMounted, onBeforeMount } from "vue";
+import { ref, onMounted, onBeforeMount, computed } from "vue";
 import { useQuasar } from "quasar";
 import ls from "localstorage-slim";
 import LoginDialog from "src/components/LoginDialog.vue";
@@ -163,6 +165,9 @@ import LoginDialog from "src/components/LoginDialog.vue";
 const $q = useQuasar();
 const qtyDialog = ref(false);
 const qty = ref();
+const daftarWahana = computed(() =>
+  wahanaStore().daftarWahana.filter((wahana) => wahana.status === true)
+);
 
 const selectAllWahana = () => {
   wahanaStore().daftarWahana.forEach((wahana) => {
@@ -216,18 +221,19 @@ const pilihPaket = async (paket) => {
 
   transaksiStore().idPaket = paket.idPaket;
 
-  // console.log(wahanaStore().daftarWahana)
-  const data = {
-    transaksi: transaksiStore().detailTransaksi,
-    diskon: transaksiStore().diskon,
-    totalAfterDiskon: transaksiStore().totalAfterDiskon,
-    totalBayar: transaksiStore().totalBayar,
-    namaPaket: wahanaStore().namaPaketTerpilih,
-  };
+  const store = await transaksiStore().insertIntoDB();
+  // console.log("store.id_transaksi", store.id_transaksi);
   // console.log("data", data);
   // return;
-  const store = await transaksiStore().insertIntoDB();
   if (store) {
+    const data = {
+      transaksi: transaksiStore().detailTransaksi,
+      diskon: transaksiStore().diskon,
+      totalAfterDiskon: transaksiStore().totalAfterDiskon,
+      totalBayar: transaksiStore().totalBayar,
+      namaPaket: wahanaStore().namaPaketTerpilih,
+      id_transaksi: store.id_transaksi,
+    };
     window.electron.createPDFStruk("Depok Fantasy Land", JSON.stringify(data));
     window.electron.print(ls.get("namaPrinter"));
     $q.notify({

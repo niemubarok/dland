@@ -12,6 +12,24 @@ export default class PetugasSeeder extends BaseSeeder {
         password: "admin",
       },
       {
+        namaLengkap: "gadis",
+        noHp: "089876543210",
+        username: "gadis",
+        password: "gadis",
+      },
+      {
+        namaLengkap: "najwa",
+        noHp: "089876543210",
+        username: "najwa",
+        password: "najwa",
+      },
+      {
+        namaLengkap: "lala",
+        noHp: "089876543210",
+        username: "lala",
+        password: "lala",
+      },
+      {
         namaLengkap: "Kasir",
         noHp: "089876543210",
         username: "kasir",

@@ -46,86 +46,372 @@
       </template>
       <!-- class="glass-light" -->
       <template v-slot="{ item: row, index }">
-        <tr :key="index" :class="index % 2 == 0 ? 'bg-white' : 'bg-grey-2'">
+        <tr
+          :key="index"
+          :class="{
+            'bg-grey-2': index % 2 !== 0 && selectedRow !== index,
+            'bg-green-9 text-white': selectedRow === index,
+          }"
+          class="cursor-pointer"
+          @click.right.prevent="onRightClick(index)"
+        >
           <td>{{ index + 1 }}</td>
           <td align="left">
-            <span class="text-subtitle2">{{ row.nama_paket }}</span>
+            <span class="text-subtitle2">{{ row.namaPaket }}</span>
+            <q-popup-edit
+              v-model="row.namaPaket"
+              v-slot="scope"
+              @save="(value) => update(row.idPaket, 'nama_paket', value)"
+            >
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+              <div class="float-right">
+                <q-btn
+                  size="sm"
+                  color="red-9"
+                  flat
+                  icon="close"
+                  @click="scope.cancel"
+                />
+                <q-btn
+                  size="sm"
+                  color="green-9"
+                  flat
+                  icon="check"
+                  @click="scope.set"
+                />
+              </div>
+            </q-popup-edit>
           </td>
           <!-- <td align="center">
             <span class="text-center text-subtitle2">{{ row.harga_tiket }}</span>
           </td> -->
           <td align="center" width="140px">
-            <div class="row justify-evenly">
+            <div class="row justify-between">
               <span class="text-weight-bolder">Rp</span>
-              <span class="text-subtitle2">
-                {{
-                  parseInt(row.harga_paket)
-                    ?.toLocaleString("id-ID", {
-                      style: "currency",
-                      currency: "IDR",
-                      currencyDisplay: "code",
-                    })
-                    .replace("IDR", "")
-                    .trim()
-                    .split(",")[0]
-                }}</span
-              >
+              <span class="text-subtitle2"> {{ rp(row.hargaPaket) }}</span>
             </div>
+
+            <q-popup-edit
+              v-model="row.hargaPaket"
+              v-slot="scope"
+              @save="(value) => update(row.idPaket, 'harga_paket', value)"
+            >
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+              <div class="float-right">
+                <q-btn
+                  size="sm"
+                  color="red-9"
+                  flat
+                  icon="close"
+                  @click="scope.cancel"
+                />
+                <q-btn
+                  size="sm"
+                  color="green-9"
+                  flat
+                  icon="check"
+                  @click="scope.set"
+                />
+              </div>
+            </q-popup-edit>
           </td>
           <td align="center" width="130px">
             <div class="row justify-between">
               <span class="text-weight-bolder">Rp</span>
-              <span class="text-subtitle2">
-                {{
-                  parseInt(row.diskon)
-                    ?.toLocaleString("id-ID", {
-                      style: "currency",
-                      currency: "IDR",
-                      currencyDisplay: "code",
-                    })
-                    .replace("IDR", "")
-                    .trim()
-                    .split(",")[0]
-                }}</span
-              >
+              <span class="text-subtitle2"> {{ rp(row.diskon) }}</span>
             </div>
+
+            <q-popup-edit
+              v-model="row.diskon"
+              v-slot="scope"
+              @save="(value) => update(row.idPaket, 'diskon', value)"
+            >
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+              <div class="float-right">
+                <q-btn
+                  size="sm"
+                  color="red-9"
+                  flat
+                  icon="close"
+                  @click="scope.cancel"
+                />
+                <q-btn
+                  size="sm"
+                  color="green-9"
+                  flat
+                  icon="check"
+                  @click="scope.set"
+                />
+              </div>
+            </q-popup-edit>
           </td>
           <td align="center">
-            <span class="text-subtitle2">
-              {{ row.status ? "Aktif" : "Tidak Aktif" }}</span
+            <span
+              class="text-subtitle2"
+              :class="
+                row.jenisPaket?.toLowerCase() == 'weekend'
+                  ? 'text-red'
+                  : 'text-green'
+              "
             >
+              {{ row.jenisPaket }}</span
+            >
+            <q-popup-edit
+              v-model="row.jenisPaket"
+              v-slot="scope"
+              @save="(value) => update(row.idPaket, 'jenis_paket', value)"
+            >
+              <q-select
+                filled
+                v-model="scope.value"
+                :options="['Weekend', 'Weekday']"
+                label="Jenis Wahana"
+              />
+              <div class="float-right">
+                <q-btn
+                  size="sm"
+                  color="red-9"
+                  flat
+                  icon="close"
+                  @click="scope.cancel"
+                />
+                <q-btn
+                  size="sm"
+                  color="green-9"
+                  flat
+                  icon="check"
+                  @click="scope.set"
+                />
+              </div>
+            </q-popup-edit>
           </td>
-          <td align="right">
-            <!-- @click="reportStore().deleteTransaksiFromDB(row.no_transaksi)" -->
+          <td align="left">
+            <span class="text-subtitle2">{{ row.deskripsi }}</span>
+            <q-popup-edit
+              v-model="row.deskripsi"
+              v-slot="scope"
+              @save="(value) => update(row.idPaket, 'deskripsi', value)"
+            >
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+              <div class="float-right">
+                <q-btn
+                  size="sm"
+                  color="red-9"
+                  flat
+                  icon="close"
+                  @click="scope.cancel"
+                />
+                <q-btn
+                  size="sm"
+                  color="green-9"
+                  flat
+                  icon="check"
+                  @click="scope.set"
+                />
+              </div>
+            </q-popup-edit>
+          </td>
+
+          <td align="center">
+            <q-toggle
+              v-model="row.status"
+              color="green"
+              checked-icon="check"
+              unchecked-icon="close"
+              @update:model-value="
+                (value) => update(row.idPaket, 'status', value)
+              "
+            />
+          </td>
+
+          <!-- <td align="right">
             <q-badge
               text-color="white"
               class="q-ml-md cursor-pointer bg-transparent"
+              @click="onDelete(row.idPaket)"
             >
               <q-icon name="delete" color="red" />
             </q-badge>
-          </td>
+          </td> -->
+
+          <q-menu touch-position context-menu @hide="onMenuHide(index)">
+            <q-list dense style="min-width: 100px">
+              <!-- <q-item
+                clickable
+                v-close-popup
+                @click="
+                  onClickPrint(row.diskon, row.no_transaksi, row.nama_paket)
+                "
+              > -->
+              <!-- <q-item-section>
+                  <q-chip class="bg-transparent">
+                    <q-avatar icon="print" color="brown" text-color="white" />
+                    print
+                  </q-chip>
+                </q-item-section>
+              </q-item>
+              <q-separator /> -->
+              <q-item clickable v-close-popup @click="onDelete(row.idPaket)">
+                <q-item-section>
+                  <q-chip class="bg-transparent text-red">
+                    <q-avatar icon="delete" color="red" text-color="white" />
+                    Hapus
+                  </q-chip>
+                </q-item-section>
+              </q-item>
+              <q-separator />
+              <q-item
+                clickable
+                v-close-popup
+                @click="onClickDetail(row.no_transaksi)"
+              >
+                <q-item-section>
+                  <q-chip class="bg-transparent text-blue">
+                    <q-avatar icon="info" color="blue" text-color="white" />
+                    Detail
+                  </q-chip>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
         </tr>
       </template>
     </q-virtual-scroll>
 
     <q-card-section>
-      <!-- <div class="flex row justify-between q-px-sm glass-dark q-py-md">
-        <span class="text-h6 text-white"> Total </span>
-        <span
-          class="text-weight-bolder text-h6 text-white q-mr-sm"
-          :style="
-            reportStore().diskon > 0 ? 'text-decoration:line-through' : ''
-          "
-          >{{
-            reportStore()
-              .totalPendapatanWahana?.toLocaleString("id-ID", {
-                style: "currency",
-                currency: "IDR",
-              })
-              .split(",")[0]
-          }}</span
-        >
-      </div> -->
+      <add-button
+        title="Tambah Paket Baru"
+        label="Tambah Paket"
+        style="z-index: 2"
+      >
+        <template #form>
+          <q-form @reset="onReset" class="q-gutter-md">
+            <q-input
+              ref="namaPaketRef"
+              standout="bg-brown-9 text-yellow"
+              v-model="newPaket.nama_paket"
+              label="Nama Paket"
+            />
+            <q-select
+              standout="bg-brown-9 text-yellow"
+              v-model="newPaket.jenis_paket"
+              :options="['Weekend', 'Weekday']"
+              behavior="menu"
+              label="Jenis Paket"
+            />
+            <q-input
+              type="textarea"
+              standout="bg-brown-9 text-yellow"
+              v-model="newPaket.deskripsi"
+              label="Deskripsi Paket"
+              autogrow
+            />
+            <q-input
+              standout="bg-brown-9 text-yellow"
+              v-model="newPaket.harga_paket"
+              type="number"
+              label="Tarif Paket"
+              prefix="Rp"
+            />
+            <q-input
+              standout="bg-brown-9 text-yellow"
+              v-model="newPaket.diskon"
+              type="number"
+              label="Tarif Paket"
+              prefix="Rp"
+            />
+            <q-select
+              standout="bg-brown-9 text-yellow"
+              v-model="newPaket.status"
+              :options="['Aktif', 'Tidak Aktif']"
+              label="Status Paket"
+              behavior="menu"
+            />
+            <q-select
+              ref="detailWahanaRef"
+              standout="bg-brown-9 text-yellow"
+              v-model="modelMultiple"
+              multiple
+              :options="options"
+              use-chips
+              stack-label
+              clearable
+              options-dense
+              behavior="dialog"
+              label="Detail Wahana"
+            >
+              <!-- hide-selected -->
+              <template v-slot:option="scope">
+                <q-chip
+                  v-bind="scope.itemProps"
+                  class="q-pa-lg q-ma-sm shadow-1"
+                  :class="scope.selected ? 'bg-green-4' : ''"
+                >
+                  {{ scope.opt.label }}
+                </q-chip>
+                <!-- <q-item-section class="row">
+                    <q-item-label>{{ scope.opt.label }}</q-item-label>
+                    <q-item-label caption>{{ scope.opt.harga }}</q-item-label>
+                    <q-separator />
+                  </q-item-section>
+                </q-item> -->
+              </template>
+              <template #after-options>
+                <div class="row full-width justify-end q-pa-md">
+                  <q-btn
+                    icon="close"
+                    label="selesai"
+                    color="brown"
+                    @click="detailWahanaRef.hidePopup"
+                  />
+                </div>
+              </template>
+            </q-select>
+          </q-form>
+        </template>
+        <template #button>
+          <div class="row">
+            <q-btn
+              label="Simpan"
+              type="submit"
+              color="brown-9"
+              @click="onSubmit"
+            />
+            <q-btn
+              label="Reset"
+              type="reset"
+              color="secondary"
+              flat
+              class="q-ml-md"
+              @click="onReset"
+            />
+          </div>
+        </template>
+      </add-button>
     </q-card-section>
   </q-card>
 </template>
@@ -133,112 +419,167 @@
 <script setup>
 import { wahanaStore } from "src/stores/wahana-store";
 import { transaksiStore } from "src/stores/transaksi-store";
+import { componentStore } from "src/stores/component-store";
+import AddButton from "src/components/AddButton.vue";
 import { onMounted, ref } from "vue";
 import { date, useQuasar } from "quasar";
+import { rp } from "src/utils/helpers";
 
 const $q = useQuasar();
-const todaySelected = ref(false);
-const startDateSelected = ref(false);
-const endDateSelected = ref(false);
-const store = wahanaStore();
-// const laporanWahana = ref([]);
-const laporanPendapatan = ref([]);
-const laporanKunjungan = ref([]);
-const timeStamp = date.formatDate(Date.now(), "YYYY/MM/DD");
-const datePicker = ref(timeStamp);
-const proxyDate = ref(Date.now());
-const isToday = ref(false);
-const startDate = ref("");
-const endDate = ref("");
 const columns = [
   { name: "No", prop: "no", align: "left" },
   { name: "Nama Paket", prop: "nama_paket", align: "left" },
   { name: "Harga Paket", prop: "harga_paket", align: "center" },
-  { name: "Diskon", prop: "jenis", align: "center" },
+  { name: "Diskon", prop: "diskon", align: "center" },
+  { name: "Jenis", prop: "jenis", align: "center" },
+  { name: "Deskripsi", prop: "deskripsi", align: "left" },
   { name: "Status", prop: "status", align: "center" },
   // { name: "TotalBayar", prop: "total_bayar", align: "right" },
-  { name: "Hapus", prop: "hapus", align: "right" },
+  // { name: "Hapus", prop: "hapus", align: "right" },
 ];
+const detailWahanaRef = ref();
+const namaPaketRef = ref();
 
-// const todayBtn = async () => {
-//   isToday.value = !isToday.value;
-//   startDateSelected.value = false;
-//   endDateSelected.value = false;
-//   // Ensure the time zone offset is accounted for so that startDate is set to today's date
-//   const today = new Date();
-//   today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-//   reportStore().startDate = today.toISOString().split("T")[0];
-//   reportStore().endDate = today.toISOString().split("T")[0];
-//   await store.getLaporanTransaksiFromDB();
-// };
+const modelMultiple = ref([]);
 
-// const dayLabel = (dateValue) => {
-//   const daysInIndonesian = {
-//     Sunday: "Minggu",
-//     Monday: "Senin",
-//     Tuesday: "Selasa",
-//     Wednesday: "Rabu",
-//     Thursday: "Kamis",
-//     Friday: "Jumat",
-//     Saturday: "Sabtu",
-//   };
-//   const dayInEnglish = date.formatDate(dateValue, "dddd");
-//   const dateInIndonesian = daysInIndonesian[dayInEnglish];
+const options = ref([]);
+const newPaket = ref({
+  nama_paket: "",
+  jenis_paket: "",
+  harga_paket: "",
+  diskon: "0",
+  deskripsi: "-",
+  status: "Aktif",
+  id_wahana: [],
+});
 
-//   return dateValue
-//     ? `${dateInIndonesian}, ${date.formatDate(dateValue, "DD-MM-YYYY")}`
-//     : "PILIH TANGGAL";
-// };
+const onSubmit = async () => {
+  try {
+    if (
+      newPaket.value.nama_paket &&
+      newPaket.value.jenis_paket &&
+      // newPaket.value.deskripsi
+      // &&
+      newPaket.value.harga_paket > 0 &&
+      modelMultiple.value?.length
+    ) {
+      newPaket.value.id_wahana = modelMultiple.value.map((wahana) => {
+        return wahana.value;
+      });
+      console.log(newPaket.value);
 
-// const startDateLabel = () => dayLabel(startDate.value);
-// const endDateLabel = () => dayLabel(endDate.value);
+      const store = await wahanaStore().addPaketToDB(newPaket.value);
+      if (store) {
+        // wahanaStore.paket.push(newPaket.value);
+        newPaket.value = {
+          nama_paket: "",
+          jenis_paket: "",
+          harga_paket: "",
+          diskon: "",
+          deskripsi: "",
+          status: "",
+        };
+        componentStore().nextMorph();
+      } else {
+        $q.notify({
+          color: "negative",
+          position: "top",
+          message: "GAGAL",
+          icon: "report_problem",
+        });
+      }
+    } else {
+      $q.notify({
+        color: "negative",
+        position: "top",
+        message: "Semua field harus diisi ",
+        icon: "report_problem",
+      });
+    }
+    // Notify success
+  } catch (error) {
+    // Notify error
+  }
+};
 
-// const updateProxy = () => {
-//   proxyDate.value = datePicker.value;
-//   // chooseDateSelected.value = true;
-// };
-// const optionFn = (proxyDate) => {
-//   // const aWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-//   return proxyDate <= timeStamp;
-// };
+const onReset = () => {
+  newPaket.value = {
+    nama_paket: "",
+    jenis_paket: "",
+    harga_paket: "",
+    diskon: "",
+    deskripsi: "",
+    status: "",
+  };
+  modelMultiple.value = [];
+  namaPaketRef.value.focus();
+};
 
-// const save = async (type) => {
-//   const isDateAfterToday = new Date(proxyDate.value).getTime() > Date.now();
+const update = async (id, column, value) => {
+  console.log(id, column, value);
+  const editWahana = await wahanaStore().editPaketOnDB(id, column, value);
+  if (editWahana) {
+    $q.notify({
+      message: "Berhasil di ubah",
+      type: "positive",
+      position: "top",
+    });
+  }
+};
 
-//   if (isDateAfterToday) {
-//     $q.notify({
-//       color: "negative",
-//       textColor: "white",
-//       icon: "error",
-//       message: "Tanggal tidak boleh lebih dari hari ini!",
-//     });
-//     return;
-//   }
-//   if (type === "start") {
-//     startDateSelected.value = true;
-//     startDate.value = proxyDate.value;
-//     endDate.value = proxyDate.value;
-//     reportStore().startDate = startDate.value;
-//     if (new Date(proxyDate.value).getDate() == new Date(Date.now()).getDate()) {
-//       isToday.value = true;
-//       todaySelected.value = true;
-//     } else {
-//       isToday.value = false;
-//       todaySelected.value = false;
-//     }
-//   } else if (type === "end") {
-//     endDateSelected.value = true;
-//     endDate.value = proxyDate.value;
-//     console.log("endate", endDate.value);
-//     reportStore().endDate = endDate.value;
-//   }
+const onDelete = async (id) => {
+  console.log(id);
+  const deleted = await wahanaStore().deletePaketFromDB(id);
+  if (deleted) {
+    $q.notify({
+      message: "Berhasil di hapus",
+      type: "positive",
+      position: "top",
+    });
+  } else {
+    $q.notify({
+      message: "Gagal hapus data",
+      type: "negative",
+      position: "top",
+    });
+  }
+};
 
-//   await store.getLaporanTransaksiFromDB();
-//   // await store.getLaporanPendapatan();
-// };
+const selectedRow = ref();
+const isLoading = ref(false);
+const showMenu = ref(false);
+
+const onRightClick = (index) => {
+  selectedRow.value = index;
+};
+
+const onMenuHide = (index) => {
+  if (selectedRow.value === index) {
+    selectedRow.value = "";
+  }
+};
+
+const onClickDetail = async (no_transaksi) => {
+  await transaksiStore().getDetailTransaksi(no_transaksi);
+  const detailDialog = $q.dialog({
+    component: DetailTransaksiDialog,
+    props: {},
+  });
+  detailDialog.update();
+};
+
+// const onClickPrint = asy;
 
 onMounted(async () => {
   await wahanaStore().getPaketFromDB();
+  const wahana = (await wahanaStore().getWahanaFromDB()).map((item) => ({
+    value: item.id_wahana,
+    label: item.nama,
+    harga: item.harga_tiket,
+  }));
+
+  console.log(wahana);
+  options.value.splice(0, options.value.length, ...wahana);
   // isToday.value = true;
 });
 </script>

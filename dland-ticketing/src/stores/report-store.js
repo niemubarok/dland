@@ -66,13 +66,18 @@ export const reportStore = defineStore("report", {
           this.kunjunganWahanaPerHari = res.data.kunjunganWahanaPerHari;
           this.kunjunganWahanaPerBulan = res.data.kunjunganWahanaPerBulan;
           this.totalPendapatanWahana = res.data.totalPendapatan;
-          this.laporanWahana = res.data.kunjunganWahanaPerHari;
+          this.laporanWahana = res.data.kunjunganWahanaPerHari.sort(
+            (a, b) => b.jumlah - a.jumlah
+          );
 
           console.log(this.startDate);
           console.log(this.endDate);
 
           // console.log("laporanKunjunganWahana", laporanKunjunganWahana);
-          console.log(res.data.kunjunganWahanaPerHari);
+          console.log(
+            "res.data.kunjunganWahanaPerHari",
+            res.data.kunjunganWahanaPerHari
+          );
         }
       } catch (err) {
         console.log(err);

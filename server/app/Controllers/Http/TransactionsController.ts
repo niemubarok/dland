@@ -102,28 +102,32 @@ WHERE SUBSTRING(transaksi_penjualan.no_transaksi, 1, 10) BETWEEN ? AND ?
     try {
       // return transactionsData;
       const currentDate = new Date();
-      const transaksi_penjualan = await Database.table(
-        "transaksi_penjualan"
-      ).insert({
-        no_transaksi,
-        cara_bayar,
-        total,
-        diskon,
-        total_bayar: totalAfterDiskon,
-        petugas,
-        status,
-        created_at: currentDate.toISOString(),
-        id_paket: idPaket,
-      });
+      const [transaksi_penjualan] = await Database.table("transaksi_penjualan")
+        .returning("id_transaksi")
+        .insert({
+          no_transaksi,
+          cara_bayar,
+          total,
+          diskon,
+          total_bayar: totalAfterDiskon,
+          petugas,
+          status,
+          created_at: currentDate.toISOString(),
+          id_paket: idPaket,
+        });
 
       const detail_transaksi = await Database.table(
         "detail_transaksi"
       ).multiInsert(transactionsData);
       // Handle the successful insertion
+
+      console.log(transaksi_penjualan);
+
       response.status(201).json({
         message: "Transaction created successfully",
         transaksi_penjualan,
         detail_transaksi,
+        no_transaksi,
       });
     } catch (error) {
       // Handle the error

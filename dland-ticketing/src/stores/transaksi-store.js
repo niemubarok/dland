@@ -65,6 +65,7 @@ export const transaksiStore = defineStore("transaksi", {
     },
 
     addTransaksi(data) {
+      console.log("addTransaksi", data);
       const wahana = this.detailTransaksi.find(
         (item) => item.id_wahana === data.id_wahana
       );
@@ -73,7 +74,12 @@ export const transaksiStore = defineStore("transaksi", {
         this.qty = wahana.qty;
         wahana.total_bayar = data.tarif * wahana.qty;
       } else {
-        this.detailTransaksi.push({ ...data, qty: 1, total_bayar: data.tarif });
+        this.detailTransaksi.push({
+          ...data,
+          qty: 1,
+          total_bayar: data.tarif,
+          deskripsi: data.deskripsi || "",
+        });
         console.log(this.detailTransaksi);
       }
     },
@@ -128,7 +134,9 @@ export const transaksiStore = defineStore("transaksi", {
           });
           isSuccess = true;
           // this.detailTransaksi.splice(0);
-          return isSuccess;
+          console.log(response.data);
+          const id_transaksi = response.data.transaksi_penjualan.id_transaksi;
+          return { isSuccess, id_transaksi };
         }
       } catch (error) {
         isSuccess = false;

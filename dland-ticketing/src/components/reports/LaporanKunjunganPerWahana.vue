@@ -129,14 +129,30 @@
       <!-- class="glass-light" -->
       <template v-slot="{ item: row, index }">
         <tr :key="index">
-          <td>{{ index + 1 }}</td>
-          <td align="left">
+          <td width="20px">{{ index + 1 }}</td>
+          <td align="left" width="150px">
             <span class="text-subtitle2">{{ row.nama_wahana }}</span>
           </td>
           <td align="center">
-            <span class="text-center text-subtitle2">{{ row.jumlah }}</span>
+            <!-- <span class="text-center text-subtitle2">{{ row.jumlah }}</span> -->
+            <q-linear-progress
+              stripe
+              rounded
+              size="20px"
+              :value="row.jumlah / 10"
+              :color="getColor(row.jumlah)"
+              class="q-mt-sm relative"
+            >
+              <div class="absolute-top-right flex flex-center">
+                <q-badge
+                  color="white"
+                  text-color="accent"
+                  :label="row.jumlah"
+                />
+              </div>
+            </q-linear-progress>
           </td>
-          <td align="right">
+          <!-- <td align="right">
             <span class="text-subtitle2">
               {{
                 parseInt(row.pendapatan)
@@ -147,14 +163,14 @@
                   .split(",")[0]
               }}</span
             >
-          </td>
+          </td> -->
         </tr>
       </template>
       <template v-slot:after> </template>
     </q-virtual-scroll>
 
     <q-card-section>
-      <div class="flex row justify-between q-px-sm glass-dark q-py-md">
+      <!-- <div class="flex row justify-between q-px-sm glass-dark q-py-md">
         <span class="text-h6 text-white"> Total </span>
         <span
           class="text-weight-bolder text-h6 text-white q-mr-sm"
@@ -170,7 +186,7 @@
               .split(",")[0]
           }}</span
         >
-      </div>
+      </div> -->
     </q-card-section>
   </q-card>
 </template>
@@ -198,7 +214,7 @@ const columns = [
   { name: "No", prop: "name", align: "left" },
   { name: "Nama Wahana", prop: "nama_wahana", align: "left" },
   { name: "Jumlah", prop: "jumlah", align: "center" },
-  { name: "Pendapatan", prop: "pendapatan", align: "right" },
+  // { name: "Pendapatan", prop: "pendapatan", align: "right" },
   // { name: 'Protein (g)', prop: 'protein' }
 ];
 
@@ -279,8 +295,25 @@ const save = async (type) => {
   // await store.getLaporanPendapatan();
 };
 
+const highestTotal = ref(0);
+
+const calculatePercentage = (value) => (value / highestTotal.value) * 100;
+
+const getColor = (jumlah) => {
+  const percentage = calculatePercentage(jumlah);
+
+  if (percentage <= 20) return "red";
+  if (percentage <= 40) return "orange";
+  if (percentage <= 60) return "yellow";
+  if (percentage <= 80) return "lightgreen";
+  return "green";
+};
+
 onMounted(async () => {
   await reportStore().getLaporanKunjunganWahana();
+  highestTotal.value = Math.max(
+    ...reportStore().laporanWahana.map((item) => item.jumlah)
+  );
   isToday.value = true;
 });
 </script>

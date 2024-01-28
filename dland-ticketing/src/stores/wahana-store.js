@@ -114,8 +114,8 @@ export const wahanaStore = defineStore("wahana", {
     async getWahanaFromDB() {
       const res = await api.get("wahana");
       this.daftarWahana.splice(0, this.daftarWahana.length, ...res.data);
-
-      console.log(res.data);
+      console.log("getWahanaFromDBr", res.data);
+      return res.data;
     },
 
     async getDetailPaketFromDB() {
@@ -188,8 +188,53 @@ export const wahanaStore = defineStore("wahana", {
 
     async getPaketFromDB() {
       const res = await api.get("paket/detail");
-      this.paket.splice(0, this.paket.length, ...res.data);
-      console.log(res.data);
+
+      const data = res.data
+        .filter((item) => item.status === true)
+        .map((item) => {
+          return {
+            idPaket: item.idPaket,
+            namaPaket: item.namaPaket,
+            hargaPaket: parseInt(item.hargaPaket),
+            diskon: parseInt(item.diskon),
+            jenisPaket: item.jenisPaket,
+            deskripsi: item.deskripsi,
+            status: item.status,
+            idWahana: [...item.idWahana],
+          };
+        });
+
+      this.paket.splice(0, this.paket.length, ...data);
+
+      console.log("res.data", res.data);
+      console.log(data);
+    },
+    async addPaketToDB(data) {
+      console.log("data", data);
+      try {
+        const res = await api.post("/paket/create", { data });
+        if (res.status === 201) {
+          const dataToPush = {
+            idPaket: data.id_paket,
+            namaPaket: data.nama_paket,
+            hargaPaket: parseInt(data.harga_paket),
+            diskon: parseInt(data.diskon),
+            jenisPaket: data.jenis_paket,
+            deskripsi: data.deskripsi,
+            status: data.status,
+            idWahana: [...data.id_wahana],
+          };
+
+          this.paket.push(dataToPush);
+          console.log("Paket added:", dataToPush);
+          return true;
+        } else {
+          console.error("Failed to add paket:", res);
+          return false;
+        }
+      } catch (error) {
+        console.error("Error adding paket:", error);
+      }
     },
     async addMasterWahanaToDB(data) {
       try {
@@ -242,6 +287,45 @@ export const wahanaStore = defineStore("wahana", {
             console.log(`Wahana with ID ${id} deleted.`);
           } else {
             console.log(`Wahana with ID ${id} not found.`);
+          }
+          return true;
+        } else {
+          return false;
+        }
+      } catch (err) {
+        return err;
+      }
+    },
+    async editPaketOnDB(id, column, value) {
+      try {
+        const res = await api.post("paket/edit", { id, column, value });
+
+        if (res.status === 201) {
+          const index = this.paket.findIndex((paket) => paket.id_paket === id);
+          if (index !== -1) {
+            Object.assign(this.paket[index], { [column]: value });
+            console.log(`paket with ID ${id} updated:`, this.paket[index]);
+          } else {
+            console.log(`paket with ID ${id} not found.`);
+          }
+          return true;
+        } else {
+          return false;
+        }
+      } catch (err) {
+        return err;
+      }
+    },
+    async deletePaketFromDB(id) {
+      try {
+        const res = await api.post("paket/delete", { id });
+        if (res.status === 201) {
+          const index = this.paket.findIndex((paket) => paket.idPaket === id);
+          if (index !== -1) {
+            this.paket.splice(index, 1);
+            console.log(`paket with ID ${id} deleted.`);
+          } else {
+            console.log(`paket with ID ${id} not found.`);
           }
           return true;
         } else {

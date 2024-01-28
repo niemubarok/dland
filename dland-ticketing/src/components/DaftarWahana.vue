@@ -103,7 +103,7 @@
       :virtual-scroll-sticky-size-start="48"
       :virtual-scroll-sticky-size-end="32"
       :items="wahanaStore().daftarWahana"
-      sort-by="id_wahana"
+      sort-by="nama"
     >
       <template v-slot:before>
         <thead class="thead-sticky">
@@ -167,17 +167,23 @@
           <!-- <td align="center">
             <span class="text-center text-subtitle2">{{ row.harga_tiket }}</span>
           </td> -->
-          <td align="center">
-            <span class="text-subtitle2">
-              {{
-                parseInt(row.harga_tiket)
-                  ?.toLocaleString("id-ID", {
-                    style: "currency",
-                    currency: "IDR",
-                  })
-                  .split(",")[0]
-              }}</span
-            >
+          <td align="center" width="140px">
+            <div class="row justify-between">
+              <span class="text-grey-7">Rp</span>
+              <span class="text-subtitle2">
+                {{
+                  parseInt(row.harga_tiket)
+                    ?.toLocaleString("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                      currencyDisplay: "code",
+                    })
+                    .replace("IDR", "")
+                    .trim()
+                    .split(",")[0]
+                }}</span
+              >
+            </div>
             <q-popup-edit
               v-model="row.harga_tiket"
               v-slot="scope"
@@ -209,7 +215,16 @@
             </q-popup-edit>
           </td>
           <td align="center">
-            <span class="text-subtitle2"> {{ row.jenis }}</span>
+            <span
+              class="text-subtitle2"
+              :class="
+                row.jenis?.toLowerCase() == 'weekend'
+                  ? 'text-red'
+                  : 'text-green'
+              "
+            >
+              {{ row.jenis }}</span
+            >
             <q-popup-edit
               v-model="row.jenis"
               v-slot="scope"
@@ -238,6 +253,17 @@
                 />
               </div>
             </q-popup-edit>
+          </td>
+          <td align="center">
+            <q-toggle
+              v-model="row.status"
+              color="green"
+              checked-icon="check"
+              unchecked-icon="close"
+              @update:model-value="
+                (value) => update(row.id_wahana, 'status', value)
+              "
+            />
           </td>
           <td align="left">
             <span class="text-subtitle2"> {{ row.deskripsi }}</span>
@@ -351,6 +377,7 @@
 
 <script setup>
 import { wahanaStore } from "src/stores/wahana-store";
+import { componentStore } from "src/stores/component-store";
 import { transaksiStore } from "src/stores/transaksi-store";
 import { onMounted, ref } from "vue";
 import { date, useQuasar } from "quasar";
@@ -375,23 +402,39 @@ const columns = [
   { name: "Nama Wahana", prop: "nama", align: "left" },
   { name: "Harga Tiket", prop: "harga_tiket", align: "center" },
   { name: "Jenis", prop: "jenis", align: "center" },
+  { name: "Status", prop: "status", align: "center" },
   { name: "Keterangan", prop: "deskripsi", align: "left" },
-  // { name: "TotalBayar", prop: "total_bayar", align: "right" },
   { name: "Hapus", prop: "hapus", align: "right" },
 ];
 
 const newWahana = ref({
   nama: "",
   jenis: "",
-  deskripsi: "",
+  deskripsi: "-",
   harga_tiket: 0,
 });
 
 const onSubmit = async () => {
   try {
-    console.log(newWahana.value);
-    await wahanaStore().addMasterWahanaToDB(newWahana.value);
-    // newWahana.value = { nama: "", jenis: "", deskripsi: "", tarif: 0 };
+    if (
+      newWahana.value.nama &&
+      newWahana.value.jenis &&
+      newWahana.value.deskripsi
+      // &&
+      // newWahana.value.harga_tiket > 0
+    ) {
+      console.log(newWahana.value);
+      await wahanaStore().addMasterWahanaToDB(newWahana.value);
+      newWahana.value = { nama: "", jenis: "", deskripsi: "", harga_tiket: 0 };
+      componentStore().nextMorph();
+    } else {
+      $q.notify({
+        color: "negative",
+        position: "top",
+        message: "Semua field harus diisi ",
+        icon: "report_problem",
+      });
+    }
     // Notify success
   } catch (error) {
     // Notify error

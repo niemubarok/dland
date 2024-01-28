@@ -12,6 +12,8 @@ export default class DetailPaketController {
     p.nama_paket AS "namaPaket",
     p.harga_paket AS "hargaPaket",
     p.diskon AS "diskon",
+    p.jenis_paket AS "jenisPaket",
+    p.deskripsi AS "deskripsi",
     p.status AS "status",
     (SELECT STRING_AGG(dpt.id_wahana::text, ',') FROM detail_paket_tiket dpt WHERE dpt.id_paket = p.id_paket) AS "idWahana"
   FROM
@@ -22,7 +24,7 @@ export default class DetailPaketController {
         (item: { idWahana: string; status: string }) => ({
           ...item,
           idWahana: item.idWahana ? item.idWahana.split(",").map(Number) : [],
-          status: item.status === "true",
+          status: item.status,
         })
       );
 

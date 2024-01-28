@@ -9,9 +9,11 @@ export default class extends BaseSchema {
     if (!hasTable) {
       this.schema.createTable(this.tableName, (table) => {
         table.increments("id_paket").primary();
-        table.string("nama_paket").notNullable();
+        table.string("nama_paket", 50).notNullable();
+        table.string("jenis_paket", 25).notNullable();
         table.decimal("harga_paket", 10, 2).notNullable();
         table.decimal("diskon", 10, 2).notNullable();
+        table.string("deskripsi", 100).notNullable();
         table.boolean("status").notNullable();
       });
     }

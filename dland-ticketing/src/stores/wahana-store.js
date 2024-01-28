@@ -190,7 +190,6 @@ export const wahanaStore = defineStore("wahana", {
       const res = await api.get("paket/detail");
 
       const data = res.data
-        .filter((item) => item.status === true)
         .map((item) => {
           return {
             idPaket: item.idPaket,

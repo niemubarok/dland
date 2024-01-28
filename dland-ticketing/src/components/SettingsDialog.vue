@@ -43,13 +43,16 @@
             <q-avatar color="primary" text-color="white" icon="print" />
           </q-item-section>
           <q-item-section>
-            <q-select
+            <!-- <q-select
               filled
               v-model="selectedPrinter"
               :options="printers"
               label="Printer"
               emit-value
               map-options
+            /> -->
+            <q-input
+            v-model="selectedPrinter"
             />
           </q-item-section>
           <!-- <q-item-section side>

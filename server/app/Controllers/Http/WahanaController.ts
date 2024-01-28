@@ -50,8 +50,12 @@ export default class WahanaController {
 
   public async create({ request, response }: HttpContextContract) {
     const req = request.body();
-
-    const data = {
+    const idTerakhirWahana = await Database.from('master_wahana').orderBy('id_wahana', 'desc').first();
+    const lastSaleId = idTerakhirWahana?.id_wahana + 1 || 0;
+    console.log(lastSaleId);
+    
+        const data = {
+          id_wahana:lastSaleId,
       nama: req.nama,
       deskripsi: req.deskripsi,
       jenis: req.jenis,
@@ -59,8 +63,8 @@ export default class WahanaController {
     };
 
     const store = await Database.rawQuery(
-      "INSERT INTO master_wahana (nama, deskripsi, harga_tiket, jenis) VALUES (?, ?, ?, ?)",
-      [data.nama, data.deskripsi, data.harga_tiket, data.jenis]
+      "INSERT INTO master_wahana (id_wahana,nama, deskripsi, harga_tiket, jenis) VALUES (?, ?, ?, ?,?)",
+      [data.id_wahana, data.nama, data.deskripsi, data.harga_tiket, data.jenis]
     );
 
     if (store) {

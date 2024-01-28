@@ -20,7 +20,7 @@
       :virtual-scroll-item-size="48"
       :virtual-scroll-sticky-size-start="48"
       :virtual-scroll-sticky-size-end="32"
-      :items="wahanaStore().paket"
+      :items="daftarPaket"
     >
       <template v-slot:before>
         <thead class="thead-sticky">
@@ -37,7 +37,7 @@
         </thead>
       </template>
 
-      <template v-if="!wahanaStore().paket.length" v-slot:after>
+      <template v-if="!daftarPaket.length" v-slot:after>
         <tr>
           <td align="center" colspan="7" class="text-grey-5">
             <h5>Tidak ada wahana</h5>
@@ -421,7 +421,7 @@ import { wahanaStore } from "src/stores/wahana-store";
 import { transaksiStore } from "src/stores/transaksi-store";
 import { componentStore } from "src/stores/component-store";
 import AddButton from "src/components/AddButton.vue";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { date, useQuasar } from "quasar";
 import { rp } from "src/utils/helpers";
 
@@ -567,6 +567,10 @@ const onClickDetail = async (no_transaksi) => {
   });
   detailDialog.update();
 };
+
+const daftarPaket = computed(()=>{
+  return wahanaStore().paket
+})
 
 // const onClickPrint = asy;
 

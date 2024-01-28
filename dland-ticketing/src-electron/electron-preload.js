@@ -97,14 +97,21 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     harga: "Harga",
     ceklis: "Ceklis",
   };
+
+  console.log( "JSON.parse(transaksi)",  JSON.parse(transaksi))
+
   const rows = Object.values(JSON.parse(transaksi).transaksi).map((item) => [
     `${
-      item.deskripsi !== "-"
-        ? item.nama + " - " + item.deskripsi + "....."
-        : item.nama
+      item.deskripsi === "-"  || item.deskripsi === ""
+        ? item.nama 
+        : item.nama + " - " + item.deskripsi 
     }`, // Ganti dengan data sesuai kebutuhan, contoh: item.nama,
-    item.qty,
-    formatCurrency(item.total_bayar),
+    item.deskripsi === "-" || item.deskripsi === ""
+    ? item.qty
+    :'',
+    item.deskripsi === "-" || item.deskripsi === ""
+    ? formatCurrency(item.total_bayar)
+    :'',
     ".............", // Ganti dengan data sesuai kebutuhan
   ]);
 

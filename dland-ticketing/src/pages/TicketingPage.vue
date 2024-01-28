@@ -86,7 +86,7 @@
             class="q-mx-xs"
           />
 
-          <template v-for="paket in wahanaStore().paket" :key="paket.idPaket">
+          <template v-for="paket in daftarPaket" :key="paket.idPaket">
             <!-- :label="paket.namaPaket + ' - ' + paket.hargaPaket" -->
             <q-btn
               push
@@ -166,8 +166,13 @@ const $q = useQuasar();
 const qtyDialog = ref(false);
 const qty = ref();
 const daftarWahana = computed(() =>
-  wahanaStore().daftarWahana.filter((wahana) => wahana.status === true)
+wahanaStore().daftarWahana.filter((wahana) => wahana.status === true).sort((a, b) => a.nama.localeCompare(b.nama))
+
 );
+
+const daftarPaket = computed(()=>{
+  return wahanaStore().paket.filter(paket=>paket.status === true)
+})
 
 const selectAllWahana = () => {
   wahanaStore().daftarWahana.forEach((wahana) => {

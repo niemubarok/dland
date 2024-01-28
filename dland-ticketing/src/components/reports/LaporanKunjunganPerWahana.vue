@@ -145,8 +145,9 @@
             >
               <div class="absolute-top-right flex flex-center">
                 <q-badge
-                  color="white"
-                  text-color="accent"
+                  color="brown"
+                  text-color="yellow"
+                  class="text-body"
                   :label="row.jumlah"
                 />
               </div>

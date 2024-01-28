@@ -102,7 +102,7 @@
       :virtual-scroll-item-size="48"
       :virtual-scroll-sticky-size-start="48"
       :virtual-scroll-sticky-size-end="32"
-      :items="wahanaStore().daftarWahana"
+      :items="daftarWahana"
       sort-by="nama"
     >
       <template v-slot:before>
@@ -120,8 +120,9 @@
         </thead>
       </template>
 
-      <template v-if="!wahanaStore().daftarWahana.length" v-slot:after>
+      <template v-if="!daftarWahana?.length" v-slot:after>
         <tr>
+          {{ daftarWahana }}
           <td align="center" colspan="7" class="text-grey-5">
             <h5>Tidak ada wahana</h5>
           </td>
@@ -379,7 +380,7 @@
 import { wahanaStore } from "src/stores/wahana-store";
 import { componentStore } from "src/stores/component-store";
 import { transaksiStore } from "src/stores/transaksi-store";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { date, useQuasar } from "quasar";
 import AddButton from "src/components/AddButton.vue";
 
@@ -513,6 +514,10 @@ const save = async (type) => {
   await store.getLaporanTransaksiFromDB();
   // await store.getLaporanPendapatan();
 };
+
+const daftarWahana= computed(()=>{
+  return wahanaStore().daftarWahana.sort((a,b)=>a.nama.localeCompare(b.nama))
+})
 
 onMounted(async () => {
   await wahanaStore().getWahanaFromDB();

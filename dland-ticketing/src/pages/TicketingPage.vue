@@ -250,7 +250,7 @@ const pilihPaket = async (paket) => {
       totalAfterDiskon: transaksiStore().totalAfterDiskon,
       totalBayar: transaksiStore().totalBayar,
       namaPaket: wahanaStore().namaPaketTerpilih,
-      id_transaksi: store.id_transaksi,
+      no_transaksi: store.no_transaksi,
     };
     window.electron.createPDFStruk("Depok Fantasy Land", JSON.stringify(data));
     window.electron.print(ls.get("namaPrinter"));

@@ -28,6 +28,7 @@
     "jspm": "^3.2.0",
     "jsprintmanager": "^6.0.3",
     "localstorage-slim": "^2.7.0",
+    "node-hid": "^3.0.0",
     "numeral": "^2.0.6",
     "pdf-to-printer": "^5.6.0",
     "pdfkit": "^0.14.0",

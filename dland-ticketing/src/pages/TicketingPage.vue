@@ -167,13 +167,14 @@ const $q = useQuasar();
 const qtyDialog = ref(false);
 const qty = ref();
 const daftarWahana = computed(() =>
-wahanaStore().daftarWahana.filter((wahana) => wahana.status === true).sort((a, b) => a.nama.localeCompare(b.nama))
-
+  wahanaStore()
+    .daftarWahana.filter((wahana) => wahana.status === true)
+    .sort((a, b) => a.nama.localeCompare(b.nama))
 );
 
-const daftarPaket = computed(()=>{
-  return wahanaStore().paket.filter(paket=>paket.status === true)
-})
+const daftarPaket = computed(() => {
+  return wahanaStore().paket.filter((paket) => paket.status === true);
+});
 
 const selectAllWahana = () => {
   wahanaStore().daftarWahana.forEach((wahana) => {
@@ -289,7 +290,10 @@ onMounted(async () => {
     });
     _loginDialog.update();
   }
-  
+
+  // console.log(await window.electron.getHIDDevices());
+  // console.log(await window.electron.readDataFromHID(27027, 45090));
+
   await wahanaStore().getWahanaFromDB();
   const handleKeyDown = async (event) => {
     if (event.key === "Enter" && !qtyDialog.value) {

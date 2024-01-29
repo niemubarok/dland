@@ -49,7 +49,7 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   log(transaksi.totalAfterDiskon);
   const pdf = new jsPDF({
     unit: "mm",
-    format: [80, 100],
+    format: [80, 150],
     // autoPaging: true,
     plugins: [autoTable],
   });
@@ -98,20 +98,26 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     ceklis: "Ceklis",
   };
 
-  console.log( "JSON.parse(transaksi)",  JSON.parse(transaksi))
+  console.log("JSON.parse(transaksi)", JSON.parse(transaksi));
 
   const rows = Object.values(JSON.parse(transaksi).transaksi).map((item) => [
     `${
-      item.deskripsi === "-"  || item.deskripsi === ""
-        ? item.nama 
-        : item.nama + " - " + item.deskripsi 
+      item.deskripsi === "-" ||
+      item.deskripsi === "" ||
+      item.deskripsi === undefined
+        ? item.nama
+        : item.nama + " - " + item.deskripsi
     }`, // Ganti dengan data sesuai kebutuhan, contoh: item.nama,
-    item.deskripsi === "-" || item.deskripsi === ""
-    ? item.qty
-    :'',
-    item.deskripsi === "-" || item.deskripsi === ""
-    ? formatCurrency(item.total_bayar)
-    :'',
+    item.deskripsi === "-" ||
+    item.deskripsi === "" ||
+    item.deskripsi === undefined
+      ? item.qty
+      : "",
+    item.deskripsi === "-" ||
+    item.deskripsi === "" ||
+    item.deskripsi === undefined
+      ? formatCurrency(item.total_bayar)
+      : "",
     ".............", // Ganti dengan data sesuai kebutuhan
   ]);
 
@@ -386,12 +392,35 @@ async function getPrinters() {
   }
 }
 
+const HID = require("node-hid");
+
+async function getHIDDevices() {
+  return await HID.devicesAsync();
+}
+
+async function readDataFromHID(vid, pid) {
+  const device = await HID.HIDAsync.open(vid, pid);
+
+  return new Promise((resolve, reject) => {
+    device.on("data", function (data) {
+      console.log(data);
+    });
+    device.on("error", function (error) {
+      console.log(error);
+    });
+  });
+}
+
+console.log(readDataFromHID(1133, 50498));
+
 contextBridge.exposeInMainWorld("electron", {
   // serialport: createSerialPort,
   print: printStruk,
   createPDFStruk,
   getPrinters,
   printDirectlyToPrinter,
+  getHIDDevices,
+  readDataFromHID,
   // detectLicensePlateArea: detectLicensePlateArea,
   // getSerialPortList: getSerialPortList,
 });

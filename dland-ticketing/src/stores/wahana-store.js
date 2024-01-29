@@ -101,6 +101,7 @@ export const wahanaStore = defineStore("wahana", {
       // },
     ]),
     detailPaket: ref([]),
+    jenisTiket: ref([]),
     namaPaketTerpilih: ref(""),
   }),
 
@@ -123,6 +124,21 @@ export const wahanaStore = defineStore("wahana", {
       this.detailPaket.splice(0, this.paket.length, ...res.data);
       console.log(res.data);
       return res.data;
+    },
+    async getJenisTiketFromDB() {
+      try {
+        const res = await api.get("wahana/jenis-tiket");
+        if (res.status === 200 && Array.isArray(res.data)) {
+          this.jenisTiket = res.data.map((jenis) => ({
+            id: jenis.id_jenis,
+            label: jenis.nama_jenis,
+          }));
+        } else {
+          console.error("Failed to fetch jenis tiket, status:", res.status);
+        }
+      } catch (error) {
+        console.error("Error fetching jenis tiket:", error);
+      }
     },
     pilihPaket(paket, daftarWahana) {
       // Mendapatkan array wahana yang sesuai dengan paket dari daftarWahana
@@ -189,19 +205,18 @@ export const wahanaStore = defineStore("wahana", {
     async getPaketFromDB() {
       const res = await api.get("paket/detail");
 
-      const data = res.data
-        .map((item) => {
-          return {
-            idPaket: item.idPaket,
-            namaPaket: item.namaPaket,
-            hargaPaket: parseInt(item.hargaPaket),
-            diskon: parseInt(item.diskon),
-            jenisPaket: item.jenisPaket,
-            deskripsi: item.deskripsi,
-            status: item.status,
-            idWahana: [...item.idWahana],
-          };
-        });
+      const data = res.data.map((item) => {
+        return {
+          idPaket: item.idPaket,
+          namaPaket: item.namaPaket,
+          hargaPaket: parseInt(item.hargaPaket),
+          diskon: parseInt(item.diskon),
+          jenisPaket: item.jenisPaket,
+          deskripsi: item.deskripsi,
+          status: item.status,
+          idWahana: [...item.idWahana],
+        };
+      });
 
       this.paket.splice(0, this.paket.length, ...data);
 
@@ -250,6 +265,7 @@ export const wahanaStore = defineStore("wahana", {
       }
     },
     async editMasterWahanaOnDB(id, column, value) {
+      console.log("value", value);
       try {
         const res = await api.post("wahana/edit", { id, column, value });
 
@@ -259,6 +275,39 @@ export const wahanaStore = defineStore("wahana", {
           );
           if (index !== -1) {
             Object.assign(this.daftarWahana[index], { [column]: value });
+            console.log(
+              `Wahana with ID ${id} updated:`,
+              this.daftarWahana[index]
+            );
+          } else {
+            console.log(`Wahana with ID ${id} not found.`);
+          }
+          return true;
+        } else {
+          return false;
+        }
+      } catch (err) {
+        return err;
+      }
+    },
+    async editJenisTiketOnDB(id, column, value) {
+      try {
+        console.log("value.column", column);
+        const id_jenis = value.id;
+        const res = await api.post("wahana/edit", {
+          id,
+          column,
+          value: id_jenis,
+        });
+
+        if (res.status === 201) {
+          const index = this.daftarWahana.findIndex(
+            (wahana) => wahana.id_wahana === id
+          );
+          if (index !== -1) {
+            Object.assign(this.daftarWahana[index], {
+              nama_jenis: value.label,
+            });
             console.log(
               `Wahana with ID ${id} updated:`,
               this.daftarWahana[index]

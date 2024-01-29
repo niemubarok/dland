@@ -163,9 +163,9 @@ const onClickBayar = async (method) => {
       diskon: transaksiStore().diskon,
       totalAfterDiskon: transaksiStore().totalAfterDiskon,
       totalBayar: transaksiStore().totalBayar,
-      namaPaket: "Tiket",
-      id_transaksi: store.id_transaksi,
+      no_transaksi: store.no_transaksi,
     };
+    // namaPaket: "Tiket",
     // console.log("store", store);
     if (store) {
       window.electron.createPDFStruk(

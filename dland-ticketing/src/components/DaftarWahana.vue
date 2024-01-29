@@ -122,7 +122,9 @@
 
       <template v-if="!daftarWahana?.length" v-slot:after>
         <tr>
-          {{ daftarWahana }}
+          {{
+            daftarWahana
+          }}
           <td align="center" colspan="7" class="text-grey-5">
             <h5>Tidak ada wahana</h5>
           </td>
@@ -219,22 +221,52 @@
             <span
               class="text-subtitle2"
               :class="
-                row.jenis?.toLowerCase() == 'weekend'
-                  ? 'text-red'
-                  : 'text-green'
+                row.hari?.toLowerCase() == 'weekend' ? 'text-red' : 'text-green'
               "
             >
-              {{ row.jenis }}</span
+              {{ row.hari }}</span
             >
             <q-popup-edit
-              v-model="row.jenis"
+              v-model="row.hari"
               v-slot="scope"
-              @save="(value) => update(row.id_wahana, 'jenis', value)"
+              @save="(value) => update(row.id_wahana, 'hari', value)"
             >
               <q-select
                 filled
                 v-model="scope.value"
                 :options="['Weekend', 'Weekday']"
+                label="Hari"
+              />
+              <div class="float-right">
+                <q-btn
+                  size="sm"
+                  color="red-9"
+                  flat
+                  icon="close"
+                  @click="scope.cancel"
+                />
+                <q-btn
+                  size="sm"
+                  color="green-9"
+                  flat
+                  icon="check"
+                  @click="scope.set"
+                />
+              </div>
+            </q-popup-edit>
+          </td>
+          <td align="center">
+            <span class="text-subtitle2"> {{ row.nama_jenis }}</span>
+            <q-popup-edit
+              v-model="row.nama_jenis"
+              v-slot="scope"
+              @save="(value) => updateJenis(row.id_wahana, 'id_jenis', value)"
+            >
+              <q-select
+                filled
+                v-model="scope.value"
+                :options="wahanaStore().jenisTiket"
+                option-value="id"
                 label="Jenis Wahana"
               />
               <div class="float-right">
@@ -402,6 +434,7 @@ const columns = [
   { name: "No", prop: "name", align: "left" },
   { name: "Nama Wahana", prop: "nama", align: "left" },
   { name: "Harga Tiket", prop: "harga_tiket", align: "center" },
+  { name: "Hari", prop: "hari", align: "center" },
   { name: "Jenis", prop: "jenis", align: "center" },
   { name: "Status", prop: "status", align: "center" },
   { name: "Keterangan", prop: "deskripsi", align: "left" },
@@ -453,6 +486,17 @@ const update = async (id, column, value) => {
     column,
     value
   );
+  if (editWahana) {
+    $q.notify({
+      message: "Berhasil di ubah",
+      type: "positive",
+      position: "top",
+    });
+  }
+};
+const updateJenis = async (id, column, value) => {
+  console.log(id, column, value);
+  const editWahana = await wahanaStore().editJenisTiketOnDB(id, column, value);
   if (editWahana) {
     $q.notify({
       message: "Berhasil di ubah",
@@ -515,12 +559,15 @@ const save = async (type) => {
   // await store.getLaporanPendapatan();
 };
 
-const daftarWahana= computed(()=>{
-  return wahanaStore().daftarWahana.sort((a,b)=>a.nama.localeCompare(b.nama))
-})
+const daftarWahana = computed(() => {
+  return wahanaStore().daftarWahana.sort((a, b) =>
+    a.nama.localeCompare(b.nama)
+  );
+});
 
 onMounted(async () => {
   await wahanaStore().getWahanaFromDB();
+  await wahanaStore().getJenisTiketFromDB();
   isLoading.value = false;
 });
 </script>

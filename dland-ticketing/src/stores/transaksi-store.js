@@ -135,8 +135,8 @@ export const transaksiStore = defineStore("transaksi", {
           isSuccess = true;
           // this.detailTransaksi.splice(0);
           console.log(response.data);
-          const id_transaksi = response.data.transaksi_penjualan.id_transaksi;
-          return { isSuccess, id_transaksi };
+          const no_transaksi = response.data.no_transaksi;
+          return { isSuccess, no_transaksi };
         }
       } catch (error) {
         isSuccess = false;

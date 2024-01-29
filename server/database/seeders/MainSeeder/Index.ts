@@ -22,6 +22,7 @@ export default class IndexSeeder extends BaseSeeder {
   public async run() {
     await this.runSeeder(await import("../Petugas"));
     await this.runSeeder(await import("../Paket"));
+    await this.runSeeder(await import("../JenisTiket"));
     await this.runSeeder(await import("../Wahana"));
     await this.runSeeder(await import("../DetailPaket"));
   }

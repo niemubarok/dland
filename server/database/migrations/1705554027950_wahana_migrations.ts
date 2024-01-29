@@ -26,9 +26,15 @@ export default class extends BaseSchema {
       this.schema.createTable(this.tableName, (table) => {
         table.increments("id_wahana").primary();
         table.string("nama").notNullable();
-        table.string("deskripsi", 100);
+        table
+          .integer("id_jenis", 30)
+          .references("id_jenis")
+          .inTable("jenis_tiket")
+          .withKeyName("id_jenis_fk");
+        table.string("hari", 15);
         table.decimal("harga_tiket", 10, 2).notNullable();
-        table.string("jenis", 15);
+        table.decimal("diskon", 10, 2).defaultTo(0);
+        table.string("deskripsi", 100);
         table.boolean("status").defaultTo(true);
 
         /**

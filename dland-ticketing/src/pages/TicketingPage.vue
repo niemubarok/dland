@@ -72,6 +72,8 @@
               :nama="wahana.nama"
               :tarif="parseInt(wahana.harga_tiket)"
               :deskripsi="wahana.deskripsi"
+              :hari="wahana.hari"
+              :jenis="wahana.nama_jenis"
             />
             <!-- <TicketCard /> -->
           </div>
@@ -184,11 +186,20 @@ const selectAllWahana = () => {
       qty: qty.value,
       tarif: "",
       total_bayar: "",
+      deskripsi: "",
+      jenis: "",
+      hari: "",
+      diskon: 0,
     });
     data.value.id_wahana = wahana.id_wahana?.toString();
     data.value.nama = wahana.nama;
     data.value.tarif = wahana.harga_tiket;
     data.value.total_bayar = wahana.harga_tiket * qty.value;
+    data.value.qty = qty.value;
+    data.value.deskripsi = wahana.deskripsi;
+    data.value.jenis = wahana.nama_jenis_tiket;
+    data.value.hari = wahana.hari;
+    data.value.diskon = 0;
 
     console.log("test", data.value);
     transaksiStore().detailTransaksi.push(data.value);

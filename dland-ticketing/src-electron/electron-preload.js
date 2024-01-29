@@ -74,21 +74,26 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
       }
     );
   } else {
-    pdf.text("Tiket", pdf.internal.pageSize.width / 2, 8, {
-      align: "center",
-    });
+    pdf.text(
+      JSON.parse(transaksi).transaksi[0].jenis,
+      pdf.internal.pageSize.width / 2,
+      8,
+      {
+        align: "center",
+      }
+    );
   }
 
-  pdf.setFontSize(6);
+  pdf.setFontSize(5);
 
   const petugas = ls.get("petugas").nama;
   const waktu = new Date().toLocaleString("id-ID");
-  const id_transaksi = JSON.parse(transaksi).id_transaksi;
+  const no_transaksi = JSON.parse(transaksi).no_transaksi;
 
-  pdf.text(`Id: ${id_transaksi}`, 5, 8, { align: "left" });
+  pdf.text(`${waktu}`, 5, 8, { align: "left" });
 
   pdf.text(`petugas: ${petugas}`, 5, 11, { align: "left" });
-  pdf.text(waktu, pageWidth - 5, 11, { align: "right" });
+  pdf.text(no_transaksi, pageWidth - 5, 11, { align: "right" });
 
   pdf.line(5, 12, pdf.internal.pageSize.width - 5, 12); // Draw a line at y = 12 mm from the left margin to the right margin
   const headers = {
@@ -102,20 +107,14 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
 
   const rows = Object.values(JSON.parse(transaksi).transaksi).map((item) => [
     `${
-      item.deskripsi === "-" ||
-      item.deskripsi === "" ||
-      item.deskripsi === undefined
+      item.jenis?.toLowerCase() === "tiket wahana" || item.jenis === undefined
         ? item.nama
         : item.nama + " - " + item.deskripsi
     }`, // Ganti dengan data sesuai kebutuhan, contoh: item.nama,
-    item.deskripsi === "-" ||
-    item.deskripsi === "" ||
-    item.deskripsi === undefined
+    item.jenis?.toLowerCase() === "tiket wahana" || item.jenis === undefined
       ? item.qty
       : "",
-    item.deskripsi === "-" ||
-    item.deskripsi === "" ||
-    item.deskripsi === undefined
+    item.jenis?.toLowerCase() === "tiket wahana" || item.jenis === undefined
       ? formatCurrency(item.total_bayar)
       : "",
     ".............", // Ganti dengan data sesuai kebutuhan

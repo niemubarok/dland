@@ -31,6 +31,7 @@ Route.group(() => {
     Route.post("/add", "WahanaController.create");
     Route.post("/edit", "WahanaController.edit");
     Route.post("/delete", "WahanaController.delete");
+    Route.get("/jenis-tiket", "WahanaController.getJenisTiket");
     // Route.post("/add", "WahanaController.create");
   }).prefix("wahana");
 

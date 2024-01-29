@@ -5,8 +5,13 @@ export default class WahanaController {
   public async index({ response }: HttpContextContract) {
     const wahana = await Database.query()
       .from("master_wahana")
-      .orderBy("id_wahana", "asc")
-      .select("*");
+      .innerJoin(
+        "jenis_tiket",
+        "master_wahana.id_jenis",
+        "jenis_tiket.id_jenis"
+      )
+      .orderBy("master_wahana.id_wahana", "asc")
+      .select("master_wahana.*", "jenis_tiket.nama_jenis as nama_jenis");
     response.status(200).json(wahana);
   }
 
@@ -50,29 +55,38 @@ export default class WahanaController {
 
   public async create({ request, response }: HttpContextContract) {
     const req = request.body();
-    const lastSale = await Database.from("master_wahana")
-      .orderBy("id_wahana", "desc")
-      .first();
-    const lastSaleId = lastSale?.id || 0;
-    const data = {
-      id_transaksi: lastSaleId,
-      nama: req.nama,
-      deskripsi: req.deskripsi,
-      jenis: req.jenis,
-      harga_tiket: req.harga_tiket,
-    };
 
-    const store = await Database.rawQuery(
-      "INSERT INTO master_wahana (nama, deskripsi, harga_tiket, jenis) VALUES (?, ?, ?, ?)",
-      [data.nama, data.deskripsi, data.harga_tiket, data.jenis]
-    );
+    const newWahana = await Database.table("master_wahana")
+      .returning("id_wahana")
+      .insert({
+        nama: req.nama,
+        jenis: req.jenis,
+        hari_operasional: req.hari,
+        harga_tiket: req.harga_tiket,
+        diskon: req.diskon,
+        deskripsi: req.deskripsi,
+        status: req.status === "aktif" ? 1 : 0,
+        created_at: new Date(),
+        // updated_at:nu
+      });
 
-    if (store) {
-      response.status(201).json(store);
+    if (newWahana) {
+      const wahanaId = newWahana[0];
+      response
+        .status(201)
+        .json({ message: "Wahana created successfully", id_wahana: wahanaId });
+    } else {
+      response.status(400).json({ message: "Failed to create wahana" });
     }
   }
 
-  public async show({}: HttpContextContract) {}
+  public async getJenisTiket({ response }: HttpContextContract) {
+    const jenisTiket = await Database.rawQuery(`SELECT * FROM jenis_tiket`);
+
+    if (jenisTiket.rows?.length) {
+      response.status(200).json(jenisTiket.rows);
+    }
+  }
 
   public async edit({ request, response }: HttpContextContract) {
     const { id, column, value } = request.body();

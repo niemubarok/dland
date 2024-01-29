@@ -1,5 +1,7 @@
 import { DateTime } from "luxon";
 import { BaseModel, column } from "@ioc:Adonis/Lucid/Orm";
+import { BelongsTo, belongsTo } from "@ioc:Adonis/Lucid/Orm";
+import JenisTiket from "App/Models/JenisTiket";
 
 export default class Wahana extends BaseModel {
   public static table = "master_wahana";
@@ -10,14 +12,26 @@ export default class Wahana extends BaseModel {
   @column()
   public nama: string;
 
+  @belongsTo(() => JenisTiket, {
+    localKey: "id_jenis_tiket",
+    foreignKey: "id_jenis",
+  })
+  public idJenis: BelongsTo<typeof JenisTiket>;
+
   @column()
-  public jenis: string;
+  public hari: string;
+
+  @column()
+  public hargaTiket: number;
+
+  @column()
+  public diskon: number;
 
   @column()
   public deskripsi: string | null;
 
   @column()
-  public hargaTiket: number;
+  public status: boolean;
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime;

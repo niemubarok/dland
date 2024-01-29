@@ -1,12 +1,12 @@
 <template>
-  <!-- <q-dialog
+  <q-dialog
     ref="dialogRef"
     no-backdrop-dismiss
     no-esc-dismiss
     maximized
     @hide="onDialogHide"
     persistent
-  > -->
+  >
   <div class="row justify-center items-center">
     <q-card
       class="q-px-md q-pt-sm q-pb-md glass relative"
@@ -53,6 +53,36 @@
             /> -->
             <q-input
             v-model="selectedPrinter"
+            label="Masukan nama printer"
+            />
+          </q-item-section>
+          <!-- <q-item-section side>
+            <q-btn
+              push
+              text-color="white"
+              style="width: 60px"
+              color="black"
+              @click="getPrinters()"
+            ></q-btn> -->
+          <!-- <q-icon name="star" color="yellow" /> -->
+          <!-- </q-item-section> -->
+        </q-item>
+        <q-item class="glass q-mt-md">
+          <q-item-section avatar>
+            <q-avatar color="brown-9" text-color="white" icon="globe" />
+          </q-item-section>
+          <q-item-section>
+            <!-- <q-select
+              filled
+              v-model="selectedPrinter"
+              :options="printers"
+              label="Printer"
+              emit-value
+              map-options
+            /> -->
+            <q-input
+            v-model="apiUrl"
+            label="APIURL"
             />
           </q-item-section>
           <!-- <q-item-section side>
@@ -84,7 +114,7 @@
       </q-card-actions>
     </q-card>
   </div>
-  <!-- </q-dialog> -->
+  </q-dialog>
 </template>
 
 <script setup>
@@ -104,6 +134,7 @@ import {
 import ls from "localstorage-slim";
 const printers = ref([]);
 const selectedPrinter = ref(ls.get("namaPrinter"));
+const apiUrl = ref(ls.get("APIURL"))
 
 // ls.config.encrypt = false;
 const getPrinters = async () => {};
@@ -116,6 +147,7 @@ const { dialogRef } = useDialogPluginComponent();
 const onSaveSettings = () => {
   // dialogRef.value.hide();
   ls.set("namaPrinter", selectedPrinter.value);
+  ls.set("APIURL", apiUrl.value);
   window.location.reload();
 };
 
@@ -165,8 +197,8 @@ const handleKeyDownOnSettingDialog = async (event) => {
 };
 
 onMounted(async () => {
-  window.addEventListener("keydown", handleKeyDownOnSettingDialog);
-  printers.value = await window.electron.getPrinters();
+  // window.addEventListener("keydown", handleKeyDownOnSettingDialog);
+  // printers.value = await window.electron.getPrinters();
   // console.log(getPrinters);
   // const listPrinter = getPrinters.forEach((each) => {
   //   return each.printer;
@@ -174,18 +206,12 @@ onMounted(async () => {
   // printers.value = listPrinter;
 });
 
-// const onDialogHide = () => {
-//   if (transaksiStore.lokasiPos === "-" || transaksiStore.lokasiPos === null) {
-//     dialogRef.value.show();
-//     $q.notify({
-//       type: "negative",
-//       message: "Silahkan pilih lokasi terlebih dahulu",
-//       position: "center",
-//     });
-//   } else {
-//     window.removeEventListener("keydown", handleKeyDownOnSettingDialog);
-//   }
-
+const onDialogHide = () => {
+  if (!ls.get("APIURL") || !ls.get("namaPrinter")) {
+    dialogRef.value.show()
+  }
+  }
+  
 // else if (transaksiStore.API_URL === "-") {
 //   dialogRef.value.show();
 //   $q.notify({

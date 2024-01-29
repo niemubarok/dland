@@ -159,6 +159,7 @@ import PaymentDialog from "src/components/PaymentDialog.vue";
 import { transaksiStore } from "src/stores/transaksi-store";
 import { ref, onMounted, onBeforeMount, computed } from "vue";
 import { useQuasar } from "quasar";
+import SettingsDialog from "src/components/SettingsDialog.vue";
 import ls from "localstorage-slim";
 import LoginDialog from "src/components/LoginDialog.vue";
 
@@ -288,6 +289,7 @@ onMounted(async () => {
     });
     _loginDialog.update();
   }
+  
   await wahanaStore().getWahanaFromDB();
   const handleKeyDown = async (event) => {
     if (event.key === "Enter" && !qtyDialog.value) {

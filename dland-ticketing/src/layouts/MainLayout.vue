@@ -70,9 +70,25 @@
 </template>
 
 <script setup>
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import EssentialLink from "components/EssentialLink.vue";
 import { componentStore } from "src/stores/component-store";
+import { useQuasar } from "quasar";
+import SettingsDialog from "src/components/SettingsDialog.vue";
+import ls from "localstorage-slim";
+
+const $q = useQuasar();
+
+onMounted(()=>{
+  if (!ls.get("APIURL") || !ls.get("namaPrinter")) {
+    const settingDialog = $q.dialog({
+      component: SettingsDialog,
+      persistent: true,
+
+    });
+    settingDialog.update();
+  }
+})
 
 const essentialLinks = [
   {

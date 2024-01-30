@@ -216,7 +216,6 @@ const columns = [
   { name: "Nama Wahana", prop: "nama_wahana", align: "left" },
   { name: "Jumlah", prop: "jumlah", align: "center" },
   // { name: "Pendapatan", prop: "pendapatan", align: "right" },
-  // { name: 'Protein (g)', prop: 'protein' }
 ];
 
 const todayBtn = async () => {

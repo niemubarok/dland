@@ -35,8 +35,12 @@ import CardNumber from "src/components/CardNumber.vue";
 import BarChart from "src/components/BarChart.vue";
 import { chartStore } from "src/stores/chart-store";
 import { reportStore } from "src/stores/report-store";
+import { wahanaStore } from "src/stores/wahana-store";
 
 onMounted(async () => {
+  if (wahanaStore().daftarWahana?.length === 0) {
+    await wahanaStore().getWahanaFromDB();
+  }
   await reportStore().getLaporanPendapatan();
   await reportStore().getLaporanKunjungan();
   await reportStore().getLaporanKunjunganWahana();
@@ -46,7 +50,9 @@ onMounted(async () => {
 const dataPenjualan = ref([
   {
     caption: "Jumlah Wahana",
-    number: 10,
+    get number() {
+      return wahanaStore().daftarWahana?.length;
+    },
     icon: "",
   },
   {

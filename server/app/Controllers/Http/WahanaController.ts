@@ -56,16 +56,22 @@ export default class WahanaController {
   public async create({ request, response }: HttpContextContract) {
     const req = request.body();
 
+    const lastIdResult = await Database.rawQuery(
+      "SELECT MAX(id_wahana) AS max_id FROM master_wahana"
+    );
+    const lastId = lastIdResult[0]?.max_id;
+
     const newWahana = await Database.table("master_wahana")
       .returning("id_wahana")
       .insert({
+        id_wahana: lastId + 1,
         nama: req.nama,
-        jenis: req.jenis,
-        hari_operasional: req.hari,
+        id_jenis: req.jenis,
+        hari: req.hari,
         harga_tiket: req.harga_tiket,
         diskon: req.diskon,
         deskripsi: req.deskripsi,
-        status: req.status === "aktif" ? 1 : 0,
+        status: 1,
         created_at: new Date(),
         // updated_at:nu
       });

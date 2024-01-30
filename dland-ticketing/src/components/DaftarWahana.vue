@@ -368,8 +368,15 @@
             <q-select
               filled
               v-model="newWahana.jenis"
-              :options="['Weekend', 'Weekday']"
+              :options="wahanaStore().jenisTiket"
+              option-value="id"
               label="Jenis Wahana"
+            />
+            <q-select
+              filled
+              v-model="newWahana.hari"
+              :options="['Weekend', 'Weekday']"
+              label="Hari"
             />
             <q-input
               type="textarea"
@@ -381,6 +388,12 @@
               filled
               v-model="newWahana.harga_tiket"
               label="Tarif Wahana"
+              prefix="Rp"
+            />
+            <q-input
+              filled
+              v-model="newWahana.diskon"
+              label="Diskon"
               prefix="Rp"
             />
           </q-form>
@@ -445,8 +458,23 @@ const newWahana = ref({
   nama: "",
   jenis: "",
   deskripsi: "-",
+  hari: "",
   harga_tiket: 0,
+  diskon: 0,
+  // status: 1,
 });
+
+const onReset = () => {
+  newWahana.value = {
+    nama: "",
+    jenis: "",
+    deskripsi: "-",
+    hari: "",
+    harga_tiket: 0,
+    diskon: 0,
+    status: 1,
+  };
+};
 
 const onSubmit = async () => {
   try {
@@ -459,7 +487,7 @@ const onSubmit = async () => {
     ) {
       console.log(newWahana.value);
       await wahanaStore().addMasterWahanaToDB(newWahana.value);
-      newWahana.value = { nama: "", jenis: "", deskripsi: "", harga_tiket: 0 };
+      onReset();
       componentStore().nextMorph();
     } else {
       $q.notify({
@@ -473,10 +501,6 @@ const onSubmit = async () => {
   } catch (error) {
     // Notify error
   }
-};
-
-const onReset = () => {
-  newWahana.value = { nama: "", jenis: "", deskripsi: "", tarif: 0 };
 };
 
 const update = async (id, column, value) => {

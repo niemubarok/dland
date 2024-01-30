@@ -136,9 +136,9 @@ WHERE SUBSTRING(transaksi_penjualan.no_transaksi, 1, 10) BETWEEN ? AND ?
   }
 
   public async delete({ request, response }: HttpContextContract) {
+    const { no_transaksi, petugas, keterangan } = request.body();
+    console.log("onDelete", no_transaksi, petugas, keterangan);
     try {
-      const { no_transaksi } = request.body();
-
       if (!no_transaksi) {
         response
           .status(400)
@@ -164,11 +164,24 @@ WHERE SUBSTRING(transaksi_penjualan.no_transaksi, 1, 10) BETWEEN ? AND ?
           return;
         }
 
+        //log
+        await trx.table("logs").insert({
+          action: "DELETE",
+          table: "transaksi_penjualan",
+          deleted_rows: no_transaksi,
+          petugas,
+          keterangan,
+          created_at: new Date(),
+          updated_at: new Date(),
+        });
+
         response.status(200).json({
           message: `Deleted ${deletedRows} rows from transaksi_penjualan and detail_transaksi`,
         });
       });
     } catch (error) {
+      console.log(error);
+
       // If error occurs, the transaction is automatically rolled back
       response.status(500).json({ message: "Internal Server Error", error });
     }

@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { api } from "boot/axios";
+import ls from "localstorage-slim";
 
 export const reportStore = defineStore("report", {
   state: () => ({
@@ -19,6 +20,7 @@ export const reportStore = defineStore("report", {
     daftarTransaksi: ref([]),
     totalPendapatanWahana: ref(0),
     totalPendapatanTransaksi: ref(0),
+    deleteReason: ref(""),
   }),
 
   getters: {
@@ -104,6 +106,8 @@ export const reportStore = defineStore("report", {
       try {
         const res = await api.post("transaksi/delete", {
           no_transaksi,
+          petugas: ls.get("petugas")?.nama,
+          keterangan: this.deleteReason,
         });
 
         console.log(res);
@@ -119,6 +123,7 @@ export const reportStore = defineStore("report", {
           return true;
         }
       } catch (error) {
+        console.log(error);
         return false;
       }
     },

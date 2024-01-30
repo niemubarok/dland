@@ -103,6 +103,7 @@ export const wahanaStore = defineStore("wahana", {
     detailPaket: ref([]),
     jenisTiket: ref([]),
     namaPaketTerpilih: ref(""),
+    jumlahWahana: ref(0),
   }),
 
   // getters: {
@@ -115,6 +116,7 @@ export const wahanaStore = defineStore("wahana", {
     async getWahanaFromDB() {
       const res = await api.get("wahana");
       this.daftarWahana.splice(0, this.daftarWahana.length, ...res.data);
+      this.jumlahWahana = res.data?.length;
       console.log("getWahanaFromDBr", res.data);
       return res.data;
     },

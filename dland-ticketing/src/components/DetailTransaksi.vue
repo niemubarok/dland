@@ -181,7 +181,7 @@ const onClickBayar = async (method) => {
       });
       // dialogRef.value.hide();
     } else {
-      const existingTransaksiGagal = ls.get("transaksi_gagal", []);
+      const existingTransaksiGagal = ls.get("transaksi_gagal") || [];
       const newTransaksiGagal = transaksiStore().detailTransaksi;
       const combinedTransaksiGagal = [
         ...existingTransaksiGagal,

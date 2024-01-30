@@ -219,6 +219,8 @@
           </td> -->
 
           <q-menu touch-position context-menu @hide="onMenuHide(index)">
+            <!-- auto-close -->
+            <!-- v-model="showMenu" -->
             <q-list dense style="min-width: 100px">
               <q-item
                 clickable
@@ -237,9 +239,10 @@
               <q-separator />
               <q-item
                 clickable
+                @click="onDelete(row.no_transaksi)"
                 v-close-popup
-                @click="reportStore().deleteTransaksiFromDB(row.no_transaksi)"
               >
+                <!-- @click="reportStore().deleteTransaksiFromDB(row.no_transaksi)" -->
                 <q-item-section>
                   <q-chip class="bg-transparent text-red">
                     <q-avatar icon="delete" color="red" text-color="white" />
@@ -292,6 +295,7 @@ import { wahanaStore } from "src/stores/wahana-store";
 import { onMounted, ref } from "vue";
 import { date, useQuasar } from "quasar";
 import DetailTransaksiDialog from "src/components/dialogues/DetailTransaksiDialog.vue";
+import DeleteTransaksiDialog from "src/components/dialogues/DeleteTransaksiDialog.vue";
 import ls from "localstorage-slim";
 
 const $q = useQuasar();
@@ -322,11 +326,34 @@ const columns = [
 const selectedRow = ref();
 const isLoading = ref(false);
 const showMenu = ref(false);
+const deleteReason = ref("");
+// const deleteDialog = ref(false);
 
 const onRightClick = (index) => {
   selectedRow.value = index;
 };
 
+const onDelete = async (no_transaksi) => {
+  console.log(no_transaksi);
+  const deleteDialog = $q.dialog({
+    component: DeleteTransaksiDialog,
+    componentProps: {
+      no_transaksi: no_transaksi,
+    },
+  });
+
+  // Rest of the code for onDelete function...
+
+  deleteDialog.update();
+  // if (deleteTransaksi) {
+  //   $q.notify({
+  //     type: "positive",
+  //     message: "Transaksi Berhasil Dihapus",
+  //     position: "top",
+  //   });
+  // }
+  // deleteDialog.value = false;
+};
 const onMenuHide = (index) => {
   if (selectedRow.value === index) {
     selectedRow.value = "";

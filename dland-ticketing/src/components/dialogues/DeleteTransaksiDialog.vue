@@ -11,13 +11,18 @@
           :rules="[(val) => (val && val.length > 5) || 'Minimal 5 huruf']"
           dense
           autofocus
+          @keyup.enter="
+            [
+              reportStore().deleteTransaksiFromDB(props.no_transaksi),
+              dialogRef.hide(),
+            ]
+          "
         />
         <!-- @keyup.enter="deleteConfirm" -->
       </q-card-section>
 
       <q-card-actions align="right">
         <q-btn flat label="Batal" color="negative" v-close-popup />
-        <!-- @click="deleteCancel" -->
         <q-btn
           flat
           label="Konfirmasi"
@@ -33,7 +38,6 @@
             ]
           "
         />
-        <!-- @keyup.enter="onDelete(row.no_transaksi)" -->
       </q-card-actions>
     </q-card>
   </q-dialog>

@@ -59,14 +59,15 @@ export default class WahanaController {
     const lastIdResult = await Database.rawQuery(
       "SELECT MAX(id_wahana) AS max_id FROM master_wahana"
     );
-    const lastId = lastIdResult[0]?.max_id;
+    const lastId = lastIdResult.rows[0]?.max_id;
+    console.log("lastId", lastId);
 
     const newWahana = await Database.table("master_wahana")
       .returning("id_wahana")
       .insert({
         id_wahana: lastId + 1,
         nama: req.nama,
-        id_jenis: req.jenis,
+        id_jenis: req.jenis?.id,
         hari: req.hari,
         harga_tiket: req.harga_tiket,
         diskon: req.diskon,

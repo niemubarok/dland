@@ -126,9 +126,7 @@
           </td>
         </tr>
       </template>
-      <!-- class="glass-light" -->
       <template v-slot="{ item: row, index }">
-        <!-- 'bg-white': index % 2 == 0, -->
         <tr
           :key="index"
           :class="{
@@ -208,19 +206,8 @@
               </span>
             </div>
           </td>
-          <!-- <td align="right">
-            <q-badge
-              @click="reportStore().deleteTransaksiFromDB(row.no_transaksi)"
-              text-color="white"
-              class="q-ml-md cursor-pointer bg-transparent"
-            >
-              <q-icon name="delete" color="red" />
-            </q-badge>
-          </td> -->
 
           <q-menu touch-position context-menu @hide="onMenuHide(index)">
-            <!-- auto-close -->
-            <!-- v-model="showMenu" -->
             <q-list dense style="min-width: 100px">
               <q-item
                 clickable
@@ -272,9 +259,6 @@
     <q-card-section>
       <div class="flex row justify-between q-px-sm glass-dark q-py-md">
         <span class="text-h6 text-white"> Total </span>
-        <!-- :style="
-            reportStore().diskon > 0 ? 'text-decoration:line-through' : ''
-          " -->
         <span class="text-weight-bolder text-h6 text-white q-mr-sm">{{
           reportStore()
             .totalPendapatanTransaksi?.toLocaleString("id-ID", {
@@ -303,9 +287,6 @@ const todaySelected = ref(false);
 const startDateSelected = ref(false);
 const endDateSelected = ref(false);
 const store = reportStore();
-// const laporanWahana = ref([]);
-const laporanPendapatan = ref([]);
-const laporanKunjungan = ref([]);
 const timeStamp = date.formatDate(Date.now(), "YYYY/MM/DD");
 const datePicker = ref(timeStamp);
 const proxyDate = ref(Date.now());
@@ -320,21 +301,16 @@ const columns = [
   { name: "Diskon", prop: "diskon", align: "center" },
   { name: "TotalBayar", prop: "total_bayar", align: "center" },
   { name: "Keterangan", prop: "nama_paket", align: "left" },
-  // { name: "Hapus", prop: "hapus", align: "right" },
 ];
 
 const selectedRow = ref();
 const isLoading = ref(false);
-const showMenu = ref(false);
-const deleteReason = ref("");
-// const deleteDialog = ref(false);
 
 const onRightClick = (index) => {
   selectedRow.value = index;
 };
 
 const onDelete = async (no_transaksi) => {
-  console.log(no_transaksi);
   const deleteDialog = $q.dialog({
     component: DeleteTransaksiDialog,
     componentProps: {
@@ -342,17 +318,7 @@ const onDelete = async (no_transaksi) => {
     },
   });
 
-  // Rest of the code for onDelete function...
-
   deleteDialog.update();
-  // if (deleteTransaksi) {
-  //   $q.notify({
-  //     type: "positive",
-  //     message: "Transaksi Berhasil Dihapus",
-  //     position: "top",
-  //   });
-  // }
-  // deleteDialog.value = false;
 };
 const onMenuHide = (index) => {
   if (selectedRow.value === index) {

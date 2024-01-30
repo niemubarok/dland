@@ -246,7 +246,8 @@ export default class ReportsController {
         .select(
           "master_wahana.nama",
           Database.raw(
-            "count(distinct transaksi_penjualan.no_transaksi) as total_kunjungan"
+            // "count(distinct transaksi_penjualan.no_transaksi) as total_kunjungan"
+            "sum(detail_transaksi.qty) as total_kunjungan"
           ),
           Database.raw(
             "sum(master_wahana.harga_tiket * detail_transaksi.qty) as pendapatan_per_wahana"

@@ -257,7 +257,10 @@ export const wahanaStore = defineStore("wahana", {
         const res = await api.post("wahana/add", data);
         console.log(res.data);
         if (res.status === 201) {
-          this.daftarWahana.push(data);
+          this.daftarWahana.push({
+            id_wahana: res.data.id_wahana.id_wahana,
+            ...data,
+          });
           return true;
         } else {
           return false;

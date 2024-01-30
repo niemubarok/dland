@@ -196,7 +196,7 @@ WHERE SUBSTRING(transaksi_penjualan.no_transaksi, 1, 10) BETWEEN ? AND ?
    INNER JOIN master_wahana ON detail_transaksi.id_wahana = master_wahana.id_wahana 
    WHERE detail_transaksi.no_transaksi = '${no_transaksi}' `
     );
-    console.log(detaiTransaksi.rows);
+    // console.log(detaiTransaksi.rows);
 
     //  GROUP BY detail_transaksi.id_detail_transaksi, detail_transaksi.no_transaksi, detail_transaksi.id_wahana, detail_transaksi.qty, detail_transaksi.harga, master_wahana.nama`
     if (detaiTransaksi.rows?.length) {

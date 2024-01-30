@@ -344,32 +344,17 @@
     </q-virtual-scroll>
 
     <q-card-section>
-      <!-- <div class="flex row justify-between q-px-sm glass-dark q-py-md">
-        <span class="text-h6 text-white"> Total </span>
-        <span
-          class="text-weight-bolder text-h6 text-white q-mr-sm"
-          :style="
-            reportStore().diskon > 0 ? 'text-decoration:line-through' : ''
-          "
-          >{{
-            reportStore()
-              .totalPendapatanWahana?.toLocaleString("id-ID", {
-                style: "currency",
-                currency: "IDR",
-              })
-              .split(",")[0]
-          }}</span
-        >
-      </div> -->
       <add-button title="Tambah Wahana Baru" style="z-index: 2">
         <template #form>
           <q-form @reset="onReset" class="q-gutter-md">
             <q-input filled v-model="newWahana.nama" label="Nama Wahana" />
+            <!-- emit-value -->
             <q-select
               filled
               v-model="newWahana.jenis"
               :options="wahanaStore().jenisTiket"
               option-value="id"
+              option-label="label"
               label="Jenis Wahana"
             />
             <q-select
@@ -461,7 +446,7 @@ const newWahana = ref({
   hari: "",
   harga_tiket: 0,
   diskon: 0,
-  // status: 1,
+  status: true,
 });
 
 const onReset = () => {
@@ -472,7 +457,7 @@ const onReset = () => {
     hari: "",
     harga_tiket: 0,
     diskon: 0,
-    status: 1,
+    status: true,
   };
 };
 

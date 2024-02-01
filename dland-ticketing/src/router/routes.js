@@ -36,14 +36,14 @@ const routes = [
         },
         component: () => import("pages/QrScannerPage.vue"),
       },
-      {
-        path: "/print",
-        meta: {
-          requireHeader: false,
-          requireSideNav: false,
-        },
-        component: () => import("pages/PrintPage.vue"),
-      },
+      // {
+      //   path: "/print",
+      //   meta: {
+      //     requireHeader: false,
+      //     requireSideNav: false,
+      //   },
+      //   component: () => import("pages/PrintPage.vue"),
+      // },
       {
         path: "/petugas",
         meta: {
@@ -75,6 +75,14 @@ const routes = [
           requireSideNav: true,
         },
         component: () => import("pages/LaporanKunjunganPerWahanaPage.vue"),
+      },
+      {
+        path: "/print",
+        meta: {
+          requireHeader: false,
+          requireSideNav: false,
+        },
+        component: () => import("pages/TestPrint.vue"),
       },
     ],
   },

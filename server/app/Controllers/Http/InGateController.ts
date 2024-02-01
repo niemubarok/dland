@@ -8,12 +8,13 @@ export default class InGateController {
 
   public async store({}: HttpContextContract) {}
 
-  public async show({ request, response }: HttpContextContract) {
-    const { no_transaksi } = request.body();
+  public async barcode({ request, response }: HttpContextContract) {
+    const { barcode } = request.body();
+    console.log(barcode);
 
     const transaksi = await Database.rawQuery(
       `SELECT no_transaksi FROM transaksi_penjualan 
-   WHERE no_transaksi = '${no_transaksi}' `
+   WHERE no_transaksi = '${barcode}' `
     );
     console.log(transaksi.rows);
 

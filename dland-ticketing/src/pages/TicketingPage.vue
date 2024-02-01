@@ -59,6 +59,12 @@
       class="col q-ma-xs q-pa-sm glass-light"
       style="height: 89vh; border-top: #5d4037 3px solid"
     >
+      <q-btn
+        color="primary"
+        icon="check"
+        label="OK"
+        @click="$router.push('/print')"
+      />
       <!-- <div class="text-weight-bolder text-body text-white q-mb-md">
           Daftar Wahana
         </div>

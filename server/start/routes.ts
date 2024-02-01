@@ -62,6 +62,6 @@ Route.group(() => {
     Route.post("/delete", "PaketController.delete");
   }).prefix("paket");
   Route.group(() => {
-    Route.get("/", "InGateController.index");
+    Route.post("/barcode", "InGateController.barcode");
   }).prefix("ingate");
 }).prefix("api");

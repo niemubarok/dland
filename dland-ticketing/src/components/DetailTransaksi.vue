@@ -15,7 +15,7 @@
         class="absolute-top-right q-ma-xs"
         @click="onClickDaftarTransaksi"
       >
-        <q-tooltip class="bg-brown-8 text-yellow-7 text-weight-bolder">
+        <q-tooltip class="bg-brown-8 text-yellow-7">
           Daftar Transaksi
         </q-tooltip>
       </q-btn>

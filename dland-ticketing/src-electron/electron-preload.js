@@ -14,19 +14,6 @@ import {
 
 const print = process.platform === "win32" ? printWindows : printUnix;
 
-import jsPDF from "jspdf";
-import { log } from "console";
-import { platform } from "os";
-const QRCode = require("qrcode");
-const autoTable = require("jspdf-autotable");
-const fs = require("fs");
-const path = require("path");
-const os = require("os");
-const directoryPath = path.join(os.homedir(), "struk");
-if (!fs.existsSync(directoryPath)) {
-  fs.mkdirSync(directoryPath, { recursive: true });
-}
-const filePath = path.join(directoryPath, "struk.pdf");
 const formatCurrency = (amount) => {
   // Pemisah ribuan
   const separator = ".";
@@ -43,6 +30,24 @@ const formatCurrency = (amount) => {
   formattedAmount = formattedAmount;
 
   return formattedAmount;
+};
+import { log } from "console";
+import { platform } from "os";
+const QRCode = require("qrcode");
+import jsPDF from "jspdf";
+const autoTable = require("jspdf-autotable");
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
+const directoryPath = path.join(os.homedir(), "struk");
+if (!fs.existsSync(directoryPath)) {
+  fs.mkdirSync(directoryPath, { recursive: true });
+}
+const filePath = path.join(directoryPath, "struk.pdf");
+
+const generateBarcode = (text) => {
+  JsBarcode(canvas, text, { displayValue: false, format: "CODE128" });
+  return canvas.toDataURL("image/png");
 };
 
 const createPDFStruk = async (nama_perusahaan, transaksi) => {
@@ -232,29 +237,28 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     }
   );
 
-  const { toDataURL } = require("qrcode");
-
-  // Generate QR code as data URL
-  const qrCodeDataURL = await toDataURL("09876577676", {
-    version: 7,
-    errorCorrectionLevel: "H",
-    margin: 1,
-    type: "image/png",
-  });
-
-  // Extract base64 data from data URL
-  const base64Data = qrCodeDataURL.split(",")[1];
-  const buffer = Buffer.from(base64Data, "base64");
-
-  // Add QR code image to PDF
-  pdf.addImage(
-    buffer,
-    "PNG",
-    (pageWidth - 200) / 2, // Assuming QR code width is 200 as per the canvas size
-    pdf.autoTable.previous.finalY + 20,
-    200,
-    200
-  );
+  const barcodeData = generateBarcode("no_transaksi");
+  console.log("barcodedata", barcodeData);
+  // Add barcode to PDF
+  if (barcodeData) {
+    const barcodeImage = new Image();
+    barcodeImage.src = barcodeData;
+    barcodeImage.onload = () => {
+      const barcodeWidth = 50;
+      const barcodeHeight = 15;
+      const xPosition = (pageWidth - barcodeWidth) / 2;
+      const yPosition = pdf.autoTable.previous.finalY + 20;
+      pdf.addImage(
+        barcodeImage,
+        "JPEG",
+        xPosition,
+        yPosition,
+        barcodeWidth,
+        barcodeHeight
+      );
+      // pdf.save(filePath); // Save the PDF after adding the barcode image
+    };
+  }
 
   pdf.setFontSize(7);
   pdf.text(

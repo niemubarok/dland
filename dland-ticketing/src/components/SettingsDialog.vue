@@ -1,18 +1,11 @@
 <template>
-  <q-dialog
-    ref="dialogRef"
-    no-backdrop-dismiss
-    no-esc-dismiss
-    maximized
-    @hide="onDialogHide"
-    persistent
-  >
+  <q-dialog ref="dialogRef" maximized @hide="onDialogHide" persistent>
     <div class="row justify-center items-center">
       <q-card
         class="q-px-md q-pt-sm q-pb-md glass relative"
         style="width: 90vw; height: fit-content"
       >
-        <!-- <div>
+        <div v-if="props.closeButton">
           <q-avatar
             size="40px"
             class="cursor-pointer z-top absolute-top-right q-ma-sm"
@@ -21,8 +14,8 @@
             icon="close"
             @click="dialogRef.hide()"
           />
-        </div> -->
-        <!-- <q-icon name="close"  /> -->
+        </div>
+        <!-- <q-icon name="close" /> -->
         <q-item>
           <q-item-section avatar>
             <q-icon name="settings" />
@@ -43,26 +36,8 @@
               <q-avatar color="primary" text-color="white" icon="print" />
             </q-item-section>
             <q-item-section>
-              <!-- <q-select
-              filled
-              v-model="selectedPrinter"
-              :options="printers"
-              label="Printer"
-              emit-value
-              map-options
-            /> -->
               <q-input v-model="selectedPrinter" label="Masukan nama printer" />
             </q-item-section>
-            <!-- <q-item-section side>
-            <q-btn
-              push
-              text-color="white"
-              style="width: 60px"
-              color="black"
-              @click="getPrinters()"
-            ></q-btn> -->
-            <!-- <q-icon name="star" color="yellow" /> -->
-            <!-- </q-item-section> -->
           </q-item>
           <q-item class="glass q-mt-md">
             <q-item-section avatar>
@@ -129,6 +104,10 @@ import ls from "localstorage-slim";
 const printers = ref([]);
 const selectedPrinter = ref(ls.get("namaPrinter"));
 const apiUrl = ref(ls.get("APIURL"));
+
+const props = defineProps({
+  closeButton: Boolean,
+});
 
 // ls.config.encrypt = false;
 const getPrinters = async () => {};

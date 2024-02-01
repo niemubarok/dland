@@ -295,7 +295,12 @@ const startDate = ref("");
 const endDate = ref("");
 const columns = [
   { name: "No", prop: "name", align: "left" },
-  { name: "No. Transaksi", prop: "no_transaksi", align: "left" },
+  {
+    name: "No. Transaksi",
+    prop: "no_transaksi",
+    align: "left",
+    sortable: true,
+  },
   { name: "Cara Bayar", prop: "cara_bayar", align: "center" },
   { name: "Total", prop: "total", align: "center" },
   { name: "Diskon", prop: "diskon", align: "center" },

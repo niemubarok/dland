@@ -46,7 +46,7 @@ const formatCurrency = (amount) => {
 };
 
 const createPDFStruk = async (nama_perusahaan, transaksi) => {
-  log(transaksi.totalAfterDiskon);
+  // log(transaksi.totalAfterDiskon);
   const pdf = new jsPDF({
     unit: "mm",
     format: [80, 150],
@@ -232,44 +232,35 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     }
   );
 
-  // const qrCodeData = "09876797";
-  // const qrCodeOptions = {
-  //   type: "png",
-  //   margin: 1,
-  //   color: {
-  //     dark: "#000000",
-  //     light: "#FFFFFF",
-  //   },
-  // };
+  const { toDataURL } = require("qrcode");
 
-  // const qrCodePDFPath = path.resolve(
-  //   __dirname,
-  //   process.env.QUASAR_PUBLIC_FOLDER + "/struk/qrcode.png"
-  // );
+  // Generate QR code as data URL
+  const qrCodeDataURL = await toDataURL("09876577676", {
+    version: 7,
+    errorCorrectionLevel: "H",
+    margin: 1,
+    type: "image/png",
+  });
 
-  // await QRCode.toFile(qrCodePDFPath, qrCodeData, qrCodeOptions);
+  // Extract base64 data from data URL
+  const base64Data = qrCodeDataURL.split(",")[1];
+  const buffer = Buffer.from(base64Data, "base64");
 
-  // pdf.text(
-  //   "QR Code",
-  //   pdf.internal.pageSize.width / 2,
-  //   pdf.autoTable.previous.finalY + 15,
-  //   {
-  //     align: "center",
-  //   }
-  // );
-
-  // const qrCodeImageBuffer = fs.readFileSync(qrCodePDFPath);
-  // // const pageWidth = pdf.internal.pageSize.getWidth();
-  // const qrCodePosX = (pageWidth - 40) / 2; // Center the QR code horizontally
-  // const qrCodePosY = pdf.autoTable.previous.finalY + 20; // Position after the table
-
-  // pdf.addImage(qrCodeImageBuffer, "PNG", qrCodePosX, qrCodePosY, 40, 40);
+  // Add QR code image to PDF
+  pdf.addImage(
+    buffer,
+    "PNG",
+    (pageWidth - 200) / 2, // Assuming QR code width is 200 as per the canvas size
+    pdf.autoTable.previous.finalY + 20,
+    200,
+    200
+  );
 
   pdf.setFontSize(7);
   pdf.text(
     "Terimakasih atas kunjungan anda",
     pdf.internal.pageSize.width / 2,
-    pdf.autoTable.previous.finalY + 18,
+    pdf.autoTable.previous.finalY + 18, // Adjust vertical position based on QR code size
     { align: "center" }
   );
 
@@ -328,8 +319,8 @@ async function printDirectlyToPrinter(printerName) {
   const { Printer, InMemory } = require("escpos-buffer");
 
   const connection = new InMemory();
-  console.log(connection);
-  return;
+  // console.log(connection);
+  // return;
   const printer = await Printer.CONNECT(printerName, connection);
 
   const data = {

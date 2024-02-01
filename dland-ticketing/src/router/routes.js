@@ -9,12 +9,13 @@ const routes = [
         meta: {
           requireHeader: true,
           requireSideNav: true,
+          requireAuth: true,
         },
       },
       {
         path: "",
         meta: {
-          requireHeader: false,
+          requireHeader: true,
           requireSideNav: false,
         },
         component: () => import("pages/TicketingPage.vue"),
@@ -44,12 +45,12 @@ const routes = [
         component: () => import("pages/PrintPage.vue"),
       },
       {
-        path: "/settings",
+        path: "/petugas",
         meta: {
           requireHeader: true,
           requireSideNav: true,
         },
-        component: () => import("pages/SettingsPage.vue"),
+        component: () => import("pages/PetugasPage.vue"),
       },
       {
         path: "/wahana",

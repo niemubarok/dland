@@ -1,9 +1,25 @@
 <template>
-  <q-card class="col-md-4 glass-light q-ma-xs">
+  <q-card class="col-md-4 glass-light q-ma-xs relative">
     <!-- style="height: 75vh;" -->
     <!-- <img src="https://cdn.quasar.dev/img/mountains.jpg" /> -->
     <!-- <q-card-section> -->
-    <div class="text-h6 text-white glass-dark">Detail Transaksi</div>
+    <div class="text-h6 text-white bg-brown-8">
+      Detail Transaksi
+      <!-- flat -->
+      <q-btn
+        push
+        dense
+        color="white"
+        text-color="brown-8"
+        icon="view_list"
+        class="absolute-top-right q-ma-xs"
+        @click="onClickDaftarTransaksi"
+      >
+        <q-tooltip class="bg-brown-8 text-yellow-7 text-weight-bolder">
+          Daftar Transaksi
+        </q-tooltip>
+      </q-btn>
+    </div>
     <q-separator dark />
     <!-- <div class="text-subtitle2">by John Doe</div> -->
     <!-- </q-card-section> -->
@@ -125,6 +141,7 @@
       <!-- @keydown.enter.prevent="onClickBayar('cash')" -->
       <!-- <q-btn flat label="Action 2" /> -->
     </q-card-actions>
+    <!-- label="Daftar Transaksi" -->
   </q-card>
 </template>
 
@@ -132,7 +149,7 @@
 import { transaksiStore } from "src/stores/transaksi-store";
 import { computed, onMounted, ref, onBeforeUnmount } from "vue";
 import { useQuasar } from "quasar";
-import PaymentDialog from "src/components/PaymentDialog.vue";
+import DaftarTransaksiDialog from "src/components/dialogues/DaftarTransaksiDialog.vue";
 import { userStore } from "src/stores/user-store";
 import { wahanaStore } from "src/stores/wahana-store";
 import ls from "localstorage-slim";
@@ -151,6 +168,16 @@ const totalBayar = computed(() => {
 const onClickBayar = async (method) => {
   // transaksiStore().bayar();
   // console.log(method == "cash" && !transaksiStore().isShowPaymentDialog);
+
+  if (!transaksiStore().detailTransaksi?.length) {
+    $q.notify({
+      message: "Pilih wahana terlebih dahulu",
+      type: "negative",
+      position: "center",
+    });
+    return;
+  }
+
   if (!transaksiStore().isPaket) {
     console.log(
       "detail transaksi di detailtransaksi:",
@@ -252,6 +279,14 @@ const handleKeyDownOnDetailTransaksi = (event) => {
   //     pressedKeys = "";
   //   }
   // }
+};
+
+const onClickDaftarTransaksi = () => {
+  const daftarTransaksiDialog = $q.dialog({
+    component: DaftarTransaksiDialog,
+    componentProps: {},
+  });
+  daftarTransaksiDialog.update();
 };
 
 onMounted(() => {

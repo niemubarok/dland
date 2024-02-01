@@ -8,6 +8,7 @@ export const userStore = defineStore("user", {
   state: () => ({
     counter: 0,
     isLogin: ref(false),
+    dataPetugas: ref([]),
   }),
 
   getters: {
@@ -17,6 +18,12 @@ export const userStore = defineStore("user", {
   },
 
   actions: {
+    async getAllPetugas() {
+      const res = await api.get("petugas/all");
+
+      console.log(res.data);
+      this.dataPetugas.splice(0, this.dataPetugas?.length, ...res.data);
+    },
     async login(username, password) {
       try {
         // const lokasiPos = ls.get("lokasiPos")?.value || null;

@@ -1,6 +1,6 @@
 <template>
   <!-- <q-page class="fixed-center full-width"> -->
-  <div
+  <!-- <div
     class="full-width"
     style="overflow-y: hidden"
     :class="{
@@ -30,14 +30,14 @@
           />
         </div>
       </q-card>
-    </div>
-    <!-- 'q-mt-sm': $q.platform.desktop, -->
-    <!-- <div
+    </div> -->
+  <!-- 'q-mt-sm': $q.platform.desktop, -->
+  <!-- <div
       class="text-subtitle1 text-weight-bolder text-white text-center glass-dark q-mt-xs"
     >
       DEPOK FANTASY LAND TICKETING SYSTEM
     </div> -->
-    <!-- <q-header class="glass-dark q-mt-lg">
+  <!-- <q-header class="glass-dark q-mt-lg">
       <q-card class="col-md-3 glass-light q-ma-xs">
         <div class="text-subtitle1 q-ma-xs q-ml-md">Detail Pesanan Tiket</div>
         <q-separator inset dark />
@@ -52,68 +52,72 @@
         </q-card-section>
       </q-card>
     </q-header> -->
-    <div class="flex row full-width text-center q-mt-md">
-      <DetailTransaksi v-if="$q.screen.gt.sm" />
-      <q-card flat class="col q-ma-xs q-pa-sm glass-light" style="height: 89vh">
-        <!-- <div class="text-weight-bolder text-body text-white q-mb-md">
+  <div class="flex row full-width text-center q-mt-md">
+    <DetailTransaksi v-if="$q.screen.gt.sm" />
+    <q-card
+      flat
+      class="col q-ma-xs q-pa-sm glass-light"
+      style="height: 89vh; border-top: #5d4037 3px solid"
+    >
+      <!-- <div class="text-weight-bolder text-body text-white q-mb-md">
           Daftar Wahana
         </div>
         <q-separator spaced inset dark /> -->
 
-        <DetailTransaksi v-if="$q.screen.lt.sm" />
-        <div
-          class="flex row q-gutter-md flex-center q-mt-md"
-          style="overflow-y: auto"
-          :style="$q.screen.lt.sm ? { height: '40vh' } : { height: '76vh' }"
-        >
-          <div v-for="(wahana, index) in daftarWahana" :key="wahana">
-            <WahanaCard
-              :id="wahana.id_wahana.toString()"
-              :nama="wahana.nama"
-              :tarif="parseInt(wahana.harga_tiket)"
-              :deskripsi="wahana.deskripsi"
-              :hari="wahana.hari"
-              :jenis="wahana.nama_jenis"
-            />
-            <!-- <TicketCard /> -->
-          </div>
+      <DetailTransaksi v-if="$q.screen.lt.sm" />
+      <div
+        class="flex row q-gutter-md flex-center q-mt-md"
+        style="overflow-y: auto"
+        :style="$q.screen.lt.sm ? { height: '40vh' } : { height: '76vh' }"
+      >
+        <div v-for="(wahana, index) in daftarWahana" :key="wahana">
+          <WahanaCard
+            :id="wahana.id_wahana.toString()"
+            :nama="wahana.nama"
+            :tarif="parseInt(wahana.harga_tiket)"
+            :deskripsi="wahana.deskripsi"
+            :hari="wahana.hari"
+            :jenis="wahana.nama_jenis"
+          />
+          <!-- <TicketCard /> -->
         </div>
-        <div class="full-width flex row flex-center q-mt-md gap-sm">
-          <span class="text-dark"> Paket : </span>
+      </div>
+      <div class="full-width flex row flex-center q-mt-md gap-sm">
+        <span class="text-dark"> Paket : </span>
+        <q-btn
+          push
+          color="brown-9"
+          label="Semua"
+          @click="qtyDialog = true"
+          class="q-mx-xs"
+        />
+
+        <template v-for="paket in daftarPaket" :key="paket.idPaket">
+          <!-- :label="paket.namaPaket + ' - ' + paket.hargaPaket" -->
           <q-btn
             push
             color="brown-9"
-            label="Semua"
-            @click="qtyDialog = true"
-            class="q-mx-xs"
-          />
-
-          <template v-for="paket in daftarPaket" :key="paket.idPaket">
-            <!-- :label="paket.namaPaket + ' - ' + paket.hargaPaket" -->
-            <q-btn
-              push
-              color="brown-9"
-              class="q-mx-xs q-my-xs"
-              @click="pilihPaket(paket)"
-            >
-              {{ paket.namaPaket }}
-              <!-- <span class="text-body2 text-weight-thin">
+            class="q-mx-xs q-my-xs"
+            @click="pilihPaket(paket)"
+          >
+            {{ paket.namaPaket }}
+            <!-- <span class="text-body2 text-weight-thin">
                 ({{ (paket.hargaPaket) }})</span -->
-            </q-btn>
-          </template>
-          <!-- <q-btn
+          </q-btn>
+        </template>
+        <!-- <q-btn
             push
             color="brown-9"
             label="tes print"
             class="q-mx-xs"
             @click="testPrint"
           /> -->
-        </div>
-      </q-card>
-    </div>
-
-    <!-- </q-page> -->
+      </div>
+    </q-card>
   </div>
+
+  <!-- </q-page> -->
+  <!-- </div> -->
 
   <q-dialog v-model="qtyDialog">
     <q-card class="glass-light q-pa-lg relative">

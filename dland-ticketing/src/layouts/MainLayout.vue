@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf" class="bg-grey-6">
-    <q-header v-if="$route.meta.requireHeader" class="bg-brown">
-      <q-toolbar>
+    <q-header v-if="$route.meta.requireHeader" class="bg-brown-8">
+      <q-toolbar class="q-py-xs">
         <q-btn
           v-if="$route.meta.requireSideNav"
           flat
@@ -10,17 +10,44 @@
           icon="menu"
           aria-label="Menu"
           @click="toggleLeftDrawer"
-        />
+        >
+        </q-btn>
+        <q-btn
+          v-else
+          flat
+          dense
+          round
+          icon="dashboard"
+          aria-label="Menu"
+          @click="$router.push('/dashboard')"
+        >
+        </q-btn>
 
         <q-toolbar-title>
           <q-img
             src="~/assets/logo-dland.png"
-            :width="$q.platform.is.desktop ? '250px' : '100px'"
+            :width="$q.platform.is.desktop ? '200px' : '100px'"
             spinner-color="primary"
             spinner-size="20px"
         /></q-toolbar-title>
 
-        <div>v{{ $q.version }}</div>
+        <div class="text-body text-weight-bolder text-white text-start q-px-md">
+          {{ ls.get("petugas")?.nama }}
+          <Clock />
+        </div>
+        <div>
+          <q-btn flat color="white" icon="logout" @click="onLogOut"
+            ><q-tooltip class="bg-brown-8 text-yellow-7 text-weight-bolder">
+              Log Out
+            </q-tooltip></q-btn
+          >
+          <q-btn flat color="white" icon="settings" @click="onClickSettings">
+            <q-tooltip class="bg-brown-8 text-yellow-7 text-weight-bolder">
+              Settings
+            </q-tooltip></q-btn
+          >
+          <!-- label="Log Out" -->
+        </div>
       </q-toolbar>
     </q-header>
 
@@ -76,19 +103,24 @@ import { componentStore } from "src/stores/component-store";
 import { useQuasar } from "quasar";
 import SettingsDialog from "src/components/SettingsDialog.vue";
 import ls from "localstorage-slim";
+import Clock from "src/components/Clock.vue";
+// import LoginDialog from "src/components/LoginDialog.vue";
 
 const $q = useQuasar();
 
-onMounted(()=>{
+onMounted(() => {
   if (!ls.get("APIURL") || !ls.get("namaPrinter")) {
     const settingDialog = $q.dialog({
       component: SettingsDialog,
       persistent: true,
-
     });
     settingDialog.update();
   }
-})
+});
+const onLogOut = () => {
+  ls.remove("petugas");
+  window.location.reload();
+};
 
 const essentialLinks = [
   {
@@ -117,28 +149,38 @@ const essentialLinks = [
     link: "/laporan/transaksi",
   },
   {
-    title: "Settings",
+    title: "Petugas",
     caption: "",
-    icon: "settings",
-    link: "/settings",
+    icon: "person",
+    link: "/petugas",
   },
   {
     title: "Master Wahana",
     caption: "",
-    icon: "",
+    icon: "apps",
     link: "/wahana",
   },
   {
     title: "Daftar Paket",
     caption: "",
-    icon: "",
+    icon: "dataset",
     link: "/paket",
   },
 ];
 const leftDrawerOpen = ref(false);
 
 // essentialLinks: linksList,
-// leftDrawerOpen,
+// leftDrawerOpen
+
+const onClickSettings = () => {
+  const settingDialog = $q.dialog({
+    component: SettingsDialog,
+    componentProps: {
+      closeButton: true,
+    },
+  });
+  settingDialog.update();
+};
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 };

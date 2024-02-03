@@ -1,11 +1,15 @@
-import { app, BrowserWindow } from "electron";
+import { ipcMain, app, BrowserWindow } from "electron";
 import path from "path";
+import fs from "fs";
 import os from "os";
-
-// needed in case process is undefined under Linux
 const platform = process.platform || os.platform();
 
+import { initialize, enable } from "@electron/remote/main";
+import { log } from "console";
+initialize();
 let mainWindow;
+
+// needed in case process is undefined under Linux
 
 function createWindow() {
   /**
@@ -25,6 +29,22 @@ function createWindow() {
       sandbox: false,
     },
   });
+
+  ipcMain.on("download-pdf", async (event, arrayBuffer, filename) => {
+    const directoryPath = path.join(os.homedir(), "struk");
+    try {
+      const fsp = fs.promises;
+      await fsp.mkdir(directoryPath, { recursive: true });
+      const filePath = path.join(directoryPath, filename);
+      const buffer = Buffer.from(arrayBuffer);
+      await fsp.writeFile(filePath, buffer);
+      console.log("File written successfully");
+    } catch (err) {
+      console.log("Error writing file", err);
+    }
+  });
+
+  enable(mainWindow.webContents);
 
   mainWindow.webContents.session.on(
     "select-hid-device",

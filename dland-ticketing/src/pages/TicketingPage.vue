@@ -59,12 +59,12 @@
       class="col q-ma-xs q-pa-sm glass-light"
       style="height: 89vh; border-top: #5d4037 3px solid"
     >
-      <q-btn
+      <!-- <q-btn
         color="primary"
         icon="check"
         label="OK"
         @click="$router.push('/print')"
-      />
+      /> -->
       <!-- <div class="text-weight-bolder text-body text-white q-mb-md">
           Daftar Wahana
         </div>
@@ -174,6 +174,7 @@ import { useQuasar } from "quasar";
 import SettingsDialog from "src/components/SettingsDialog.vue";
 import ls from "localstorage-slim";
 import LoginDialog from "src/components/LoginDialog.vue";
+import { generatePDF } from "src/utils/helpers";
 
 const $q = useQuasar();
 const qtyDialog = ref(false);
@@ -224,25 +225,6 @@ const onLogOut = () => {
   window.location.reload();
 };
 
-const testPrint = () => {
-  const data = {
-    nama_perusahaan: "Nama Perusahaan Anda",
-    nama_paket: "Paket A",
-    petugas: "Nama Petugas",
-    waktu: new Date().toLocaleString("id-ID"),
-    transaksi: {
-      transaksi: [
-        { nama: "Wahana 1", qty: 2, harga: 50000 },
-        { nama: "Wahana 2", qty: 1, harga: 75000 },
-      ],
-      totalBayar: 175000,
-      diskon: 25000,
-      totalAfterDiskon: 150000,
-    },
-  };
-  window.electron.printDirectlyToPrinter(ls.get("namaPrinter"));
-};
-
 const pilihPaket = async (paket) => {
   wahanaStore().pilihPaket(paket, wahanaStore().daftarWahana);
   transaksiStore().isPaket = true;
@@ -262,7 +244,8 @@ const pilihPaket = async (paket) => {
       namaPaket: wahanaStore().namaPaketTerpilih,
       no_transaksi: store.no_transaksi,
     };
-    window.electron.createPDFStruk("Depok Fantasy Land", JSON.stringify(data));
+
+    generatePDF(data);
     window.electron.print(ls.get("namaPrinter"));
     $q.notify({
       message: "Berhasil",

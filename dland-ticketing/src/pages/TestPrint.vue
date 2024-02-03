@@ -234,64 +234,56 @@ const generatePDF = () => {
     }
   );
 
+  pdf.setFontSize(7);
+  pdf.text(
+    "Terimakasih atas kunjungan anda",
+    pdf.internal.pageSize.width / 2,
+    pdf.autoTable.previous.finalY + 20, // Adjust vertical position based on QR code size
+    { align: "center" }
+  );
+
   // Generate barcode
 
-  const barcodeData = generateBarcode("no_transaksi");
-  console.log("barcodedata", barcodeData);
+  const barcodeData = generateBarcode("no_transaksi", { width: 2, height: 50 });
   // Add barcode to PDF
   if (barcodeData) {
     const barcodeImage = new Image();
     barcodeImage.src = barcodeData;
+    console.log("barcodedata", barcodeData);
     barcodeImage.onload = () => {
-      const barcodeWidth = 50;
-      const barcodeHeight = 15;
+      const barcodeWidth = 70; // Increased width for better clarity
+      const barcodeHeight = 20; // Increased height for better clarity
       const xPosition = (pageWidth - barcodeWidth) / 2;
-      const yPosition = pdf.autoTable.previous.finalY + 20;
+      const yPosition = pdf.autoTable.previous.finalY + 22;
       pdf.addImage(
         barcodeImage,
-        "JPEG",
+        "PNG",
         xPosition,
         yPosition,
         barcodeWidth,
         barcodeHeight
       );
       // pdf.save(filePath); // Save the PDF after adding the barcode image
+      const pdfOutput = pdf.output("blob");
+      const filePath = `./tes1.pdf`;
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        const buffer = this.result;
+        window.electron.downloadPDF(buffer, filePath);
+      };
+      reader.readAsArrayBuffer(pdfOutput);
     };
   }
-
-  pdf.setFontSize(7);
-  pdf.text(
-    "Terimakasih atas kunjungan anda",
-    pdf.internal.pageSize.width / 2,
-    pdf.autoTable.previous.finalY + 18, // Adjust vertical position based on QR code size
-    { align: "center" }
-  );
-  const blobPDF = pdf.output("blob");
-  const filePath = `nama_file.pdf`;
-
-  // Buat URL objek dari Blob
-  const pdfURL = URL.createObjectURL(blobPDF);
-
-  // Buat link untuk file PDF
-  const downloadLink = document.createElement("a");
-  downloadLink.href = pdfURL;
-  downloadLink.download = filePath;
-
-  // Sembunyikan link dan tambahkan ke dalam body
-  downloadLink.style.display = "none";
-  document.body.appendChild(downloadLink);
-
-  // Klik pada link untuk memicu penyimpanan otomatis
-  downloadLink.click();
-
-  // Hapus link setelah selesai
-  document.body.removeChild(downloadLink);
-
-  // Hapus URL objek
-  URL.revokeObjectURL(pdfURL);
 };
 
+// Create a Blob from the PDF Stream
+
 const barcodeData = ref("");
+
+const testPrint = () => {
+  window.electron.printWithElectronPosPrinter();
+};
 
 const tesGenerate = () => {
   ipcRenderer.send("generateBarcode", "yourBarcodeText");

@@ -153,6 +153,7 @@ import DaftarTransaksiDialog from "src/components/dialogues/DaftarTransaksiDialo
 import { userStore } from "src/stores/user-store";
 import { wahanaStore } from "src/stores/wahana-store";
 import ls from "localstorage-slim";
+import { generatePDF } from "src/utils/helpers.js";
 
 const $q = useQuasar();
 const totalBayar = computed(() => {
@@ -190,15 +191,17 @@ const onClickBayar = async (method) => {
       diskon: transaksiStore().diskon,
       totalAfterDiskon: transaksiStore().totalAfterDiskon,
       totalBayar: transaksiStore().totalBayar,
-      no_transaksi: store.no_transaksi,
+      no_transaksi: transaksiStore().no_transaksi,
     };
     // namaPaket: "Tiket",
-    // console.log("store", store);
+    console.log("data.transaksi", data.transaksi);
     if (store) {
-      window.electron.createPDFStruk(
-        "Depok Fantasy Land",
-        JSON.stringify(data)
-      );
+      await generatePDF(data);
+
+      // window.electron.createPDFStruk(
+      //   "Depok Fantasy Land",
+      //   JSON.stringify(data)
+      // );
       const namaPrinter = ls.get("namaPrinter");
       window.electron.print(namaPrinter);
       $q.notify({
@@ -221,7 +224,7 @@ const onClickBayar = async (method) => {
         position: "top",
       });
     }
-    transaksiStore().resetTransaksi();
+
     // const dialog = $q.dialog({
     //   component: PaymentDialog,
     // });
@@ -230,6 +233,7 @@ const onClickBayar = async (method) => {
     transaksiStore().resetTransaksi();
     transaksiStore().isPaket = false;
   }
+  transaksiStore().resetTransaksi();
 };
 
 const handleKeyDownOnDetailTransaksi = (event) => {

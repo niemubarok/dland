@@ -32,8 +32,8 @@
 import { ref, onMounted, watch } from "vue";
 import GrowingNumber from "src/components/GrowingNumber.vue";
 import CardNumber from "src/components/CardNumber.vue";
-import BarChart from "src/components/BarChart.vue";
-import { chartStore } from "src/stores/chart-store";
+// import BarChart from "src/components/BarChart.vue";
+// import { chartStore } from "src/stores/chart-store";
 import { reportStore } from "src/stores/report-store";
 import { wahanaStore } from "src/stores/wahana-store";
 

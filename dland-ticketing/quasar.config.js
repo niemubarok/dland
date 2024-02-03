@@ -55,6 +55,7 @@ module.exports = configure(function (/* ctx */) {
       // analyze: true,
       env: {
         WA_GATEWAY: "http://127.0.0.1:8000",
+        NAMA_PERUSAHAAN: "DEPOK FANTASY LAND",
       },
       // rawDefine: {}
       // ignorePublicFolder: true,
@@ -172,15 +173,14 @@ module.exports = configure(function (/* ctx */) {
         // osxSign: '',
         // protocol: 'myapp://path',
         // Windows only
-        win32metadata: { 
+        win32metadata: {
           CompanyName: "DLAND",
-    FileDescription: "string",
-    // InternalName: "string",
-    // OriginalFilename: "string",
-    requestedExecutionLevel:"requireAdministrator",
-    ProductName: "dland"
-        }
-        
+          FileDescription: "string",
+          // InternalName: "string",
+          // OriginalFilename: "string",
+          requestedExecutionLevel: "requireAdministrator",
+          ProductName: "dland",
+        },
       },
 
       builder: {

@@ -117,7 +117,7 @@ export const wahanaStore = defineStore("wahana", {
       const res = await api.get("wahana");
       this.daftarWahana.splice(0, this.daftarWahana.length, ...res.data);
       this.jumlahWahana = res.data?.length;
-      console.log("getWahanaFromDBr", res.data);
+      // console.log("getWahanaFromDBr", res.data);
       return res.data;
     },
 
@@ -185,6 +185,8 @@ export const wahanaStore = defineStore("wahana", {
         return {
           id_wahana: wahana.id_wahana.toString(),
           nama: wahana.nama,
+          jenis: wahana.nama_jenis,
+          deskripsi: wahana.deskripsi,
           tarif: parseFloat(wahana.harga_tiket),
           total_bayar: parseFloat(wahana.harga_tiket),
           qty: 1,
@@ -222,8 +224,8 @@ export const wahanaStore = defineStore("wahana", {
 
       this.paket.splice(0, this.paket.length, ...data);
 
-      console.log("res.data", res.data);
-      console.log(data);
+      // console.log("res.data", res.data);
+      // console.log(data);
     },
     async addPaketToDB(data) {
       console.log("data", data);
@@ -255,7 +257,7 @@ export const wahanaStore = defineStore("wahana", {
     async addMasterWahanaToDB(data) {
       try {
         const res = await api.post("wahana/add", data);
-        console.log(res.data);
+        // console.log(res.data);
         if (res.status === 201) {
           this.daftarWahana.push({
             id_wahana: res.data.id_wahana.id_wahana,
@@ -270,7 +272,7 @@ export const wahanaStore = defineStore("wahana", {
       }
     },
     async editMasterWahanaOnDB(id, column, value) {
-      console.log("value", value);
+      // console.log("value", value);
       try {
         const res = await api.post("wahana/edit", { id, column, value });
 

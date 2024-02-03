@@ -191,9 +191,10 @@ WHERE SUBSTRING(transaksi_penjualan.no_transaksi, 1, 10) BETWEEN ? AND ?
     const { no_transaksi } = request.body();
 
     const detaiTransaksi = await Database.rawQuery(
-      `SELECT detail_transaksi.*, master_wahana.nama 
+      `SELECT detail_transaksi.*, master_wahana.nama, master_wahana.id_jenis,jenis_tiket.nama_jenis 
    FROM detail_transaksi 
    INNER JOIN master_wahana ON detail_transaksi.id_wahana = master_wahana.id_wahana 
+   INNER JOIN jenis_tiket ON master_wahana.id_jenis = jenis_tiket.id_jenis
    WHERE detail_transaksi.no_transaksi = '${no_transaksi}' `
     );
     // console.log(detaiTransaksi.rows);

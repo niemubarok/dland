@@ -75,7 +75,7 @@ const onClickWahana = () => {
     hari: props.hari,
   });
 
-  console.log("data di wahanacard", data.value);
+  // console.log("data di wahanacard", data.value);
   transaksiStore().addTransaksi(data.value);
 
   transaksiStore().detailTransaksi;

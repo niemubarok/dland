@@ -281,6 +281,7 @@ import { date, useQuasar } from "quasar";
 import DetailTransaksiDialog from "src/components/dialogues/DetailTransaksiDialog.vue";
 import DeleteTransaksiDialog from "src/components/dialogues/DeleteTransaksiDialog.vue";
 import ls from "localstorage-slim";
+import { generatePDF } from "src/utils/helpers";
 
 const $q = useQuasar();
 const todaySelected = ref(false);
@@ -345,6 +346,9 @@ const onClickPrint = async (diskon, no_transaksi, namaPaket) => {
     no_transaksi
   );
 
+  console.log("detailTransaksi", detailTransaksi);
+  // console.log("diskon", diskon);
+
   await wahanaStore().getWahanaFromDB();
   let paket = {
     diskon,
@@ -355,6 +359,7 @@ const onClickPrint = async (diskon, no_transaksi, namaPaket) => {
   wahanaStore().pilihPaket(paket, wahanaStore().daftarWahana);
 
   const data = {
+    no_transaksi,
     transaksi: transaksiStore().detailTransaksi,
     diskon: transaksiStore().diskon,
     totalAfterDiskon: transaksiStore().totalAfterDiskon,
@@ -362,9 +367,10 @@ const onClickPrint = async (diskon, no_transaksi, namaPaket) => {
     namaPaket: wahanaStore().namaPaketTerpilih,
   };
 
-  // console.log(data.namaPaket);
+  console.log("data di daftarTransaksi", data);
   // return;
-  window.electron.createPDFStruk("Depok Fantasy Land", JSON.stringify(data));
+  // window.electron.createPDFStruk("Depok Fantasy Land", JSON.stringify(data));
+  generatePDF(data);
   window.electron.print(ls.get("namaPrinter"));
   $q.notify({
     message: "Berhasil",

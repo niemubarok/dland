@@ -1,5 +1,8 @@
-const HID = require("node-hid");
-const axios = require("axios");
+// index.js
+
+import { devices as _devices, HID as _HID } from "node-hid";
+import { SerialPort } from "serialport";
+import { getNumberWithPrompt } from "simple-prompt-promise";
 
 const keyMap = {
   4: "a",
@@ -57,83 +60,115 @@ const keyMap = {
   // Tambahkan lebih banyak sesuai kebutuhan
 };
 
-async function selectDevice() {
-  const devices = HID.devices();
-
+let serialPath = "";
+async function selectHIDDevice() {
+  const devices = _devices();
   if (devices.length === 0) {
     console.log("No HID devices found.");
-    return;
+    return null;
   }
 
   console.log("Available HID devices:");
   devices.forEach((device, index) => {
     console.log(
-      `${index + 1}. Path: ${device.path}, Manufacturer: ${
-        device.manufacturer
-      }, Product: ${device.product}`
+      `${index + 1}. Path: ${device.path}, Name: ${device.pnpId}, Product: ${
+        device.product
+      }`
     );
   });
 
-  const selectedDeviceIndex = await promptUser(
-    "Enter the number of the device you want to use: "
+  const selectedDeviceIndex = await getNumberWithPrompt(
+    "Pilih device yang ingin digunakan: ",
+    {
+      validation: (input) =>
+        (input >= 1 && input <= devices.length) || "Input Salah",
+      range: [1, devices.length],
+      canCancel: false,
+    }
   );
 
   if (selectedDeviceIndex >= 1 && selectedDeviceIndex <= devices.length) {
-    const selectedDevice = devices[selectedDeviceIndex - 1];
-    if (selectedDevice) {
-      listenToDevice(selectedDevice);
-    }
+    return devices[selectedDeviceIndex - 1];
   } else {
-    console.log("Invalid selection.");
+    console.log("Input Salah");
+    return null;
   }
 }
 
-async function promptUser(question) {
-  const readline = require("readline").createInterface({
-    input: process.stdin,
-    output: process.stdout,
+async function selectSerialDevice() {
+  const serialDevices = await SerialPort.list();
+  if (serialDevices.length === 0) {
+    console.log("No serial devices found.");
+    return;
+  }
+
+  console.log("Available serial devices:");
+  serialDevices.forEach((device, index) => {
+    console.log(
+      `${index + 1}. ${device.path} -- ${
+        device.manufacturer || "Unknown Manufacturer"
+      } -- ${device.serialNumber || "No Serial"}`
+    );
   });
 
-  return new Promise((resolve) => {
-    readline.question(question, (answer) => {
-      readline.close();
-      resolve(parseInt(answer));
-    });
-  });
+  const selectedDeviceIndex = await getNumberWithPrompt(
+    "Enter the number of the device you want to use: ",
+    {
+      validation: (input) =>
+        (input >= 1 && input <= serialDevices.length) || "Input Salah",
+      range: [1, serialDevices.length],
+      canCancel: false,
+    }
+  );
+
+  if (selectedDeviceIndex >= 1 && selectedDeviceIndex <= serialDevices.length) {
+    const selectedDevice = serialDevices[selectedDeviceIndex - 1];
+    console.log("Selected serial device:", selectedDevice);
+    serialPath = selectedDevice.path; // Mengembalikan path dari perangkat serial yang dipilih
+    return selectedDevice.path;
+  } else {
+    console.log("Invalid selection.");
+    return null;
+  }
 }
 
 function listenToDevice(deviceInfo) {
-  const device = new HID.HID(deviceInfo.path);
-  let dataBarcode = [];
+  const device = new _HID(deviceInfo.path);
+  console.log(`Listening to device: ${deviceInfo.path}`);
+
+  let keys = [];
+
   device.on("data", (data) => {
     const keyCode = data[2];
-    const key = getKeyFromCode(keyCode);
-    if (!key) return;
+    if (keyCode === 0) return; // Ignore jika keyCode adalah 0 (no key pressed)
 
-    // console.log("Key pressed:", key);
-
-    if (dataBarcode.length > 0 && key === "Enter") {
-      // Make API request when Enter key is pressed
-      makeAPIRequest(dataBarcode.join(""));
-      dataBarcode = []; // Reset the barcode data after making the request
-    } else {
-      // Collect scanned characters into a barcode array
-      dataBarcode.push(key);
-      console.log("dataBarcode:", dataBarcode.join(""));
+    const key = keyMap[keyCode];
+    if (!key) {
+      console.log(`Unknown key code: ${keyCode}`);
+      return;
     }
+
+    // console.log(`Key pressed: ${key}`);
+    keys.push(key);
+
+    if (key === "Enter") {
+      makeAPIRequest(keys.join(""));
+      keys = [];
+    }
+    // Implementasikan logika Anda di sini, misalnya mengirim data ke API atau menampilkannya di konsol
   });
 
   device.on("error", (err) => {
-    console.error("Device error:", err);
+    console.error(`Device error on ${deviceInfo.path}:`, err);
   });
 }
 
-function getKeyFromCode(code) {
-  return keyMap[code] || null;
-}
-
 async function makeAPIRequest(dataBarcode) {
-  console.log("Barcode:", dataBarcode);
+  const serialPort = new SerialPort({
+    path: serialPath,
+    baudRate: 9600,
+  });
+
   try {
     //   Ganti URL dengan endpoint API yang sesuai2233445767676
 
@@ -144,17 +179,36 @@ async function makeAPIRequest(dataBarcode) {
         barcode: dataBarcode,
       }
     );
-    console.log("Data from API:", response.data);
+
+    if (response.data.status === 200) {
+      console.log(response.data.message);
+      serialPort.write("*OUT1ON#");
+
+      setTimeout(() => {
+        serialPort.write("*OUT1OFF#");
+      }, 2000);
+    }
+
+    // console.log("Data from API:", response.data);
   } catch (error) {
     console.error("Error fetching data from API:", error);
   }
 }
 
-async function openGate() {
-  try {
-  } catch (error) {
-    console.log(error);
+async function main() {
+  const selectedHIDDevice = await selectHIDDevice();
+  if (!selectedHIDDevice) {
+    console.log("HID device selection failed or was cancelled.");
+    return;
   }
+
+  const serialPath = await selectSerialDevice();
+  if (!serialPath) {
+    console.log("Serial device selection failed or was cancelled.");
+    return;
+  }
+
+  listenToDevice(selectedHIDDevice);
 }
 
-selectDevice();
+main();

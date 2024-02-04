@@ -40,7 +40,7 @@ export const rp = (amount) => {
 
 const generateBarcode = (text) => {
   const canvas = document.createElement("canvas");
-  JsBarcode(canvas, text, { displayValue: true, format: "CODE128" });
+  JsBarcode(canvas, text, { displayValue: false, format: "CODE128" });
   return canvas.toDataURL("image/png");
 };
 
@@ -267,10 +267,10 @@ export const generatePDF = async (transaksi) => {
     const barcodeImage = new Image();
     barcodeImage.src = barcodeData;
     barcodeImage.onload = () => {
-      const barcodeWidth = 50; // Increased width for better clarity
+      const barcodeWidth = 20; // Increased width for better clarity
       const barcodeHeight = 10; // Increased height for better clarity
       const xPosition = (pageWidth - barcodeWidth) / 2;
-      const yPosition = pdf.autoTable.previous.finalY + 22;
+      const yPosition = pdf.autoTable.previous.finalY + 21;
       pdf.addImage(
         barcodeImage,
         "PNG",

@@ -276,7 +276,7 @@
 import { reportStore } from "src/stores/report-store";
 import { transaksiStore } from "src/stores/transaksi-store";
 import { wahanaStore } from "src/stores/wahana-store";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { date, useQuasar } from "quasar";
 import DetailTransaksiDialog from "src/components/dialogues/DetailTransaksiDialog.vue";
 import DeleteTransaksiDialog from "src/components/dialogues/DeleteTransaksiDialog.vue";
@@ -380,14 +380,14 @@ const onClickPrint = async (diskon, no_transaksi, namaPaket) => {
   transaksiStore().resetTransaksi();
 };
 const todayBtn = async () => {
-  isToday.value = !isToday.value;
+  isToday.value = true;
   startDateSelected.value = false;
   endDateSelected.value = false;
   // Ensure the time zone offset is accounted for so that startDate is set to today's date
-  const today = new Date();
-  today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-  reportStore().startDate = today.toISOString().split("T")[0];
-  reportStore().endDate = today.toISOString().split("T")[0];
+  // const today = new Date();
+  // today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+  reportStore().startDate = "";
+  reportStore().endDate = "";
   await store.getLaporanTransaksiFromDB();
 };
 
@@ -450,9 +450,9 @@ const save = async (type) => {
     endDate.value = proxyDate.value;
     console.log("endate", endDate.value);
     reportStore().endDate = endDate.value;
+    await store.getLaporanTransaksiFromDB();
   }
 
-  await store.getLaporanTransaksiFromDB();
   // await store.getLaporanPendapatan();
 };
 

@@ -168,14 +168,15 @@ module.exports = configure(function (/* ctx */) {
       packager: {
         // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
         // OS X / Mac App Store
-        // appBundleId: '',
+        appBundleId: "",
+        platform: "all",
         // appCategoryType: '',
         // osxSign: '',
         // protocol: 'myapp://path',
         // Windows only
         win32metadata: {
           CompanyName: "DLAND",
-          FileDescription: "string",
+          FileDescription: "Aplikasi tiket Dland",
           // InternalName: "string",
           // OriginalFilename: "string",
           requestedExecutionLevel: "requireAdministrator",

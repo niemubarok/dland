@@ -6,27 +6,33 @@ export default class TransactionsController {
     const { startDate: startDateParam, endDate: endDateParam } = request.body();
     const today = new Date();
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-    const startDate = startDateParam ? new Date(startDateParam) : today;
-    const endDate = endDateParam ? new Date(endDateParam) : today;
+    const startDate = startDateParam
+      ? startDateParam
+      : today.toISOString().split("T")[0].replace(/-/g, "/");
+    const endDate = endDateParam
+      ? endDateParam
+      : today.toISOString().split("T")[0].replace(/-/g, "/");
 
     // return startDate;
 
-    const formatStartDate = startDate
-      .toISOString()
-      .split("T")[0]
-      .replace(/-/g, "/");
-    const formatEndDate = endDate
-      .toISOString()
-      .split("T")[0]
-      .replace(/-/g, "/");
+    // const formatStartDate = startDate
+    //   .toISOString()
+    //   .split("T")[0]
+    //   .replace(/-/g, "/");
+    // const formatEndDate = endDate
+    //   .toISOString()
+    //   .split("T")[0]
+    //   .replace(/-/g, "/");
+
+    console.log(startDate, "-", endDate);
 
     const transaksi = await Database.rawQuery(
       `SELECT transaksi_penjualan.*, paket_tiket.nama_paket 
 FROM transaksi_penjualan 
 LEFT JOIN paket_tiket ON transaksi_penjualan.id_paket = paket_tiket.id_paket 
-WHERE SUBSTRING(transaksi_penjualan.no_transaksi, 1, 10) BETWEEN ? AND ?
+WHERE SUBSTRING(transaksi_penjualan.no_transaksi, 1, 10) BETWEEN ? AND ? ORDER BY transaksi_penjualan.created_at DESC
 `,
-      [formatStartDate, formatEndDate]
+      [startDate, endDate]
     );
 
     response.status(200).json(transaksi.rows);
@@ -191,7 +197,7 @@ WHERE SUBSTRING(transaksi_penjualan.no_transaksi, 1, 10) BETWEEN ? AND ?
     const { no_transaksi } = request.body();
 
     const detaiTransaksi = await Database.rawQuery(
-      `SELECT detail_transaksi.*, master_wahana.nama, master_wahana.id_jenis,jenis_tiket.nama_jenis 
+      `SELECT detail_transaksi.*, master_wahana.nama, master_wahana.id_jenis,jenis_tiket.nama_jenis as jenis 
    FROM detail_transaksi 
    INNER JOIN master_wahana ON detail_transaksi.id_wahana = master_wahana.id_wahana 
    INNER JOIN jenis_tiket ON master_wahana.id_jenis = jenis_tiket.id_jenis

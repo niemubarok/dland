@@ -437,7 +437,9 @@ const save = async (type) => {
     startDateSelected.value = true;
     startDate.value = proxyDate.value;
     endDate.value = proxyDate.value;
+    endDateSelected.value = true;
     reportStore().startDate = startDate.value;
+    reportStore().endDate = startDate.value;
     if (new Date(proxyDate.value).getDate() == new Date(Date.now()).getDate()) {
       isToday.value = true;
       todaySelected.value = true;
@@ -450,8 +452,8 @@ const save = async (type) => {
     endDate.value = proxyDate.value;
     console.log("endate", endDate.value);
     reportStore().endDate = endDate.value;
-    await store.getLaporanTransaksiFromDB();
   }
+  await store.getLaporanTransaksiFromDB();
 
   // await store.getLaporanPendapatan();
 };

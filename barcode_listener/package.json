@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "serve": "node index.js",
+    "reset": "node index.js --reset"
   },
   "keywords": [],
   "author": "",

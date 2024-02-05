@@ -133,6 +133,38 @@ async function selectSerialDevice(forcePrompt = false) {
   return selectedSerialPath;
 }
 
+async function makeAPIRequest(dataBarcode) {
+  const deviceConfig = JSON.parse(await fs.readFile(deviceConfigPath, "utf-8"));
+  const serialPath = deviceConfig.serialPath;
+
+  const serialPort = new SerialPort({
+    path: serialPath,
+    baudRate: 9600,
+  });
+
+  try {
+    //   Ganti URL dengan endpoint API yang sesuai2233445767676
+
+    const response = await axios.post(API_URL, {
+      // barcode: "2024/01/29/00002",
+      barcode: dataBarcode,
+    });
+
+    if (response.data.status === 200) {
+      console.log(response.data.message);
+      serialPort.write("*OUT1ON#");
+
+      setTimeout(() => {
+        serialPort.write("*OUT1OFF#");
+      }, 2000);
+    }
+
+    // console.log("Data from API:", response.data);
+  } catch (error) {
+    console.error("Error fetching data from API:", error);
+  }
+}
+
 function listenToHIDDevice(deviceInfo) {
   const device = new HID.HID(deviceInfo.path);
   console.log(`Listening to HID device: ${deviceInfo.path}`);

@@ -26,7 +26,7 @@ export default class UsersController {
 
     try {
       const user = await Database.rawQuery(
-        "SELECT * FROM petugas WHERE username = :username AND password = :password",
+        "SELECT * FROM petugas WHERE username = :username AND password = :password AND status = true",
         {
           username,
           password,
@@ -118,11 +118,73 @@ export default class UsersController {
     }
   }
 
-  public async show({}: HttpContextContract) {}
+  public async create({ request, response }: HttpContextContract) {
+    const req = request.body();
 
-  public async edit({}: HttpContextContract) {}
+    // const lastIdResult = await Database.rawQuery(
+    //   "SELECT MAX(id_petugas) AS max_id FROM petugas"
+    // );
+    // const lastId = lastIdResult.rows[0]?.max_id;
+    // console.log("lastId", lastId);
 
-  public async update({}: HttpContextContract) {}
+    const newPetugas = await Database.table("petugas")
+      .returning("id_petugas")
+      .insert({
+        id_petugas: req.id_petugas,
+        nama_lengkap: req.nama_lengkap,
+        no_hp: req.no_hp,
+        username: req.username,
+        password: req.password,
+        // status: 1,
+        created_at: new Date(),
+      });
 
-  public async destroy({}: HttpContextContract) {}
+    if (newPetugas) {
+      const petugasId = newPetugas[0];
+      response.status(201).json({
+        message: "petugas created successfully",
+        id_petugas: petugasId,
+      });
+    } else {
+      response.status(400).json({ message: "Failed to create petugas" });
+    }
+  }
+
+  public async edit({ request, response }: HttpContextContract) {
+    const { id, column, value } = request.body();
+
+    try {
+      await Database.from("petugas")
+        .where("id_petugas", id)
+        .update({ [column]: value, updated_at: new Date() });
+
+      response.status(201).json({
+        message: "Update berhasil",
+      });
+    } catch (error) {
+      console.log(error);
+
+      response.status(400).json({
+        message: "Update gagal",
+        error: error.message,
+      });
+    }
+  }
+
+  public async delete({ request, response }: HttpContextContract) {
+    const { id } = request.body();
+
+    try {
+      const query = await Database.rawQuery(
+        `DELETE FROM petugas WHERE id_petugas = ${id}`
+      );
+
+      response.status(201).json(query);
+    } catch (error) {
+      response.status(400).json({
+        message: "Delete gagal",
+        error: error.message,
+      });
+    }
+  }
 }

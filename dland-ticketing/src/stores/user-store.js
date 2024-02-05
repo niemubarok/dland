@@ -8,7 +8,7 @@ export const userStore = defineStore("user", {
   state: () => ({
     counter: 0,
     isLogin: ref(false),
-    dataPetugas: ref([]),
+    daftarPetugas: ref([]),
   }),
 
   getters: {
@@ -22,7 +22,7 @@ export const userStore = defineStore("user", {
       const res = await api.get("petugas/all");
 
       console.log(res.data);
-      this.dataPetugas.splice(0, this.dataPetugas?.length, ...res.data);
+      this.daftarPetugas.splice(0, this.daftarPetugas?.length, ...res.data);
     },
     async login(username, password) {
       try {
@@ -77,6 +77,71 @@ export const userStore = defineStore("user", {
           tanggal,
         });
       } catch (error) {}
+    },
+
+    async deleteMasterPetugasFromDB(id) {
+      try {
+        const res = await api.post("petugas/delete", { id });
+        if (res.status === 201) {
+          const index = this.daftarPetugas.findIndex(
+            (petugas) => petugas.id_petugas === id
+          );
+          if (index !== -1) {
+            this.daftarPetugas.splice(index, 1);
+            console.log(`petugas with ID ${id} deleted.`);
+          } else {
+            console.log(`petugas with ID ${id} not found.`);
+          }
+          return true;
+        } else {
+          return false;
+        }
+      } catch (err) {
+        return err;
+      }
+    },
+    async editMasterPetugasOnDB(id, column, value) {
+      // console.log("value", value);
+      try {
+        const res = await api.post("petugas/edit", { id, column, value });
+
+        if (res.status === 201) {
+          const index = this.daftarPetugas.findIndex(
+            (petugas) => petugas.id_petugas === id
+          );
+          if (index !== -1) {
+            Object.assign(this.daftarPetugas[index], { [column]: value });
+            console.log(
+              `petugas with ID ${id} updated:`,
+              this.daftarPetugas[index]
+            );
+          } else {
+            console.log(`petugas with ID ${id} not found.`);
+          }
+          return true;
+        } else {
+          return false;
+        }
+      } catch (err) {
+        return err;
+      }
+    },
+    async addMasterPetugasToDB(data) {
+      try {
+        const res = await api.post("petugas/add", data);
+        // console.log(res.data);
+        if (res.status === 201) {
+          this.daftarPetugas.push({
+            id_petugas: res.data.id_petugas,
+            ...data,
+          });
+          return true;
+        } else {
+          return false;
+        }
+      } catch (err) {
+        return err;
+      }
     },
   },
 });

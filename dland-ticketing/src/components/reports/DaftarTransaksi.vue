@@ -448,14 +448,24 @@ const save = async (type) => {
       todaySelected.value = false;
     }
   } else if (type === "end") {
+    if (
+      new Date(proxyDate.value).getDate() < new Date(startDate.value).getDate()
+    ) {
+      $q.notify({
+        color: "negative",
+        textColor: "white",
+        icon: "error",
+        message: "Tanggal akhir tidak boleh Kurang dari tanggal mulai!",
+      });
+      return;
+    }
+
     endDateSelected.value = true;
     endDate.value = proxyDate.value;
     console.log("endate", endDate.value);
     reportStore().endDate = endDate.value;
   }
   await store.getLaporanTransaksiFromDB();
-
-  // await store.getLaporanPendapatan();
 };
 
 onMounted(async () => {

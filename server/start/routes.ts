@@ -38,6 +38,9 @@ Route.group(() => {
   Route.group(() => {
     Route.get("/all", "UsersController.index");
     Route.post("/login", "UsersController.login");
+    Route.post("/add", "UsersController.create");
+    Route.post("/edit", "UsersController.edit");
+    Route.post("/delete", "UsersController.delete");
   }).prefix("petugas");
 
   Route.group(() => {

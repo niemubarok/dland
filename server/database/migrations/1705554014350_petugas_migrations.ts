@@ -13,11 +13,7 @@ export default class extends BaseSchema {
         table.string("no_hp", 20).notNullable();
         table.string("username", 50).notNullable().unique();
         table.string("password", 100).notNullable();
-        // table.string("remember_me_token").nullable();
-
-        /**
-         * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
-         */
+        table.boolean("status").notNullable().defaultTo(true);
         table.timestamp("created_at", { useTz: true });
         table.timestamp("updated_at", { useTz: true });
       });

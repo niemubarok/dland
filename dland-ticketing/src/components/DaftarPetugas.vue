@@ -103,6 +103,7 @@
       :virtual-scroll-sticky-size-start="48"
       :virtual-scroll-sticky-size-end="32"
       :items="daftarPetugas"
+      :loading="isLoading"
       sort-by="nama"
     >
       <template v-slot:before>
@@ -133,14 +134,14 @@
       <!-- class="glass-light" -->
       <template v-slot="{ item: row, index }">
         <tr :key="index" :class="index % 2 == 0 ? 'bg-white' : 'bg-grey-2'">
-          <td>{{ index + 1 }}</td>
+          <td>{{ row.id_petugas }}</td>
           <td align="left">
             <span class="text-subtitle2">{{ row.nama_lengkap }}</span>
             <!-- v-if="isEditMode" -->
             <q-popup-edit
               v-model="row.nama_lengkap"
               v-slot="scope"
-              @save="(value) => update(row.id_petugas, 'nama', value)"
+              @save="(value) => update(row.id_petugas, 'nama_lengkap', value)"
             >
               <q-input
                 v-model="scope.value"
@@ -235,9 +236,9 @@
             <q-popup-edit
               v-model="row.password"
               v-slot="scope"
-              @save="(value) => updateJenis(row.id_petugas, 'password', value)"
+              @save="(value) => update(row.id_petugas, 'password', value)"
             >
-              <q-select
+              <q-input
                 filled
                 v-model="scope.value"
                 type="password"
@@ -261,7 +262,7 @@
               </div>
             </q-popup-edit>
           </td>
-          <!-- <td align="center">
+          <td align="center">
             <q-toggle
               v-model="row.status"
               color="green"
@@ -271,7 +272,7 @@
                 (value) => update(row.id_petugas, 'status', value)
               "
             />
-          </td> -->
+          </td>
 
           <td align="right">
             <q-badge
@@ -292,6 +293,11 @@
           <q-form @reset="onReset" class="q-gutter-md">
             <q-input
               filled
+              v-model="newPetugas.id_petugas"
+              label="Nomor Induk Pegawai"
+            />
+            <q-input
+              filled
               v-model="newPetugas.nama_lengkap"
               label="Nama Lengkap Petugas"
             />
@@ -302,6 +308,12 @@
             />
             <q-input filled v-model="newPetugas.username" label="username" />
             <q-input filled v-model="newPetugas.password" label="password" />
+            <!-- <q-select
+              v-model="newPetugas.status"
+              :options="[{value:true, label:"Aktif"}, {value:false, label:"Tidak Aktif"}]"
+              label="Status"
+              filled
+            /> -->
           </q-form>
         </template>
         <template #button>
@@ -337,31 +349,19 @@ import AddButton from "src/components/AddButton.vue";
 import { userStore } from "src/stores/user-store";
 
 const $q = useQuasar();
-const todaySelected = ref(false);
-const startDateSelected = ref(false);
-const endDateSelected = ref(false);
-const store = userStore();
-// const laporanPetugas = ref([]);
-const laporanPendapatan = ref([]);
-const laporanKunjungan = ref([]);
-const timeStamp = date.formatDate(Date.now(), "YYYY/MM/DD");
-const datePicker = ref(timeStamp);
-const proxyDate = ref(Date.now());
 const isLoading = ref(true);
-const startDate = ref("");
-const endDate = ref("");
 const columns = [
-  { name: "No", prop: "name", align: "left" },
+  { name: "NIP", prop: "nip", align: "left" },
   { name: "Nama Petugas", prop: "nama", align: "left" },
   { name: "No. HP", prop: "no_phone", align: "left" },
   { name: "Username", prop: "username", align: "left" },
   { name: "Password", prop: "password", align: "left" },
-  // { name: "Status", prop: "status", align: "center" },
-  // { name: "Keterangan", prop: "deskripsi", align: "left" },
+  { name: "Status", prop: "status", align: "center" },
   { name: "Hapus", prop: "hapus", align: "right" },
 ];
 
 const newPetugas = ref({
+  id_petugas: "",
   nama_lengkap: "",
   no_hp: 0,
   username: "",
@@ -371,6 +371,7 @@ const newPetugas = ref({
 
 const onReset = () => {
   newPetugas.value = {
+    id_petugas: "",
     nama_lengkap: "",
     no_hp: 0,
     username: "",
@@ -398,10 +399,7 @@ const onSubmit = async () => {
         icon: "report_problem",
       });
     }
-    // Notify success
-  } catch (error) {
-    // Notify error
-  }
+  } catch (error) {}
 };
 
 const update = async (id, column, value) => {
@@ -439,7 +437,7 @@ const onDelete = async (id) => {
 };
 
 const daftarPetugas = computed(() => {
-  return userStore().dataPetugas.sort((a, b) =>
+  return userStore().daftarPetugas.sort((a, b) =>
     a.nama_lengkap.localeCompare(b.nama_lengkap)
   );
 });

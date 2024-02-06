@@ -186,19 +186,20 @@ const onClickBayar = async (method) => {
     );
     const store = await transaksiStore().insertIntoDB();
 
+    const transaksi = transaksiStore();
     const data = {
-      transaksi: transaksiStore().detailTransaksi,
-      diskon: transaksiStore().diskon,
-      totalAfterDiskon: transaksiStore().totalAfterDiskon,
-      totalBayar: transaksiStore().totalBayar,
-      no_transaksi: transaksiStore().no_transaksi,
+      transaksi: JSON.stringify(transaksi.detailTransaksi),
+      diskon: transaksi.diskon,
+      totalAfterDiskon: transaksi.totalAfterDiskon,
+      totalBayar: transaksi.totalBayar,
+      no_transaksi: transaksi.no_transaksi,
     };
     // namaPaket: "Tiket",
     console.log("data.transaksi", data.transaksi);
     if (store) {
-      await generatePDF(data);
+      // await generatePDF(data);
 
-      // window.electron.createPDFStruk(
+      window.electron.createPDFStruk(data);
       //   "Depok Fantasy Land",
       //   JSON.stringify(data)
       // );

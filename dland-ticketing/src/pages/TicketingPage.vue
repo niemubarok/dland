@@ -237,7 +237,7 @@ const pilihPaket = async (paket) => {
   // return;
   if (store) {
     const data = {
-      transaksi: transaksiStore().detailTransaksi,
+      transaksi: JSON.stringify(transaksiStore().detailTransaksi),
       diskon: transaksiStore().diskon,
       totalAfterDiskon: transaksiStore().totalAfterDiskon,
       totalBayar: transaksiStore().totalBayar,
@@ -245,7 +245,8 @@ const pilihPaket = async (paket) => {
       no_transaksi: store.no_transaksi,
     };
 
-    generatePDF(data);
+    // generatePDF(data);
+    window.electron.createPDFStruk(data);
     window.electron.print(ls.get("namaPrinter"));
     $q.notify({
       message: "Berhasil",

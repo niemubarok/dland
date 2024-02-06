@@ -55,7 +55,7 @@ export const generatePDF = async (transaksi) => {
   const pdf = new jsPDF({
     unit: "mm",
     format: [80, 150],
-    plugins: [jsPDF.autoTable],
+    // plugins: ["autoTable"],
   });
 
   const pageWidth = pdf.internal.pageSize.width;
@@ -149,7 +149,7 @@ export const generatePDF = async (transaksi) => {
     },
   };
 
-  pdf.autoTable(autoTableOptions);
+  pdf.autoTable(pdf, autoTableOptions);
 
   // console.log(Object.values(transaksi));
   pdf.line(

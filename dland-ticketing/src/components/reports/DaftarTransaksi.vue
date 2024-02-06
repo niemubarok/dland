@@ -360,17 +360,18 @@ const onClickPrint = async (diskon, no_transaksi, namaPaket) => {
 
   const data = {
     no_transaksi,
-    transaksi: transaksiStore().detailTransaksi,
+    transaksi: JSON.stringify(transaksiStore().detailTransaksi),
     diskon: transaksiStore().diskon,
     totalAfterDiskon: transaksiStore().totalAfterDiskon,
     totalBayar: transaksiStore().totalBayar,
     namaPaket: wahanaStore().namaPaketTerpilih,
   };
 
-  console.log("data di daftarTransaksi", data);
+  // console.log("data di daftarTransaksi", data);
   // return;
-  // window.electron.createPDFStruk("Depok Fantasy Land", JSON.stringify(data));
-  generatePDF(data);
+  window.electron.createPDFStruk(data);
+  // generatePDF(data);
+
   window.electron.print(ls.get("namaPrinter"));
   $q.notify({
     message: "Berhasil",

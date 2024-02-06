@@ -86,8 +86,12 @@
         :icon="componentStore().miniMode ? 'chevron_right' : 'chevron_left'"
         aria-label="Menu"
         @click="componentStore().toggleMiniMode()"
-        class="absolute-bottom-right"
+        class="absolute-bottom-right q-mb-lg z-top"
       />
+
+      <div v-if="!componentStore().miniMode" class="absolute-bottom q-ml-sm">
+        Copyright © {{ new Date().getFullYear() }} TABAROKTA.
+      </div>
     </q-drawer>
 
     <q-page-container class="full-width">

@@ -176,7 +176,8 @@ import { log } from "console";
 import { platform } from "os";
 const QRCode = require("qrcode");
 import jsPDF from "jspdf";
-const autoTable = require("jspdf-autotable");
+import autoTable from "jspdf-autotable";
+import JsBarcode from "jsbarcode";
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
@@ -187,81 +188,81 @@ if (!fs.existsSync(directoryPath)) {
 const filePath = path.join(directoryPath, "struk.pdf");
 
 const generateBarcode = (text) => {
+  const canvas = document.createElement("canvas");
   JsBarcode(canvas, text, { displayValue: false, format: "CODE128" });
   return canvas.toDataURL("image/png");
 };
 
-const createPDFStruk = async (nama_perusahaan, transaksi) => {
-  // log(transaksi.totalAfterDiskon);
+export const generatePDF = async (transaksi) => {
+  console.log("transaksi", transaksi);
+  // return;
+
+  const jenisTiket = transaksi.transaksi[0].jenis
+    ? transaksi.transaksi[0].jenis
+    : "Tiket Satuan";
+
   const pdf = new jsPDF({
     unit: "mm",
     format: [80, 150],
-    // autoPaging: true,
-    plugins: [autoTable],
+    // plugins: [autoTable],
   });
 
   const pageWidth = pdf.internal.pageSize.width;
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(10);
-  pdf.text(nama_perusahaan, pdf.internal.pageSize.width / 2, 3, {
+  pdf.text(process.env.NAMA_PERUSAHAAN, pdf.internal.pageSize.width / 2, 3, {
     align: "center",
   });
 
   pdf.setFont("helvetica");
   pdf.setFontSize(13);
 
-  if (JSON.parse(transaksi).namaPaket) {
-    pdf.text(
-      JSON.parse(transaksi).namaPaket,
-      pdf.internal.pageSize.width / 2,
-      8,
-      {
-        align: "center",
-      }
-    );
+  if (transaksi.namaPaket && transaksi.namaPaket !== null) {
+    pdf.text(transaksi.namaPaket, pdf.internal.pageSize.width / 2, 8, {
+      align: "center",
+    });
   } else {
-    pdf.text(
-      JSON.parse(transaksi).transaksi[0].jenis,
-      pdf.internal.pageSize.width / 2,
-      8,
-      {
-        align: "center",
-      }
-    );
+    pdf.text(jenisTiket, pdf.internal.pageSize.width / 2, 8, {
+      align: "center",
+    });
   }
 
   pdf.setFontSize(5);
 
   const petugas = ls.get("petugas").nama;
-  const waktu = new Date().toLocaleString("id-ID");
-  const no_transaksi = JSON.parse(transaksi).no_transaksi;
+  const waktu = new Date().toLocaleString("id-ID").replace(/\./g, ":");
+  const no_transaksi = transaksi.no_transaksi;
 
-  pdf.text(`${waktu}`, 5, 8, { align: "left" });
+  // pdf.text(`${waktu}`, 5, 8, { align: "left" });
 
   pdf.text(`petugas: ${petugas}`, 5, 11, { align: "left" });
-  pdf.text(no_transaksi, pageWidth - 5, 11, { align: "right" });
+  pdf.text(waktu, pageWidth - 5, 11, { align: "right" });
 
   pdf.line(5, 12, pdf.internal.pageSize.width - 5, 12); // Draw a line at y = 12 mm from the left margin to the right margin
   const headers = {
     wahana: "Wahana",
-    qty: "Qty",
-    harga: "Harga",
+    qty: transaksi.namaPaket && transaksi.namaPaket !== null ? "" : "Qty",
+    harga: transaksi.namaPaket && transaksi.namaPaket !== null ? "" : "Harga",
     ceklis: "Ceklis",
   };
 
-  console.log("JSON.parse(transaksi)", JSON.parse(transaksi));
-
-  const rows = Object.values(JSON.parse(transaksi).transaksi).map((item) => [
+  const rows = Object.values(JSON.parse(transaksi.transaksi)).map((item) => [
     `${
-      item.jenis?.toLowerCase() === "tiket wahana" || item.jenis === undefined
-        ? item.nama
-        : item.nama + " - " + item.deskripsi
-    }`, // Ganti dengan data sesuai kebutuhan, contoh: item.nama,
-    item.jenis?.toLowerCase() === "tiket wahana" || item.jenis === undefined
-      ? item.qty
+      item.jenis?.toLowerCase() === "tiket wahana" ||
+      (item?.deskripsi !== "-" && item.jenis?.toLowerCase() === "tiket wahana")
+        ? // || item?.jenis === undefined
+          item?.nama
+        : item?.deskripsi === "-"
+        ? item?.nama
+        : item?.nama + " - " + item?.deskripsi
+    }`, // Ganti dengan data sesuai kebutuhan, contoh: item?.nama,
+    item?.jenis?.toLowerCase() === "tiket wahana" && !transaksi.namaPaket
+      ? // || item?.jenis === undefined
+        item?.qty
       : "",
-    item.jenis?.toLowerCase() === "tiket wahana" || item.jenis === undefined
-      ? formatCurrency(item.total_bayar)
+    item?.jenis?.toLowerCase() === "tiket wahana" && !transaksi.namaPaket
+      ? // || item?.jenis === undefined
+        formatCurrency(item?.total_bayar)
       : "",
     ".............", // Ganti dengan data sesuai kebutuhan
   ]);
@@ -297,9 +298,9 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     },
   };
 
-  pdf.autoTable(autoTableOptions);
+  autoTable(pdf, autoTableOptions);
 
-  // console.log(Object.values(JSON.parse(transaksi)));
+  // console.log(Object.values(transaksi));
   pdf.line(
     5,
     pdf.autoTable.previous.finalY + 2,
@@ -308,21 +309,19 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   );
 
   // pdf.setFontSize(8);
-  // const totalBayar = Object.values(JSON.parse(transaksi)).reduce(
+  // const totalBayar = Object.values(transaksi).reduce(
   //   (total, item) => total + item.total_bayar,
   //   0
   // );
   // console.log(totalBayar);
   const totalText = `Total`;
-  const totalValue = `${formatCurrency(JSON.parse(transaksi).totalBayar)}`;
+  const totalValue = `${formatCurrency(transaksi.totalBayar)}`;
   const diskonText = "Diskon";
-  const diskonTextValue = `${formatCurrency(JSON.parse(transaksi).diskon)}`;
+  const diskonTextValue = `${formatCurrency(transaksi.diskon)}`;
   const totalBayarText = "Total Bayar";
-  const totalBayarValue = `${formatCurrency(
-    JSON.parse(transaksi).totalAfterDiskon
-  )}`;
+  const totalBayarValue = `${formatCurrency(transaksi.totalAfterDiskon)}`;
 
-  pdf.setFont("helvetica");
+  // pdf.setFont("helvetica");
   pdf.setFontSize(8);
   pdf.text(totalText, 5, pdf.autoTable.previous.finalY + 5, {
     align: "left",
@@ -334,7 +333,7 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     align: "left",
   });
 
-  pdf.setFont("helvetica", "bold");
+  // pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8);
 
   //RP
@@ -345,17 +344,19 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
   pdf.text("Rp", pageWidth - 40, pdf.autoTable.previous.finalY + 9, {
     align: "right",
   });
-  pdf.setFontSize(10);
   pdf.text("Rp", pageWidth - 40, pdf.autoTable.previous.finalY + 14, {
     align: "right",
   });
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(8);
 
   //value
   pdf.text(totalValue, pageWidth - 25, pdf.autoTable.previous.finalY + 5, {
     align: "right",
   });
 
-  if (JSON.parse(transaksi).diskon > 0) {
+  if (transaksi.diskon > 0) {
     pdf.setDrawColor(0);
     pdf.setLineWidth(0.3);
     pdf.line(
@@ -378,46 +379,66 @@ const createPDFStruk = async (nama_perusahaan, transaksi) => {
     }
   );
 
-  const barcodeData = generateBarcode("no_transaksi");
-  console.log("barcodedata", barcodeData);
+  pdf.line(
+    5,
+    pdf.autoTable.previous.finalY + 16,
+    pdf.internal.pageSize.width - 5,
+    pdf.autoTable.previous.finalY + 16
+  );
+
+  pdf.setFontSize(7);
+  pdf.text(
+    ".:: Terimakasih atas kunjungan anda ::.",
+    pdf.internal.pageSize.width / 2,
+    pdf.autoTable.previous.finalY + 35, // Adjust vertical position based on QR code size
+    { align: "center" }
+  );
+
+  pdf.line(
+    15,
+    pdf.autoTable.previous.finalY + 32,
+    pdf.internal.pageSize.width - 15,
+    pdf.autoTable.previous.finalY + 32
+  );
+
+  pdf.text(
+    "Scan Barcode Di Pintu Masuk",
+    pdf.internal.pageSize.width / 2,
+    pdf.autoTable.previous.finalY + 20, // Adjust vertical position based on QR code size
+    { align: "center" }
+  );
+
+  // Generate barcode
+
+  const barcodeData = generateBarcode(no_transaksi);
   // Add barcode to PDF
   if (barcodeData) {
     const barcodeImage = new Image();
     barcodeImage.src = barcodeData;
     barcodeImage.onload = () => {
-      const barcodeWidth = 50;
-      const barcodeHeight = 15;
+      const barcodeWidth = 20; // Increased width for better clarity
+      const barcodeHeight = 10; // Increased height for better clarity
       const xPosition = (pageWidth - barcodeWidth) / 2;
-      const yPosition = pdf.autoTable.previous.finalY + 20;
+      const yPosition = pdf.autoTable.previous.finalY + 21;
       pdf.addImage(
         barcodeImage,
-        "JPEG",
+        "PNG",
         xPosition,
         yPosition,
         barcodeWidth,
         barcodeHeight
       );
-      // pdf.save(filePath); // Save the PDF after adding the barcode image
+      const pdfOutput = pdf.output("blob");
+      const filePath = `struk.pdf`;
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        const buffer = this.result;
+        downloadPDF(buffer, filePath);
+      };
+      reader.readAsArrayBuffer(pdfOutput);
     };
   }
-
-  pdf.setFontSize(7);
-  pdf.text(
-    "Terimakasih atas kunjungan anda",
-    pdf.internal.pageSize.width / 2,
-    pdf.autoTable.previous.finalY + 18, // Adjust vertical position based on QR code size
-    { align: "center" }
-  );
-
-  console.log(filePath);
-
-  fs.writeFile(filePath, pdf.output(), (err) => {
-    if (err) {
-      console.error("Error saving PDF:", err);
-    } else {
-      console.log("PDF saved successfully at:", filePath);
-    }
-  });
 };
 async function printStruk(namaPrinter) {
   // getWindowsPrinters().then(console.log);
@@ -547,19 +568,20 @@ async function readDataFromHID(vid, pid) {
 }
 
 const getHomeDir = () => os.homedir();
+const downloadPDF = (pdf, filename) =>
+  ipcRenderer.send("download-pdf", pdf, filename);
 
 contextBridge.exposeInMainWorld("electron", {
   // serialport: createSerialPort,
   print: printStruk,
-  createPDFStruk,
+  createPDFStruk: generatePDF,
   getPrinters,
   printDirectlyToPrinter,
   getHIDDevices,
   readDataFromHID,
   getHomeDir,
   // printWithElectronPosPrinter,
-  downloadPDF: (pdf, filename) =>
-    ipcRenderer.send("download-pdf", pdf, filename),
+  downloadPDF,
 
   // detectLicensePlateArea: detectLicensePlateArea,
   // getSerialPortList: getSerialPortList,

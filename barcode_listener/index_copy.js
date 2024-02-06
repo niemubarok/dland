@@ -172,27 +172,29 @@ async function makeAPIRequest(dataBarcode) {
     baudRate: 9600,
   });
 
-  try {
-    //   Ganti URL dengan endpoint API yang sesuai2233445767676
+  console.log(typeof serialPath);
 
-    const response = await axios.post(process.env.URL_BACKEND, {
-      // barcode: "2024/01/29/00002",
-      barcode: dataBarcode,
-    });
+  // try {
+  //   Ganti URL dengan endpoint API yang sesuai2233445767676
 
-    if (response.data.status === 200) {
-      console.log(response.data.message);
-      serialPort.write("*OUT1ON#");
+  // const response = await axios.post(process.env.URL_BACKEND, {
+  //   // barcode: "2024/01/29/00002",
+  //   barcode: dataBarcode,
+  // });
 
-      setTimeout(() => {
-        serialPort.write("*OUT1OFF#");
-      }, 2000);
-    }
+  // if (response.data.status === 200) {
+  // console.log(response.data.message);
+  serialPort.write("*OUT1ON#");
 
-    // console.log("Data from API:", response.data);
-  } catch (error) {
-    console.error("Error fetching data from API:", error);
-  }
+  setTimeout(() => {
+    serialPort.write("*OUT1OFF#");
+  }, 2000);
+  //   }
+
+  //   // console.log("Data from API:", response.data);
+  // } catch (error) {
+  //   console.error("Error fetching data from API:", error);
+  // }
 }
 
 async function main() {

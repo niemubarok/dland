@@ -9,6 +9,62 @@ import { config as dotenvConfig } from "dotenv";
 // Load .env configurations
 dotenvConfig();
 
+const keyMap = {
+  4: "a",
+  5: "b",
+  6: "c",
+  7: "d",
+  8: "e",
+  9: "f",
+  10: "g",
+  11: "h",
+  12: "i",
+  13: "j",
+  14: "k",
+  15: "l",
+  16: "m",
+  17: "n",
+  18: "o",
+  19: "p",
+  20: "q",
+  21: "r",
+  22: "s",
+  23: "t",
+  24: "u",
+  25: "v",
+  26: "w",
+  27: "x",
+  28: "y",
+  29: "z",
+  30: "1",
+  31: "2",
+  32: "3",
+  33: "4",
+  34: "5",
+  35: "6",
+  36: "7",
+  37: "8",
+  38: "9",
+  39: "0",
+  40: "Enter",
+  41: "Escape",
+  42: "Backspace",
+  43: "Tab",
+  44: "Space",
+  45: "-",
+  46: "=",
+  47: "[",
+  48: "]",
+  49: "\\",
+  51: ";",
+  52: "'",
+  53: "`",
+  54: ",",
+  55: ".",
+  56: "/",
+  // Tambahkan lebih banyak sesuai kebutuhan
+};
+
 // Paths and constants
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -133,33 +189,66 @@ async function selectSerialDevice(forcePrompt = false) {
   return selectedSerialPath;
 }
 
-async function makeAPIRequest(dataBarcode) {
+async function openGate() {
   const deviceConfig = JSON.parse(await fs.readFile(deviceConfigPath, "utf-8"));
   const serialPath = deviceConfig.serialPath;
 
-  const serialPort = new SerialPort({
-    path: serialPath,
-    baudRate: 9600,
+  const serialPort = new SerialPort(
+    {
+      path: serialPath,
+      baudRate: 9600,
+    },
+    (err) => {
+      if (err) {
+        return console.error("Error opening serial port: ", err.message);
+      }
+    }
+  );
+
+  serialPort.on("error", function (err) {
+    console.error("SerialPort Error: ", err);
   });
 
-  try {
-    //   Ganti URL dengan endpoint API yang sesuai2233445767676
-
-    const response = await axios.post(API_URL, {
-      // barcode: "2024/01/29/00002",
-      barcode: dataBarcode,
-    });
-
-    if (response.data.status === 200) {
-      console.log(response.data.message);
-      serialPort.write("*OUT1ON#");
-
-      setTimeout(() => {
-        serialPort.write("*OUT1OFF#");
-      }, 2000);
+  serialPort.write(process.env.OUTPUT_CODE_ON, (err) => {
+    if (err) {
+      console.error("Error writing to serial port: ", err.message);
+      return;
     }
+    // Menutup port setelah penulisan berhasil
+    serialPort.close((err) => {
+      if (err) {
+        console.error("Error closing serial port: ", err.message);
+      } else {
+        console.log("Serial port closed successfully.");
+      }
+    });
+  });
 
-    // console.log("Data from API:", response.data);
+  // setTimeout(() => {
+  //   serialPort.write(process.env.OUTPUT_CODE_OFF);
+  // }, 500);
+}
+
+async function makeAPIRequest(dataBarcode) {
+  await openGate();
+  try {
+    //   //   Ganti URL dengan endpoint API yang sesuai2233445767676
+    //   const response = await axios.post(API_URL, {
+    //     // barcode: "2024/01/29/00002",
+    //     barcode: dataBarcode,
+    //   });
+    //   if (response.data.status === 200) {
+    //     console.log(response.data.message);
+    //   }
+    //   // console.log("Data from API:", response.data);
+    // const serialPort = new SerialPort({
+    //   path: serialPath,
+    //   baudRate: 9600,
+    // });
+    // serialPort.write("*OUT1ON#");
+    // setTimeout(() => {
+    //   serialPort.write("*OUT1OFF#");
+    // }, 2000);
   } catch (error) {
     console.error("Error fetching data from API:", error);
   }
@@ -168,11 +257,30 @@ async function makeAPIRequest(dataBarcode) {
 function listenToHIDDevice(deviceInfo) {
   const device = new HID.HID(deviceInfo.path);
   console.log(`Listening to HID device: ${deviceInfo.path}`);
+  let keys = [];
+
   device.on("data", (data) => {
-    console.log("Data received:", data);
+    const keyCode = data[2];
+    if (keyCode === 0) return; // Ignore jika keyCode adalah 0 (no key pressed)
+
+    const key = keyMap[keyCode];
+    if (!key) {
+      console.log(`Unknown key code: ${keyCode}`);
+      return;
+    }
+
+    // console.log(`Key pressed: ${key}`);
+    keys.push(key);
+
+    if (key === "Enter") {
+      makeAPIRequest(keys.join(""));
+      keys = [];
+    }
+    // Implementasikan logika Anda di sini, misalnya mengirim data ke API atau menampilkannya di konsol
   });
+
   device.on("error", (err) => {
-    console.error("Device error:", err);
+    console.error(`Device error on ${deviceInfo.path}:`, err);
   });
 }
 

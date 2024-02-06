@@ -393,6 +393,18 @@ export const generatePDF = async (transaksi) => {
     pdf.autoTable.previous.finalY + 35, // Adjust vertical position based on QR code size
     { align: "center" }
   );
+  pdf.text(
+    "                             ",
+    pdf.internal.pageSize.width / 2,
+    pdf.autoTable.previous.finalY + 37, // Adjust vertical position based on QR code size
+    { align: "center" }
+  );
+  pdf.text(
+    "                             ",
+    pdf.internal.pageSize.width / 2,
+    pdf.autoTable.previous.finalY + 39, // Adjust vertical position based on QR code size
+    { align: "center" }
+  );
 
   pdf.line(
     15,
@@ -416,7 +428,7 @@ export const generatePDF = async (transaksi) => {
     const barcodeImage = new Image();
     barcodeImage.src = barcodeData;
     barcodeImage.onload = () => {
-      const barcodeWidth = 20; // Increased width for better clarity
+      const barcodeWidth = 25; // Increased width for better clarity
       const barcodeHeight = 10; // Increased height for better clarity
       const xPosition = (pageWidth - barcodeWidth) / 2;
       const yPosition = pdf.autoTable.previous.finalY + 21;
@@ -448,11 +460,6 @@ async function printStruk(namaPrinter) {
     printer: namaPrinter,
   };
 
-  // const outputFilePath = path.resolve(
-  //   __dirname,
-  //   process.env.QUASAR_PUBLIC_FOLDER + "/struk/struk.pdf"
-  // );
-
   try {
     await fs.promises.access(filePath, fs.constants.F_OK);
 
@@ -467,17 +474,49 @@ async function printStruk(namaPrinter) {
       error instanceof Error ? error.message : "Unknown error";
     console.error(`Error during printing: ${errorMessage}`);
   }
-  // return;
-
-  // console.log(outputFilePath);
-  // try {
-  //   await fs.promises.access(outputFilePath, fs.constants.F_OK);
-  //   await print(outputFilePath, printerOption);
-  //   console.log("Printing done");
-  // } catch (error) {
-  //   console.error("Error during printing:", error);
-  // }
 }
+
+// const fs = require('fs');
+// const ThermalPrinter = require("node-thermal-printer").printer;
+// const Types = require("node-thermal-printer").types;
+
+// async function printStruk(namaPrinter) {
+//   console.log("print", namaPrinter);
+
+//   let printer = new ThermalPrinter({
+//     type: Types.EPSON,
+//     interface: `tcp://${namaPrinter}:9100`,
+//     options: {
+//       timeout: 3000,
+//     },
+//     width: 48,
+//     characterSet: "SLOVENIA",
+//     removeSpecialCharacters: false,
+//     lineCharacter: "=",
+//   });
+
+//   try {
+//     await fs.promises.access(filePath, fs.constants.F_OK);
+
+//     // Assuming filePath is a text file, we read it and print its content
+//     const fileContent = fs.readFileSync(filePath, "utf8");
+//     printer.println(fileContent);
+
+//     // Add autocut command
+//     printer.cut();
+
+//     try {
+//       let execute = printer.execute();
+//       console.log("Print done!");
+//     } catch (error) {
+//       console.error("Print failed:", error);
+//     }
+//   } catch (error) {
+//     const errorMessage =
+//       error instanceof Error ? error.message : "Unknown error";
+//     console.error(`Error during printing: ${errorMessage}`);
+//   }
+// }
 
 async function printDirectlyToPrinter(printerName) {
   // Membuat teks dengan format yang sesuai tata letak yang diinginkan

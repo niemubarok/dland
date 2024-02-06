@@ -205,6 +205,7 @@ const onClickBayar = async (method) => {
       // );
       const namaPrinter = ls.get("namaPrinter");
       window.electron.print(namaPrinter);
+      // window.electron.printDirectlyToPrinter(namaPrinter);
       $q.notify({
         message: "Pembayaran Berhasil",
         color: "green",

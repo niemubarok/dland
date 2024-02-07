@@ -197,8 +197,8 @@ export const generatePDF = async (transaksi) => {
   console.log("transaksi", transaksi);
   // return;
 
-  const jenisTiket = transaksi.transaksi[0].jenis
-    ? transaksi.transaksi[0].jenis
+  const jenisTiket = JSON.parse(transaksi.transaksi)[0].jenis
+    ? JSON.parse(transaksi.transaksi)[0].jenis
     : "Tiket Satuan";
 
   const pdf = new jsPDF({

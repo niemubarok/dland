@@ -173,7 +173,7 @@ import WahanaCard from "src/components/WahanaCard.vue";
 import { transaksiStore } from "src/stores/transaksi-store";
 import { ref, onMounted, onBeforeMount, computed } from "vue";
 import { useQuasar } from "quasar";
-// import SettingsDialog from "src/components/SettingsDialog.vue";
+import SettingsDialog from "src/components/SettingsDialog.vue";
 import ls from "localstorage-slim";
 import LoginDialog from "src/components/LoginDialog.vue";
 // import { generatePDF } from "src/utils/helpers";
@@ -191,12 +191,12 @@ const daftarWahana = computed(() => {
   return wahanaStore()
     .daftarWahana.filter((wahana) => {
       if (isWeekday) {
-        return wahana.hari?.toLowerCase() === "weekday";
-      } else if (isWeekendOrHoliday) {
         return (
-          wahana.hari?.toLowerCase() === "weekend" ||
+          wahana.hari?.toLowerCase() === "weekday" ||
           wahana.hari?.toLowerCase() === "all day"
         );
+      } else if (isWeekendOrHoliday) {
+        return wahana.hari?.toLowerCase() === "weekend";
       }
       return false;
     })

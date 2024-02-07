@@ -50,20 +50,20 @@ export const reportStore = defineStore("report", {
       try {
         const res = await api.get("reports/kunjungan");
         this.totalKunjungan = res.data.totalKunjungan;
-        this.kunjunganPerHari = res.data.kunjunganPerHari;
+        // this.kunjunganPerHari = res.data.kunjunganPerHari;
         this.kunjunganPerBulan = res.data.kunjunganPerBulan;
       } catch (err) {
         console.log(err);
       }
     },
-    async getLaporanKunjunganWahana() {
+    async getLaporanKunjunganWahana(startDate, endDate) {
       try {
         const res = await api.post("reports/wahana", {
-          startDate: this.startDate,
-          endDate: this.endDate,
+          startDate,
+          endDate,
         });
         if (res.data) {
-          console.log(res.data);
+          console.log("getLaporanKunjunganWahana", res.data);
           this.totalKunjunganWahana = res.data.totalKunjunganWahana;
           this.kunjunganWahanaPerHari = res.data.kunjunganWahanaPerHari;
           this.kunjunganWahanaPerBulan = res.data.kunjunganWahanaPerBulan;
@@ -71,11 +71,17 @@ export const reportStore = defineStore("report", {
           this.laporanWahana = res.data.kunjunganWahanaPerHari.sort(
             (a, b) => b.jumlah - a.jumlah
           );
+          this.kunjunganPerHari = res.data.kunjunganWahanaPerHari
+            .filter(
+              (wahana) => wahana.jenis_tiket?.toLowerCase() === "tiket masuk"
+            )
+            .reduce((total, item) => total + parseInt(item.jumlah), 0);
 
-          console.log(this.startDate);
-          console.log(this.endDate);
+          console.log("getLaporanKunjungan", startDate);
+          console.log("getLaporanKunjungan", endDate);
 
           // console.log("laporanKunjunganWahana", laporanKunjunganWahana);
+          console.log("this.kunjunganPerHari", this.kunjunganPerHari);
           console.log(
             "res.data.kunjunganWahanaPerHari",
             res.data.kunjunganWahanaPerHari
@@ -85,11 +91,11 @@ export const reportStore = defineStore("report", {
         console.log(err);
       }
     },
-    async getLaporanTransaksiFromDB() {
+    async getLaporanTransaksiFromDB(startDate, endDate) {
       try {
         const res = await api.post("transaksi/all", {
-          startDate: this.startDate,
-          endDate: this.endDate,
+          startDate,
+          endDate,
         });
         if (res.data) {
           this.totalPendapatanTransaksi = res.data.reduce(

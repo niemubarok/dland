@@ -165,27 +165,83 @@
 
 <script setup>
 import { wahanaStore } from "src/stores/wahana-store";
-import Clock from "src/components/Clock.vue";
+// import Clock from "src/components/Clock.vue";
 import DetailTransaksi from "src/components/DetailTransaksi.vue";
 import WahanaCard from "src/components/WahanaCard.vue";
-import TicketCard from "src/components/TicketCard.vue";
-import PaymentDialog from "src/components/PaymentDialog.vue";
+// import TicketCard from "src/components/TicketCard.vue";
+// import PaymentDialog from "src/components/PaymentDialog.vue";
 import { transaksiStore } from "src/stores/transaksi-store";
 import { ref, onMounted, onBeforeMount, computed } from "vue";
 import { useQuasar } from "quasar";
-import SettingsDialog from "src/components/SettingsDialog.vue";
+// import SettingsDialog from "src/components/SettingsDialog.vue";
 import ls from "localstorage-slim";
 import LoginDialog from "src/components/LoginDialog.vue";
-import { generatePDF } from "src/utils/helpers";
+// import { generatePDF } from "src/utils/helpers";
 
 const $q = useQuasar();
 const qtyDialog = ref(false);
 const qty = ref();
-const daftarWahana = computed(() =>
-  wahanaStore()
-    .daftarWahana.filter((wahana) => wahana.status === true)
-    .sort((a, b) => a.nama.localeCompare(b.nama))
-);
+const daftarWahana = computed(() => {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 4; // Monday to Thursday
+  const isWeekendOrHoliday =
+    dayOfWeek === 5 || dayOfWeek >= 6 || isNationalHoliday(today); // Friday to Sunday or holiday
+
+  return wahanaStore()
+    .daftarWahana.filter((wahana) => {
+      if (isWeekday) {
+        return wahana.hari?.toLowerCase() === "weekday";
+      } else if (isWeekendOrHoliday) {
+        return (
+          wahana.hari?.toLowerCase() === "weekend" ||
+          wahana.hari?.toLowerCase() === "all day"
+        );
+      }
+      return false;
+    })
+    .sort((a, b) => a.nama.localeCompare(b.nama));
+});
+
+function isNationalHoliday(date) {
+  const nationalHolidays = [
+    // Tahun 2024
+    "2024-01-01", // New Year's Day
+    "2024-02-08", // Isra Mi'raj
+    "2024-02-10", // Chinese New Year
+    "2024-03-11", // Bali Hindu New Year
+    "2024-03-29", // Good Friday
+    "2024-04-10", // Hari Raya Idul Fitri
+    "2024-05-01", // Labour Day
+    "2024-05-12", // Waisak Day
+    "2024-05-29", // Ascension Day of Jesus Christ
+    "2024-06-01", // Pancasila Day
+    "2024-06-17", // Idul Adha
+    "2024-07-07", // Islamic New Year
+    "2024-08-17", // Independence Day
+    "2024-09-05", // Prophet Muhammad's Birthday
+    "2024-12-25", // Christmas Day
+
+    // Tahun 2025
+    "2025-01-01", // New Year's Day
+    "2025-01-27", // Isra Mi'raj
+    "2025-01-29", // Chinese New Year
+    "2025-03-01", // Bali Hindu New Year
+    "2025-03-31", // Hari Raya Idul Fitri
+    "2025-04-18", // Good Friday
+    "2025-05-01", // Labour Day
+    "2025-05-12", // Waisak Day
+    "2025-05-29", // Ascension Day of Jesus Christ
+    "2025-06-01", // Pancasila Day
+    "2025-06-07", // Idul Adha
+    "2025-06-27", // Islamic New Year
+    "2025-08-17", // Independence Day
+    "2025-09-05", // Prophet Muhammad's Birthday
+    "2025-12-25", // Christmas Day
+  ];
+  const dateStr = date.toISOString().split("T")[0];
+  return nationalHolidays.includes(dateStr);
+}
 
 const daftarPaket = computed(() => {
   return wahanaStore().paket.filter((paket) => paket.status === true);
@@ -222,10 +278,10 @@ const selectAllWahana = () => {
   // transaksiStore().addTransaksi(data.value);
 };
 
-const onLogOut = () => {
-  ls.remove("petugas");
-  window.location.reload();
-};
+// const onLogOut = () => {
+//   ls.remove("petugas");
+//   window.location.reload();
+// };
 
 const pilihPaket = async (paket) => {
   wahanaStore().pilihPaket(paket, wahanaStore().daftarWahana);

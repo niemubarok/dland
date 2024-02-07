@@ -14,20 +14,20 @@
             push
             class="bg-brown text-white q-mr-sm"
             label="Semua"
-            @click="jenisTiket = 'all'"
+            @click="jenisTiket = 'Semua'"
           />
           <q-btn
             push
             class="bg-brown text-white q-mr-sm"
             label="Tiket Masuk"
-            @click="jenisTiket = 'tiket masuk'"
+            @click="jenisTiket = 'Tiket Masuk'"
           />
           <!-- icon="in" -->
           <q-btn
             push
             class="bg-brown text-white"
             label="Tiket Satuan"
-            @click="jenisTiket = 'tiket wahana'"
+            @click="jenisTiket = 'Tiket Wahana'"
           />
           <!-- icon="directions" -->
         </div>
@@ -195,23 +195,12 @@
     </q-virtual-scroll>
 
     <q-card-section>
-      <!-- <div class="flex row justify-between q-px-sm glass-dark q-py-md">
-        <span class="text-h6 text-white"> Total </span>
-        <span
-          class="text-weight-bolder text-h6 text-white q-mr-sm"
-          :style="
-            reportStore().diskon > 0 ? 'text-decoration:line-through' : ''
-          "
-          >{{
-            reportStore()
-              .totalPendapatanWahana?.toLocaleString("id-ID", {
-                style: "currency",
-                currency: "IDR",
-              })
-              .split(",")[0]
-          }}</span
-        >
-      </div> -->
+      <div class="flex row justify-between q-px-sm glass-dark q-py-md">
+        <span class="text-h6 text-white"> Total {{ jenisTiket }} </span>
+        <span class="text-weight-bolder text-h6 text-white q-mr-sm">{{
+          totalKunjungan
+        }}</span>
+      </div>
     </q-card-section>
   </q-card>
 </template>
@@ -243,14 +232,14 @@ const columns = [
 ];
 
 const todayBtn = async () => {
-  isToday.value = !isToday.value;
+  isToday.value = true;
   startDateSelected.value = false;
   endDateSelected.value = false;
   // Ensure the time zone offset is accounted for so that startDate is set to today's date
-  const today = new Date();
-  today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-  reportStore().startDate = today.toISOString().split("T")[0];
-  reportStore().endDate = today.toISOString().split("T")[0];
+  // const today = new Date();
+  // today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+  // reportStore().startDate = today.toISOString().split("T")[0];
+  // reportStore().endDate = today.toISOString().split("T")[0];
   await store.getLaporanKunjunganWahana();
 };
 
@@ -299,23 +288,39 @@ const save = async (type) => {
   if (type === "start") {
     startDateSelected.value = true;
     startDate.value = proxyDate.value;
-    endDate.value = proxyDate.value;
-    reportStore().startDate = startDate.value;
-    if (new Date(proxyDate.value).getDate() == new Date(Date.now()).getDate()) {
+    // endDate.value = proxyDate.value;
+    // reportStore().startDate = startDate.value;
+  } else if (type === "end") {
+    if (
+      new Date(proxyDate.value).getTime() < new Date(startDate.value).getTime()
+    ) {
+      $q.notify({
+        color: "negative",
+        textColor: "white",
+        icon: "error",
+        message: "Tanggal akhir tidak boleh Kurang dari tanggal mulai!",
+      });
+      return;
+    }
+
+    if (
+      new Date(proxyDate.value).toDateString() === new Date().toDateString() &&
+      new Date(startDate.value).toDateString() === new Date().toDateString()
+    ) {
       isToday.value = true;
       todaySelected.value = true;
     } else {
       isToday.value = false;
       todaySelected.value = false;
     }
-  } else if (type === "end") {
+
     endDateSelected.value = true;
     endDate.value = proxyDate.value;
     console.log("endate", endDate.value);
-    reportStore().endDate = endDate.value;
+    // reportStore().endDate = endDate.value;
+    await store.getLaporanKunjunganWahana(startDate.value, endDate.value);
   }
 
-  await store.getLaporanKunjunganWahana();
   // await store.getLaporanPendapatan();
 };
 
@@ -333,10 +338,10 @@ const getColor = (jumlah) => {
   return "green";
 };
 
-const jenisTiket = ref("all");
+const jenisTiket = ref("Semua");
 
 const laporanWahana = computed(() => {
-  if (jenisTiket.value === "all") {
+  if (jenisTiket.value === "Semua") {
     return reportStore().laporanWahana;
   } else {
     return reportStore().laporanWahana.filter(
@@ -344,6 +349,12 @@ const laporanWahana = computed(() => {
         wahana.jenis_tiket?.toLowerCase() === jenisTiket.value.toLowerCase()
     );
   }
+});
+const totalKunjungan = computed(() => {
+  return laporanWahana.value?.reduce(
+    (total, item) => total + parseInt(item.jumlah),
+    0
+  );
 });
 // const laporanWahana = ref([])
 

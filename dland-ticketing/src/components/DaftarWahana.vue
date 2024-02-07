@@ -281,7 +281,7 @@
               <q-select
                 filled
                 v-model="scope.value"
-                :options="['Weekend', 'Weekday']"
+                :options="['Weekend', 'Weekday', 'All Day']"
                 label="Hari"
               />
               <div class="float-right">
@@ -345,30 +345,32 @@
               "
             />
           </td>
-          <td align="left">
-            <span class="text-subtitle2"> {{ row.deskripsi }}</span>
+          <td align="left" width="200px">
+            <span class="text-subtitle2" style="white-space: pre-line">
+              {{ row.deskripsi }}</span
+            >
+            <!-- (value) => { -->
+            <!-- } else {
+              update(row.id_wahana, 'deskripsi', multipleWahanaSelection);
+            } -->
             <q-popup-edit
               v-model="row.deskripsi"
               v-slot="scope"
               @save="
-                (value) => {
-                  if (row.nama_jenis?.toLowerCase() !== 'tiket masuk') {
-                    update(row.id_wahana, 'deskripsi', value);
-                  } else {
-                    update(row.id_wahana, 'deskripsi', multipleWahanaSelection);
-                  }
+                if (row.nama_jenis?.toLowerCase() !== 'tiket masuk') {
+                  update(row.id_wahana, 'deskripsi', value);
                 }
               "
             >
+              <!-- v-if="row.nama_jenis?.toLowerCase() !== 'tiket masuk'" -->
               <q-input
-                v-if="row.nama_jenis?.toLowerCase() !== 'tiket masuk'"
+                type="textarea"
                 v-model="scope.value"
-                dense
                 autofocus
-                counter
+                autogrow
                 @keyup.enter="scope.set"
               />
-              <q-select
+              <!-- <q-select
                 v-else
                 multiple
                 v-model="multipleWahanaSelection"
@@ -378,7 +380,7 @@
                 dense
                 label="Standard"
                 filled
-              />
+              /> -->
               <div class="float-right">
                 <q-btn
                   size="sm"
@@ -427,7 +429,7 @@
             <q-select
               filled
               v-model="newWahana.hari"
-              :options="['Weekend', 'Weekday']"
+              :options="['Weekend', 'Weekday', 'All Day']"
               label="Hari"
             />
             <q-input

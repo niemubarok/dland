@@ -11,12 +11,7 @@
           :rules="[(val) => (val && val.length > 5) || 'Minimal 5 huruf']"
           dense
           autofocus
-          @keyup.enter="
-            [
-              reportStore().deleteTransaksiFromDB(props.no_transaksi),
-              dialogRef.hide(),
-            ]
-          "
+          @keyup.enter="onDelete"
         />
         <!-- @keyup.enter="deleteConfirm" -->
       </q-card-section>
@@ -31,12 +26,7 @@
             !reportStore().deleteReason ||
             reportStore().deleteReason.length <= 5
           "
-          @click="
-            [
-              reportStore().deleteTransaksiFromDB(props.no_transaksi),
-              dialogRef.hide(),
-            ]
-          "
+          @click="onDelete"
         />
       </q-card-actions>
     </q-card>
@@ -53,6 +43,11 @@ const $q = useQuasar();
 const props = defineProps({
   no_transaksi: String,
 });
+
+const onDelete = () => {
+  reportStore().deleteTransaksiFromDB(props.no_transaksi);
+  dialogRef.hide()((reportStore().deleteReason = ""));
+};
 
 defineEmits([...useDialogPluginComponent.emits]);
 </script>

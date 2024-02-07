@@ -437,10 +437,10 @@ const save = async (type) => {
   if (type === "start") {
     startDateSelected.value = true;
     startDate.value = proxyDate.value;
-    endDate.value = proxyDate.value;
-    endDateSelected.value = true;
-    reportStore().startDate = startDate.value;
-    reportStore().endDate = startDate.value;
+    // endDate.value = proxyDate.value;
+    // endDateSelected.value = true;
+    // reportStore().startDate = startDate.value;
+    // reportStore().endDate = startDate.value;
     if (new Date(proxyDate.value).getDate() == new Date(Date.now()).getDate()) {
       isToday.value = true;
       todaySelected.value = true;
@@ -450,7 +450,7 @@ const save = async (type) => {
     }
   } else if (type === "end") {
     if (
-      new Date(proxyDate.value).getDate() < new Date(startDate.value).getDate()
+      new Date(proxyDate.value).getTime() < new Date(startDate.value).getTime()
     ) {
       $q.notify({
         color: "negative",
@@ -464,9 +464,9 @@ const save = async (type) => {
     endDateSelected.value = true;
     endDate.value = proxyDate.value;
     console.log("endate", endDate.value);
-    reportStore().endDate = endDate.value;
+    // reportStore().endDate = endDate.value;
   }
-  await store.getLaporanTransaksiFromDB();
+  await store.getLaporanTransaksiFromDB(startDate.value, endDate.value);
 };
 
 onMounted(async () => {

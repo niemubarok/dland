@@ -227,35 +227,22 @@ export default class ReportsController {
       kunjunganWahanaPerBulan,
       totalKunjunganWahana,
     ] = await Promise.all([
-      Database.from("detail_transaksi")
-        .innerJoin(
-          "transaksi_penjualan",
-          "detail_transaksi.no_transaksi",
-          "transaksi_penjualan.no_transaksi"
-        )
-        // Assuming there's a missing join to a "jenis_tiket" table, and you want to join "master_wahana" on its "id_wahana".
-        // The correct way to join "jenis_tiket" would depend on your schema.
-        .innerJoin(
-          "master_wahana",
-          "detail_transaksi.id_wahana",
-          "master_wahana.id_wahana"
-        )
-        // This assumes "jenis_tiket" is another table you need to join correctly.
-        // .innerJoin("jenis_tiket", "some_column", "another_column") // This needs to be corrected based on actual schema.
-        .whereBetween(
-          Database.raw("SUBSTRING(detail_transaksi.no_transaksi, 1, 10)"),
-          [startDate, endDate]
-        )
-        .groupBy("master_wahana.nama")
-        .select(
-          "master_wahana.nama",
-          // Assuming "jenis_tiket.nama_jenis" is valid only if you have correctly joined the "jenis_tiket" table as mentioned above.
-          "jenis_tiket.nama_jenis",
-          Database.raw("SUM(detail_transaksi.qty) as total_kunjungan"),
-          Database.raw(
-            "SUM(master_wahana.harga_tiket * detail_transaksi.qty) as pendapatan_per_wahana"
-          )
-        ),
+      Database.rawQuery(
+        `
+        SELECT master_wahana.nama,
+       jenis_tiket.nama_jenis,
+       SUM(detail_transaksi.qty) as total_kunjungan,
+       SUM(master_wahana.harga_tiket * detail_transaksi.qty) as pendapatan_per_wahana
+FROM detail_transaksi
+INNER JOIN transaksi_penjualan ON detail_transaksi.no_transaksi = transaksi_penjualan.no_transaksi
+INNER JOIN master_wahana ON detail_transaksi.id_wahana = master_wahana.id_wahana
+INNER JOIN jenis_tiket ON master_wahana.id_jenis = jenis_tiket.id_jenis
+WHERE SUBSTRING(detail_transaksi.no_transaksi, 1, 10) BETWEEN ? AND ?
+GROUP BY master_wahana.nama, jenis_tiket.nama_jenis
+
+      `,
+        [startDate, endDate]
+      ),
       Database.from("detail_transaksi")
         .innerJoin(
           "transaksi_penjualan",
@@ -304,11 +291,14 @@ export default class ReportsController {
         ),
     ]);
 
-    const kunjunganWahanaPerHariResult = kunjunganWahanaPerHari.map((row) => ({
-      nama_wahana: row.nama,
-      jumlah: row.total_kunjungan,
-      pendapatan: row.pendapatan_per_wahana,
-    }));
+    const kunjunganWahanaPerHariResult = kunjunganWahanaPerHari.rows.map(
+      (row) => ({
+        nama_wahana: row.nama,
+        jumlah: row.total_kunjungan,
+        jenis_tiket: row.nama_jenis,
+        pendapatan: row.pendapatan_per_wahana,
+      })
+    );
 
     const kunjunganWahanaPerBulanResult = kunjunganWahanaPerBulan.map(
       (row) => ({
@@ -318,7 +308,7 @@ export default class ReportsController {
       {}
     );
 
-    const totalPendapatan = kunjunganWahanaPerHari.reduce(
+    const totalPendapatan = kunjunganWahanaPerHari.rows.reduce(
       (total, row) => parseInt(total) + parseInt(row.pendapatan_per_wahana),
       0
     );

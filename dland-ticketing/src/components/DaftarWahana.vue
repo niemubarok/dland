@@ -188,9 +188,56 @@
               >
             </div>
             <q-popup-edit
-              v-model="row.harga_tiket"
+              v-model="row.diskon"
               v-slot="scope"
-              @save="(value) => update(row.id_wahana, 'harga_tiket', value)"
+              @save="(value) => update(row.id_wahana, 'diskon', value)"
+            >
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+              <div class="float-right">
+                <q-btn
+                  size="sm"
+                  color="red-9"
+                  flat
+                  icon="close"
+                  @click="scope.cancel"
+                />
+                <q-btn
+                  size="sm"
+                  color="green-9"
+                  flat
+                  icon="check"
+                  @click="scope.set"
+                />
+              </div>
+            </q-popup-edit>
+          </td>
+          <td align="center" width="140px">
+            <div class="row justify-between">
+              <span class="text-grey-7">Rp</span>
+              <span class="text-subtitle2">
+                {{
+                  parseInt(row.diskon)
+                    ?.toLocaleString("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                      currencyDisplay: "code",
+                    })
+                    .replace("IDR", "")
+                    .trim()
+                    .split(",")[0]
+                }}</span
+              >
+            </div>
+            <q-popup-edit
+              v-model="row.diskon"
+              v-slot="scope"
+              @save="(value) => update(row.id_wahana, 'diskon', value)"
             >
               <q-input
                 v-model="scope.value"
@@ -303,14 +350,34 @@
             <q-popup-edit
               v-model="row.deskripsi"
               v-slot="scope"
-              @save="(value) => update(row.id_wahana, 'deskripsi', value)"
+              @save="
+                (value) => {
+                  if (row.nama_jenis?.toLowerCase() !== 'tiket masuk') {
+                    update(row.id_wahana, 'deskripsi', value);
+                  } else {
+                    update(row.id_wahana, 'deskripsi', multipleWahanaSelection);
+                  }
+                }
+              "
             >
               <q-input
+                v-if="row.nama_jenis?.toLowerCase() !== 'tiket masuk'"
                 v-model="scope.value"
                 dense
                 autofocus
                 counter
                 @keyup.enter="scope.set"
+              />
+              <q-select
+                v-else
+                multiple
+                v-model="multipleWahanaSelection"
+                :options="daftarWahana"
+                :option-value="'nama'"
+                :option-label="'nama'"
+                dense
+                label="Standard"
+                filled
               />
               <div class="float-right">
                 <q-btn
@@ -432,12 +499,15 @@ const columns = [
   { name: "No", prop: "name", align: "left" },
   { name: "Nama Wahana", prop: "nama", align: "left" },
   { name: "Harga Tiket", prop: "harga_tiket", align: "center" },
+  { name: "Diskon", prop: "diskon", align: "center" },
   { name: "Hari", prop: "hari", align: "center" },
   { name: "Jenis", prop: "jenis", align: "center" },
   { name: "Status", prop: "status", align: "center" },
   { name: "Keterangan", prop: "deskripsi", align: "left" },
   { name: "Hapus", prop: "hapus", align: "right" },
 ];
+
+const multipleWahanaSelection = ref([]);
 
 const newWahana = ref({
   nama: "",

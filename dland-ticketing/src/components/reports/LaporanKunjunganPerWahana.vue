@@ -1,12 +1,36 @@
 <template>
   <q-card>
     <q-card-section class="row">
-      <div>
-        <q-chip
-          icon="bar_chart"
-          label="Laporan Kunjungan Per Wahana"
-          class="text-weight-bolder"
-        />
+      <div class="column">
+        <div>
+          <q-chip
+            icon="bar_chart"
+            label="Laporan Kunjungan Per Wahana"
+            class="text-weight-bolder"
+          />
+        </div>
+        <div class="row q-mt-sm">
+          <q-btn
+            push
+            class="bg-brown text-white q-mr-sm"
+            label="Semua"
+            @click="jenisTiket = 'all'"
+          />
+          <q-btn
+            push
+            class="bg-brown text-white q-mr-sm"
+            label="Tiket Masuk"
+            @click="jenisTiket = 'tiket masuk'"
+          />
+          <!-- icon="in" -->
+          <q-btn
+            push
+            class="bg-brown text-white"
+            label="Tiket Satuan"
+            @click="jenisTiket = 'tiket wahana'"
+          />
+          <!-- icon="directions" -->
+        </div>
       </div>
       <q-space />
       <div :style="!$q.screen.gt.sm ? '' : 'margin-top:10px;'">
@@ -102,7 +126,7 @@
       :virtual-scroll-item-size="48"
       :virtual-scroll-sticky-size-start="48"
       :virtual-scroll-sticky-size-end="32"
-      :items="reportStore().laporanWahana"
+      :items="laporanWahana"
     >
       <template v-slot:before>
         <thead>
@@ -194,7 +218,7 @@
 
 <script setup>
 import { reportStore } from "src/stores/report-store";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { date, useQuasar } from "quasar";
 
 const $q = useQuasar();
@@ -308,6 +332,20 @@ const getColor = (jumlah) => {
   if (percentage <= 80) return "lightgreen";
   return "green";
 };
+
+const jenisTiket = ref("all");
+
+const laporanWahana = computed(() => {
+  if (jenisTiket.value === "all") {
+    return reportStore().laporanWahana;
+  } else {
+    return reportStore().laporanWahana.filter(
+      (wahana) =>
+        wahana.jenis_tiket?.toLowerCase() === jenisTiket.value.toLowerCase()
+    );
+  }
+});
+// const laporanWahana = ref([])
 
 onMounted(async () => {
   await reportStore().getLaporanKunjunganWahana();

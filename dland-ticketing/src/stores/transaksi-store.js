@@ -69,13 +69,20 @@ export const transaksiStore = defineStore("transaksi", {
       const wahana = this.detailTransaksi.find(
         (item) => item.id_wahana === data.id_wahana
       );
-      // console.log("addTransaksi", data);
+      console.log("addTransaksi", data);
       // console.log("addTransaksi", wahana);
       if (wahana) {
         wahana.qty++;
         this.qty = wahana.qty;
         wahana.total_bayar = data.tarif * wahana.qty;
       } else {
+        const totalHarga = data.tarif * this.qty;
+        const diskon = data.diskon;
+        const totalAfterDiskon = parseInt(totalHarga) - parseInt(diskon);
+        this.totalBayar = totalHarga;
+        this.diskon = diskon;
+        this.totalAfterDiskon = totalAfterDiskon;
+
         this.detailTransaksi.push({
           ...data,
           qty: 1,

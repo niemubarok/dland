@@ -117,7 +117,7 @@ export const wahanaStore = defineStore("wahana", {
       const res = await api.get("wahana");
       this.daftarWahana.splice(0, this.daftarWahana.length, ...res.data);
       this.jumlahWahana = res.data?.length;
-      // console.log("getWahanaFromDBr", res.data);
+      console.log("getWahanaFromDBr", res.data);
       return res.data;
     },
 

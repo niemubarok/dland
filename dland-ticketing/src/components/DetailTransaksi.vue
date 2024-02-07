@@ -102,13 +102,13 @@
     <div class="flex row justify-between q-px-sm glass-dark q-py-sm">
       <span class="text-h6 text-white"> Diskon </span>
       <span class="text-h6 text-white q-mr-sm">{{
-        transaksiStore()
-          .diskon.toLocaleString("id-ID", {
-            style: "currency",
-            currency: "IDR",
-          })
-          .split(",")[0]
+        transaksiStore().diskon
       }}</span>
+      <!-- ?.toLocaleString("id-ID", {
+          style: "currency",
+          currency: "IDR",
+        })
+        .split(",")[0] -->
     </div>
     <div class="flex row justify-between q-px-sm glass-dark">
       <span class="text-h6 text-white"> Total Bayar </span>

@@ -81,10 +81,12 @@
             :id="wahana.id_wahana.toString()"
             :nama="wahana.nama"
             :tarif="parseInt(wahana.harga_tiket)"
+            :diskon="parseInt(wahana.diskon)"
             :deskripsi="wahana.deskripsi"
             :hari="wahana.hari"
             :jenis="wahana.nama_jenis"
           />
+
           <!-- <TicketCard /> -->
         </div>
       </div>

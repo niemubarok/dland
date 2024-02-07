@@ -86,18 +86,16 @@ export default class ReportsController {
   public async pendapatan({ request, response }: HttpContextContract) {
     const { startDate: startDateParam, endDate: endDateParam } = request.body();
     const today = new Date();
-    const startDate = startDateParam ? new Date(startDateParam) : today;
-    const endDate = endDateParam ? new Date(endDateParam) : today;
+    const startDate = startDateParam
+      ? startDateParam
+      : today.toISOString().split("T")[0].replace(/-/g, "/");
+    const endDate = endDateParam
+      ? endDateParam
+      : today.toISOString().split("T")[0].replace(/-/g, "/");
 
     // Convert start and end dates to the desired format
-    const formatStartDate = startDate
-      .toISOString()
-      .split("T")[0]
-      .replace(/-/g, "/");
-    const formatEndDate = endDate
-      .toISOString()
-      .split("T")[0]
-      .replace(/-/g, "/");
+    // const startDate = startDate.toISOString().split("T")[0].replace(/-/g, "/");
+    // const endDate = endDate.toISOString().split("T")[0].replace(/-/g, "/");
 
     const currentDate = new Date();
     const yearMonthDay = currentDate.toISOString().split("T")[0];
@@ -111,8 +109,8 @@ export default class ReportsController {
     // Get the revenue per day
     const pendapatanPerHari = await Database.from("transaksi_penjualan")
       .whereBetween(Database.raw("CAST(substr(no_transaksi, 1, 10) AS DATE)"), [
-        formatStartDate,
-        formatEndDate,
+        startDate,
+        endDate,
       ])
       .sum("total_bayar as total")
       .then((result) => result[0].total || 0);
@@ -203,22 +201,26 @@ export default class ReportsController {
     const { startDate: startDateParam, endDate: endDateParam } = request.body();
     const today = new Date();
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-    const startDate = startDateParam ? new Date(startDateParam) : today;
-    const endDate = endDateParam ? new Date(endDateParam) : today;
+    const startDate = startDateParam
+      ? startDateParam
+      : today.toISOString().split("T")[0].replace(/-/g, "/");
+    const endDate = endDateParam
+      ? endDateParam
+      : today.toISOString().split("T")[0].replace(/-/g, "/");
 
     // return startDate;
 
-    const formatStartDate = startDate
-      .toISOString()
-      .split("T")[0]
-      .replace(/-/g, "/");
-    const formatEndDate = endDate
-      .toISOString()
-      .split("T")[0]
-      .replace(/-/g, "/");
+    // const startDate = startDate
+    //   .toISOString()
+    //   .split("T")[0]
+    //   .replace(/-/g, "/");
+    // const endDate = endDate
+    //   .toISOString()
+    //   .split("T")[0]
+    //   .replace(/-/g, "/");
 
-    console.log("start", formatStartDate);
-    console.log("end", formatEndDate);
+    // console.log("start", startDate);
+    // console.log("end", endDate);
 
     const [
       kunjunganWahanaPerHari,
@@ -231,29 +233,29 @@ export default class ReportsController {
           "detail_transaksi.no_transaksi",
           "transaksi_penjualan.no_transaksi"
         )
+        // Assuming there's a missing join to a "jenis_tiket" table, and you want to join "master_wahana" on its "id_wahana".
+        // The correct way to join "jenis_tiket" would depend on your schema.
         .innerJoin(
           "master_wahana",
           "detail_transaksi.id_wahana",
           "master_wahana.id_wahana"
         )
+        // This assumes "jenis_tiket" is another table you need to join correctly.
+        // .innerJoin("jenis_tiket", "some_column", "another_column") // This needs to be corrected based on actual schema.
         .whereBetween(
-          Database.raw(
-            "SUBSTRING(detail_transaksi.no_transaksi FROM 1 FOR 10)"
-          ),
-          [formatStartDate, formatEndDate]
+          Database.raw("SUBSTRING(detail_transaksi.no_transaksi, 1, 10)"),
+          [startDate, endDate]
         )
         .groupBy("master_wahana.nama")
         .select(
           "master_wahana.nama",
+          // Assuming "jenis_tiket.nama_jenis" is valid only if you have correctly joined the "jenis_tiket" table as mentioned above.
+          "jenis_tiket.nama_jenis",
+          Database.raw("SUM(detail_transaksi.qty) as total_kunjungan"),
           Database.raw(
-            // "count(distinct transaksi_penjualan.no_transaksi) as total_kunjungan"
-            "sum(detail_transaksi.qty) as total_kunjungan"
-          ),
-          Database.raw(
-            "sum(master_wahana.harga_tiket * detail_transaksi.qty) as pendapatan_per_wahana"
+            "SUM(master_wahana.harga_tiket * detail_transaksi.qty) as pendapatan_per_wahana"
           )
         ),
-
       Database.from("detail_transaksi")
         .innerJoin(
           "transaksi_penjualan",
@@ -267,7 +269,7 @@ export default class ReportsController {
         )
         .whereBetween(
           Database.raw("SUBSTRING(detail_transaksi.no_transaksi FROM 1 FOR 7)"),
-          [formatStartDate.slice(0, 7), formatEndDate.slice(0, 7)]
+          [startDate.slice(0, 7), endDate.slice(0, 7)]
         )
         .groupBy("master_wahana.nama")
         .select(

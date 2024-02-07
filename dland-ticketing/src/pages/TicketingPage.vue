@@ -192,11 +192,14 @@ const daftarWahana = computed(() => {
     .daftarWahana.filter((wahana) => {
       if (isWeekday) {
         return (
-          wahana.hari?.toLowerCase() === "weekday" ||
-          wahana.hari?.toLowerCase() === "all day"
+          (wahana.status === true &&
+            wahana.hari?.toLowerCase() === "weekday") ||
+          (wahana.status === true && wahana.hari?.toLowerCase() === "all day")
         );
       } else if (isWeekendOrHoliday) {
-        return wahana.hari?.toLowerCase() === "weekend";
+        return (
+          wahana.status === true && wahana.hari?.toLowerCase() === "weekend"
+        );
       }
       return false;
     })

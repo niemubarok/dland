@@ -422,13 +422,13 @@ export const generatePDF = async (transaksi) => {
 
   // Generate barcode
 
-  const barcodeData = generateBarcode(no_transaksi);
+  const barcodeData = generateBarcode(parseInt(no_transaksi.replace(/\//g,''),10));
   // Add barcode to PDF
   if (barcodeData) {
     const barcodeImage = new Image();
     barcodeImage.src = barcodeData;
     barcodeImage.onload = () => {
-      const barcodeWidth = 25; // Increased width for better clarity
+      const barcodeWidth = 40; // Increased width for better clarity
       const barcodeHeight = 10; // Increased height for better clarity
       const xPosition = (pageWidth - barcodeWidth) / 2;
       const yPosition = pdf.autoTable.previous.finalY + 21;

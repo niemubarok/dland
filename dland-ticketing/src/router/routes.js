@@ -69,7 +69,7 @@ const routes = [
         component: () => import("pages/DaftarPaketPage.vue"),
       },
       {
-        path: "/laporan/kunjungan-per-wahana",
+        path: "/laporan/penjualan-tiket",
         meta: {
           requireHeader: true,
           requireSideNav: true,

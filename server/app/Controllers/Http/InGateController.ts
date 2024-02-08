@@ -20,11 +20,16 @@ export default class InGateController {
 
     //  GROUP BY detail_transaksi.id_detail_transaksi, detail_transaksi.no_transaksi, detail_transaksi.id_wahana, detail_transaksi.qty, detail_transaksi.harga, master_wahana.nama`
     if (transaksi.rows?.length) {
-      response.status(200).json(transaksi.rows);
+      const storeLogs = await Database.rawQuery(
+        `INSERT INTO ingate_logs (no_transaksi, created_at) VALUES ('${
+          transaksi.rows[0].no_transaksi
+        }','${new Date().toISOString()}')`
+      );
+      if (storeLogs) {
+        return true;
+      }
     } else {
-      response.abort({
-        message: "gagal",
-      });
+      return false;
     }
   }
 

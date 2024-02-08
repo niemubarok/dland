@@ -9,7 +9,7 @@
         <CardNumber
           :caption="data.caption"
           :number="data.number"
-          :icon="data.icon"
+          icon="logout"
           class="col-md col-xs-11 q-my-sm q-mx-sm"
           style="height: 20vh"
         />
@@ -48,40 +48,40 @@ onMounted(async () => {
 
 // Menggunakan komputasi dinamis untuk properti number
 const dataPenjualan = ref([
+  // {
+  //   caption: "Jumlah Wahana",
+  //   get number() {
+  //     return wahanaStore().daftarWahana?.length;
+  //   },
+  //   icon: "",
+  // },
   {
-    caption: "Jumlah Wahana",
-    get number() {
-      return wahanaStore().daftarWahana?.length;
-    },
-    icon: "",
-  },
-  {
-    caption: "Pengunjung / Hari",
+    caption: "Pengunjung Hari Ini",
     get number() {
       return reportStore().kunjunganPerHari;
     },
     icon: "trending_up",
   },
   {
-    caption: "Pengunjung / Bulan",
+    caption: "Pengunjung Bulan Ini",
     get number() {
       return reportStore().kunjunganPerBulan;
     },
     icon: "trending_up",
   },
   {
-    caption: "Pendapatan / Hari ",
+    caption: "Pendapatan Hari Ini ",
     get number() {
       return reportStore().pendapatanPerHari;
     },
     icon: "trending_up",
   },
-  {
-    caption: "Pendapatan / Bulan ",
-    get number() {
-      return reportStore().pendapatanPerBulan;
-    },
-    icon: "trending_up",
-  },
+  // {
+  //   caption: "Pendapatan / Bulan ",
+  //   get number() {
+  //     return reportStore().pendapatanPerBulan;
+  //   },
+  //   icon: "trending_up",
+  // },
 ]);
 </script>

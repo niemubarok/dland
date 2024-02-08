@@ -3,7 +3,7 @@
     <q-card-section class="row">
       <div>
         <q-chip
-          icon="bar_chart"
+          icon="fact_check"
           label="Daftar Transaksi"
           class="text-weight-bolder"
         />

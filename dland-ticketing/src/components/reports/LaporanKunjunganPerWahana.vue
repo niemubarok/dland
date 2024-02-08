@@ -5,7 +5,7 @@
         <div>
           <q-chip
             icon="bar_chart"
-            label="Laporan Kunjungan Per Wahana"
+            label="Laporan Penjualan Tiket"
             class="text-weight-bolder"
           />
         </div>
@@ -288,6 +288,17 @@ const save = async (type) => {
   if (type === "start") {
     startDateSelected.value = true;
     startDate.value = proxyDate.value;
+
+    if (
+      new Date(startDate.value).toDateString() === new Date().toDateString() &&
+      new Date(endDate.value).toDateString() === new Date().toDateString()
+    ) {
+      isToday.value = true;
+      todaySelected.value = true;
+    } else {
+      isToday.value = false;
+      todaySelected.value = false;
+    }
     // endDate.value = proxyDate.value;
     // reportStore().startDate = startDate.value;
   } else if (type === "end") {
@@ -304,8 +315,8 @@ const save = async (type) => {
     }
 
     if (
-      new Date(proxyDate.value).toDateString() === new Date().toDateString() &&
-      new Date(startDate.value).toDateString() === new Date().toDateString()
+      new Date(startDate.value).toDateString() === new Date().toDateString() &&
+      new Date(endDate.value).toDateString() === new Date().toDateString()
     ) {
       isToday.value = true;
       todaySelected.value = true;

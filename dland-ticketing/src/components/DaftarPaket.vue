@@ -3,7 +3,7 @@
     <q-card-section class="row">
       <div>
         <q-chip
-          icon="bar_chart"
+          icon="dataset"
           label="Daftar Paket"
           class="text-weight-bolder"
         />
@@ -568,9 +568,9 @@ const onClickDetail = async (no_transaksi) => {
   detailDialog.update();
 };
 
-const daftarPaket = computed(()=>{
-  return wahanaStore().paket
-})
+const daftarPaket = computed(() => {
+  return wahanaStore().paket;
+});
 
 // const onClickPrint = asy;
 

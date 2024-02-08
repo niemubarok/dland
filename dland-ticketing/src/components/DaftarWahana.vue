@@ -2,11 +2,7 @@
   <q-card>
     <q-card-section class="row">
       <div>
-        <q-chip
-          icon="bar_chart"
-          label="Daftar Wahana"
-          class="text-weight-bolder"
-        />
+        <q-chip icon="apps" label="Daftar Wahana" class="text-weight-bolder" />
       </div>
       <q-space />
       <div :style="!$q.screen.gt.sm ? '' : 'margin-top:10px;'">

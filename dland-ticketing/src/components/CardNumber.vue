@@ -11,7 +11,7 @@
               :value="props.number"
               class="text-weight-bolder text-green-9"
               :class="{
-                ' text-h6': props.number < 1000000000,
+                ' text-h5': props.number < 1000000000,
                 'text-body': props.number >= 1000000000,
               }"
             />

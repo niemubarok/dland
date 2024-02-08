@@ -141,10 +141,10 @@ const essentialLinks = [
   },
 
   {
-    title: "Kunjungan Per Wahana",
+    title: "Laporan Tiket",
     caption: "",
     icon: "bar_chart",
-    link: "/laporan/kunjungan-per-wahana",
+    link: "/laporan/penjualan-tiket",
   },
   {
     title: "Data Transaksi",

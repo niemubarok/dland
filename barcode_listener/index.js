@@ -7,6 +7,9 @@ import { dirname, join } from "path";
 import { config as dotenvConfig } from "dotenv";
 import axios from "axios";
 import usb from "usb";
+import BarcodeScanner from "native-barcode-scanner";
+
+
 
 // Load .env configurations
 dotenvConfig();
@@ -105,56 +108,56 @@ const promptUser = (question) =>
     });
   });
 
-async function selectHIDDevice(forcePrompt = false) {
-  let devices = usb.getDeviceList();
-  let selectedDevice;
+// async function selectHIDDevice(forcePrompt = false) {
+//   let devices = usb.getDeviceList();
+//   let selectedDevice;
 
-  try {
-    const stats = await fs.stat(deviceConfigPath);
-    if (!forcePrompt && stats.isFile()) {
-      let savedConfig = JSON.parse(
-        await fs.readFile(deviceConfigPath, "utf-8")
-      );
-      if (savedConfig.HIDDevicePath) {
-        console.log(`Using saved HID device: ${savedConfig.HIDDevicePath}`);
-        selectedDevice = devices.find(
-          (device) =>
-            device.deviceDescriptor.iProduct === savedConfig.HIDDevicePath
-        );
-        if (!selectedDevice) {
-          console.log(
-            "Saved HID device not found, prompting for device selection..."
-          );
-        } else {
-          return selectedDevice;
-        }
-      }
-    }
-  } catch (error) {
-    console.error("Error checking device config:", error);
-  }
+//   try {
+//     const stats = await fs.stat(deviceConfigPath);
+//     if (!forcePrompt && stats.isFile()) {
+//       let savedConfig = JSON.parse(
+//         await fs.readFile(deviceConfigPath, "utf-8")
+//       );
+//       if (savedConfig.HIDDevicePath) {
+//         console.log(`Using saved HID device: ${savedConfig.HIDDevicePath}`);
+//         selectedDevice = devices.find(
+//           (device) =>
+//             device.deviceDescriptor.iProduct === savedConfig.HIDDevicePath
+//         );
+//         if (!selectedDevice) {
+//           console.log(
+//             "Saved HID device not found, prompting for device selection..."
+//           );
+//         } else {
+//           return selectedDevice;
+//         }
+//       }
+//     }
+//   } catch (error) {
+//     console.error("Error checking device config:", error);
+//   }
 
-  if (devices.length === 0) {
-    console.log("No HID devices found.");
-    return null;
-  }
+//   if (devices.length === 0) {
+//     console.log("No HID devices found.");
+//     return null;
+//   }
 
-  console.log("Available HID devices:");
-  devices.forEach((device, index) => {
-    console.log(device);
-    console.log(
-      `${index + 1}. Path: ${device.deviceDescriptor.iProduct}, Manufacturer: ${
-        device.deviceDescriptor.iManufacturer
-      }, Product: ${device.deviceDescriptor.iProduct}`
-    );
-  });
+//   console.log("Available HID devices:");
+//   devices.forEach((device, index) => {
+//     console.log(device);
+//     console.log(
+//       `${index + 1}. Path: ${device.deviceDescriptor.iProduct}, Manufacturer: ${
+//         device.deviceDescriptor.iManufacturer
+//       }, Product: ${device.deviceDescriptor.iProduct}`
+//     );
+//   });
 
-  const selectedIndex = await promptUser(
-    "Enter the number of the HID device you want to use: "
-  );
-  selectedDevice = devices[selectedIndex - 1];
-  return selectedDevice;
-}
+//   const selectedIndex = await promptUser(
+//     "Enter the number of the HID device you want to use: "
+//   );
+//   selectedDevice = devices[selectedIndex - 1];
+//   return selectedDevice;
+// }
 
 async function selectSerialDevice(forcePrompt = false) {
   let serialDevices = await SerialPort.list();
@@ -238,8 +241,8 @@ async function makeAPIRequest(dataBarcode) {
   try {
     //   //   Ganti URL dengan endpoint API yang sesuai2233445767676
     const response = await axios.post(API_URL, {
-      // barcode: "2024/01/29/00002",
-      barcode: dataBarcode,
+      barcode: "2024/01/29/00002",
+      // barcode: dataBarcode,
     });
     if (response.data.status === 200) {
       console.log(response);
@@ -259,49 +262,39 @@ async function makeAPIRequest(dataBarcode) {
 }
 
 function listenToHIDDevice(deviceInfo) {
-  const device = usb.findByIds(
-    deviceInfo.deviceDescriptor.idVendor,
-    deviceInfo.deviceDescriptor.idProduct
-  );
-  device.open();
-  console.log(
-    `Listening to HID device: ${deviceInfo.deviceDescriptor.iProduct}`
-  );
-  let keys = [];
+   const options = {
+  devicePrefix: ''
+}
+  const scanner = new BarcodeScanner(options);
+  let keys= []
+// Add a global listener
+scanner.on('code',
+ (data) => {
+    // const keyCode = data[2];
+    // if (keyCode === 0) return; // Ignore jika keyCode adalah 0 (no key pressed)
 
-  device.interfaces[0].endpoints[0].startPoll(1, 8);
-  device.interfaces[0].endpoints[0].on("data", (data) => {
-    const keyCode = data[2];
-    if (keyCode === 0) return; // Ignore jika keyCode adalah 0 (no key pressed)
+    // const key = keyMap[keyCode];
+    // if (!key) {
+    //   console.log(`Unknown key code: ${keyCode}`);
+    //   return;
+    // }
 
-    const key = keyMap[keyCode];
-    if (!key) {
-      console.log(`Unknown key code: ${keyCode}`);
-      return;
-    }
-
-    // console.log(`Key pressed: ${key}`);
-    keys.push(key);
-
-    if (key === "Enter") {
-      makeAPIRequest(keys.join(""));
-      keys = [];
-    }
+    // keys.push(data);
+    
+    // if (data === "Enter") {
+      console.log(`Key pressed: ${data}`);
+      makeAPIRequest(data);
+      // keys = [];
+    // }
     // Implementasikan logika Anda di sini, misalnya mengirim data ke API atau menampilkannya di konsol
   });
 
-  device.interfaces[0].endpoints[0].on("error", (err) => {
-    console.error(
-      `Device error on ${deviceInfo.deviceDescriptor.iProduct}:`,
-      err
-    );
-  });
 }
 
-async function saveDeviceConfig(hidDevicePath, serialPath) {
+async function saveDeviceConfig( serialPath) {
   try {
     let config = {
-      HIDDevicePath: hidDevicePath,
+      // HIDDevicePath: hidDevicePath,
       serialPath: serialPath,
     };
     await fs.writeFile(
@@ -318,14 +311,20 @@ async function saveDeviceConfig(hidDevicePath, serialPath) {
 async function main() {
   // await makeAPIRequest("2024/01/29/00002");
   // return;
+ 
 
+// Remove the listener
+//
+
+
+// return
   let forcePrompt = process.argv.includes("--reset");
 
-  const selectedHIDDevice = await selectHIDDevice(forcePrompt);
-  if (!selectedHIDDevice) {
-    console.log("HID device selection failed or was cancelled.");
-    return;
-  }
+  // const selectedHIDDevice = await selectHIDDevice(forcePrompt);
+  // if (!selectedHIDDevice) {
+  //   console.log("HID device selection failed or was cancelled.");
+  //   return;
+  // }
 
   const serialPath = await selectSerialDevice(forcePrompt);
   if (!serialPath) {
@@ -334,9 +333,9 @@ async function main() {
   }
 
   // Simpan konfigurasi ke file
-  await saveDeviceConfig(selectedHIDDevice.path, serialPath);
+  await saveDeviceConfig( serialPath);
 
-  listenToHIDDevice(selectedHIDDevice);
+  listenToHIDDevice();
 }
 
 main().catch(console.error);

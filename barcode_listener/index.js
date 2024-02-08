@@ -238,13 +238,13 @@ async function makeAPIRequest(dataBarcode) {
   // await openGate();
   try {
     //   //   Ganti URL dengan endpoint API yang sesuai2233445767676
-    const response = await axios.post(API_URL, {
-      // barcode: "2024/01/29/00002",
-      barcode: dataBarcode,
-    });
+    // const response = await axios.post(API_URL, {
+    //   // barcode: "2024/01/29/00002",
+    //   barcode: dataBarcode,
+    // });
+    await openGate();
     if (response.status === 200) {
       console.log(response.data);
-      await openGate();
     }
     //   // console.log("Data from API:", response.data);
     // const serialPort = new SerialPort({

@@ -6,7 +6,6 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { config as dotenvConfig } from "dotenv";
 import axios from "axios";
-import usb from "usb";
 
 // Load .env configurations
 dotenvConfig();
@@ -106,7 +105,7 @@ const promptUser = (question) =>
   });
 
 async function selectHIDDevice(forcePrompt = false) {
-  let devices = usb.getDeviceList();
+  let devices = HID.devices();
   let selectedDevice;
 
   try {
@@ -118,8 +117,7 @@ async function selectHIDDevice(forcePrompt = false) {
       if (savedConfig.HIDDevicePath) {
         console.log(`Using saved HID device: ${savedConfig.HIDDevicePath}`);
         selectedDevice = devices.find(
-          (device) =>
-            device.deviceDescriptor.iProduct === savedConfig.HIDDevicePath
+          (device) => device.path === savedConfig.HIDDevicePath
         );
         if (!selectedDevice) {
           console.log(
@@ -141,11 +139,10 @@ async function selectHIDDevice(forcePrompt = false) {
 
   console.log("Available HID devices:");
   devices.forEach((device, index) => {
-    console.log(device);
     console.log(
-      `${index + 1}. Path: ${device.deviceDescriptor.iProduct}, Manufacturer: ${
-        device.deviceDescriptor.iManufacturer
-      }, Product: ${device.deviceDescriptor.iProduct}`
+      `${index + 1}. Path: ${device.path}, Manufacturer: ${
+        device.manufacturer
+      }, Product: ${device.product}`
     );
   });
 
@@ -259,18 +256,11 @@ async function makeAPIRequest(dataBarcode) {
 }
 
 function listenToHIDDevice(deviceInfo) {
-  const device = usb.findByIds(
-    deviceInfo.deviceDescriptor.idVendor,
-    deviceInfo.deviceDescriptor.idProduct
-  );
-  device.open();
-  console.log(
-    `Listening to HID device: ${deviceInfo.deviceDescriptor.iProduct}`
-  );
+  const device = new HID.HID(deviceInfo.path);
+  console.log(`Listening to HID device: ${deviceInfo.path}`);
   let keys = [];
 
-  device.interfaces[0].endpoints[0].startPoll(1, 8);
-  device.interfaces[0].endpoints[0].on("data", (data) => {
+  device.on("data", (data) => {
     const keyCode = data[2];
     if (keyCode === 0) return; // Ignore jika keyCode adalah 0 (no key pressed)
 
@@ -290,11 +280,8 @@ function listenToHIDDevice(deviceInfo) {
     // Implementasikan logika Anda di sini, misalnya mengirim data ke API atau menampilkannya di konsol
   });
 
-  device.interfaces[0].endpoints[0].on("error", (err) => {
-    console.error(
-      `Device error on ${deviceInfo.deviceDescriptor.iProduct}:`,
-      err
-    );
+  device.on("error", (err) => {
+    console.error(`Device error on ${deviceInfo.path}:`, err);
   });
 }
 
@@ -316,8 +303,8 @@ async function saveDeviceConfig(hidDevicePath, serialPath) {
 }
 
 async function main() {
-  // await makeAPIRequest("2024/01/29/00002");
-  // return;
+  await makeAPIRequest("2024/01/29/00002");
+  return;
 
   let forcePrompt = process.argv.includes("--reset");
 

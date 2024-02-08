@@ -1,4 +1,3 @@
 {
-  "HIDDevicePath": "/dev/hidraw1",
-  "serialPath": "/dev/ttyUSB0"
+  "serialPath": "/dev/ttyS0"
 }

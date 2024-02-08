@@ -9,8 +9,6 @@ import axios from "axios";
 import usb from "usb";
 import BarcodeScanner from "native-barcode-scanner";
 
-
-
 // Load .env configurations
 dotenvConfig();
 
@@ -241,11 +239,12 @@ async function makeAPIRequest(dataBarcode) {
   try {
     //   //   Ganti URL dengan endpoint API yang sesuai2233445767676
     const response = await axios.post(API_URL, {
-      barcode: "2024/01/29/00002",
-      // barcode: dataBarcode,
+      // barcode: "2024/01/29/00002",
+      barcode: dataBarcode,
     });
-    if (response.data.status === 200) {
-      console.log(response);
+    if (response.status === 200) {
+      console.log(response.data);
+      await openGate();
     }
     //   // console.log("Data from API:", response.data);
     // const serialPort = new SerialPort({
@@ -262,14 +261,13 @@ async function makeAPIRequest(dataBarcode) {
 }
 
 function listenToHIDDevice(deviceInfo) {
-   const options = {
-  devicePrefix: ''
-}
+  const options = {
+    devicePrefix: "",
+  };
   const scanner = new BarcodeScanner(options);
-  let keys= []
-// Add a global listener
-scanner.on('code',
- (data) => {
+  let keys = [];
+  // Add a global listener
+  scanner.on("code", (data) => {
     // const keyCode = data[2];
     // if (keyCode === 0) return; // Ignore jika keyCode adalah 0 (no key pressed)
 
@@ -280,18 +278,17 @@ scanner.on('code',
     // }
 
     // keys.push(data);
-    
+
     // if (data === "Enter") {
-      console.log(`Key pressed: ${data}`);
-      makeAPIRequest(data);
-      // keys = [];
+    console.log(`Key pressed: ${data}`);
+    makeAPIRequest(data);
+    // keys = [];
     // }
     // Implementasikan logika Anda di sini, misalnya mengirim data ke API atau menampilkannya di konsol
   });
-
 }
 
-async function saveDeviceConfig( serialPath) {
+async function saveDeviceConfig(serialPath) {
   try {
     let config = {
       // HIDDevicePath: hidDevicePath,
@@ -311,13 +308,11 @@ async function saveDeviceConfig( serialPath) {
 async function main() {
   // await makeAPIRequest("2024/01/29/00002");
   // return;
- 
 
-// Remove the listener
-//
+  // Remove the listener
+  //
 
-
-// return
+  // return
   let forcePrompt = process.argv.includes("--reset");
 
   // const selectedHIDDevice = await selectHIDDevice(forcePrompt);
@@ -333,7 +328,7 @@ async function main() {
   }
 
   // Simpan konfigurasi ke file
-  await saveDeviceConfig( serialPath);
+  await saveDeviceConfig(serialPath);
 
   listenToHIDDevice();
 }

@@ -12,24 +12,36 @@ export default class InGateController {
     const { barcode } = request.body();
     console.log(barcode);
 
-    const transaksi = await Database.rawQuery(
-      `SELECT no_transaksi FROM transaksi_penjualan 
-   WHERE no_transaksi = '${barcode}' `
-    );
-    console.log(transaksi.rows);
-
-    //  GROUP BY detail_transaksi.id_detail_transaksi, detail_transaksi.no_transaksi, detail_transaksi.id_wahana, detail_transaksi.qty, detail_transaksi.harga, master_wahana.nama`
-    if (transaksi.rows?.length) {
-      const storeLogs = await Database.rawQuery(
-        `INSERT INTO ingate_logs (no_transaksi, created_at) VALUES ('${
-          transaksi.rows[0].no_transaksi
-        }','${new Date().toISOString()}')`
+    try {
+      const checkLogs = await Database.rawQuery(
+        `SELECT * FROM ingate_logs WHERE no_transaksi = '${barcode}'`
       );
-      if (storeLogs) {
-        return true;
+
+      if (checkLogs.rows?.length) {
+        return false;
+      } else {
+        const transaksi = await Database.rawQuery(
+          `SELECT no_transaksi FROM transaksi_penjualan 
+         WHERE no_transaksi = '${barcode}' `
+        );
+        console.log(transaksi.rows);
+
+        //  GROUP BY detail_transaksi.id_detail_transaksi, detail_transaksi.no_transaksi, detail_transaksi.id_wahana, detail_transaksi.qty, detail_transaksi.harga, master_wahana.nama`
+        if (transaksi.rows?.length) {
+          const storeLogs = await Database.rawQuery(
+            `INSERT INTO ingate_logs (no_transaksi, created_at) VALUES ('${
+              transaksi.rows[0].no_transaksi
+            }','${new Date().toISOString()}')`
+          );
+          if (storeLogs) {
+            return true;
+          }
+        } else {
+          return false;
+        }
       }
-    } else {
-      return false;
+    } catch (error) {
+      console.log(error);
     }
   }
 

@@ -116,10 +116,12 @@ const handleKeyDownOnLoginDialog = async (event) => {
 };
 
 onMounted(() => {
+  userStore().isLoginDialog = true
   window.addEventListener("keydown", handleKeyDownOnLoginDialog);
 });
 
 onBeforeUnmount(() => {
+  userStore().isLoginDialog = false
   window.removeEventListener("keydown", handleKeyDownOnLoginDialog);
 });
 </script>

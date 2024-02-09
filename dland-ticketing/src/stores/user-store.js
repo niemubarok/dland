@@ -9,6 +9,7 @@ export const userStore = defineStore("user", {
     counter: 0,
     isLogin: ref(false),
     daftarPetugas: ref([]),
+    isLoginDialog:ref(false)
   }),
 
   getters: {
@@ -21,7 +22,7 @@ export const userStore = defineStore("user", {
     async getAllPetugas() {
       const res = await api.get("petugas/all");
 
-      console.log(res.data);
+      // console.log(res.data);
       this.daftarPetugas.splice(0, this.daftarPetugas?.length, ...res.data);
     },
     async login(username, password) {
@@ -32,6 +33,7 @@ export const userStore = defineStore("user", {
           password: password,
           // id_pos: lokasiPos,
         });
+        console.log("response.data di login", response.data)
 
         // ls.set("timeLogin", response.data.time_login);
         ls.set("petugas", response.data);

@@ -5,7 +5,33 @@ import { SerialPort } from "serialport";
 import { getNumberWithPrompt } from "simple-prompt-promise";
 import axios from "axios";
 import dotenv from "dotenv";
+import { promises as fs } from "fs";
+import { dirname, join } from "path";
+
+import { fileURLToPath } from "url";
 dotenv.config();
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const deviceConfigPath = join(__dirname, "deviceConfig.json");
+const API_URL = process.env.API_URL; // Get API URL from .env
+
+function formatNumber(number) {
+  // Konversi angka ke string untuk memudahkan pemrosesan
+  let str = number.toString();
+
+  // Memisahkan string ke dalam komponen yang diinginkan
+  let year = str.substring(0, 4);
+  let month = str.substring(4, 6);
+  let day = str.substring(6, 8);
+  let rest = str.substring(8);
+
+  // Menggabungkan komponen dengan pemisah '/'
+  let formatted = `${year}/${month}/${day}/${rest}`;
+
+  return formatted;
+}
 
 const keyMap = {
   4: "a",
@@ -166,13 +192,48 @@ function listenToDevice(deviceInfo) {
   });
 }
 
-async function makeAPIRequest(dataBarcode) {
-  const serialPort = new SerialPort({
-    path: serialPath,
-    baudRate: 9600,
+async function openGate() {
+  const deviceConfig = JSON.parse(await fs.readFile(deviceConfigPath, "utf-8"));
+  const serialPath = deviceConfig.serialPath;
+
+  const serialPort = new SerialPort(
+    {
+      path: serialPath,
+      baudRate: 9600,
+    },
+    (err) => {
+      if (err) {
+        return console.error("Error opening serial port: ", err.message);
+      }
+    }
+  );
+
+  serialPort.on("error", function (err) {
+    console.error("SerialPort Error: ", err);
   });
 
-  console.log(typeof serialPath);
+  serialPort.write(process.env.OUTPUT_CODE_ON, (err) => {
+    if (err) {
+      console.error("Error writing to serial port: ", err.message);
+      return;
+    }
+    // Menutup port setelah penulisan berhasil
+    serialPort.close((err) => {
+      if (err) {
+        console.error("Error closing serial port: ", err.message);
+      } else {
+        console.log("Serial port closed successfully.");
+      }
+    });
+  });
+
+  // setTimeout(() => {
+  //   serialPort.write(process.env.OUTPUT_CODE_OFF);
+  // }, 500);
+}
+
+async function makeAPIRequest(dataBarcode) {
+  await openGate()
 
   // try {
   //   Ganti URL dengan endpoint API yang sesuai2233445767676
@@ -184,11 +245,7 @@ async function makeAPIRequest(dataBarcode) {
 
   // if (response.data.status === 200) {
   // console.log(response.data.message);
-  serialPort.write("*OUT1ON#");
 
-  setTimeout(() => {
-    serialPort.write("*OUT1OFF#");
-  }, 2000);
   //   }
 
   //   // console.log("Data from API:", response.data);

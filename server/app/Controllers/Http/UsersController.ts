@@ -26,7 +26,7 @@ export default class UsersController {
 
     try {
       const user = await Database.rawQuery(
-        "SELECT * FROM petugas WHERE username = :username AND password = :password AND status = true",
+        "SELECT * FROM petugas WHERE username = :username AND password = :password ",
         {
           username,
           password,

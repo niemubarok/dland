@@ -137,8 +137,8 @@
         :label="'Bayar'"
         class="col bg-green-9 text-white text-weight-bolder q-mt-sm"
         @click="onClickBayar('cash')"
+       @keydown.enter.prevent="return"
       />
-      <!-- @keydown.enter.prevent="onClickBayar('cash')" -->
       <!-- <q-btn flat label="Action 2" /> -->
     </q-card-actions>
     <!-- label="Daftar Transaksi" -->
@@ -186,7 +186,11 @@ const onClickBayar = async (method) => {
     );
     const store = await transaksiStore().insertIntoDB();
 
-    const transaksi = transaksiStore();
+   
+    // namaPaket: "Tiket",
+    
+    if (store.isSuccess) {
+      const transaksi = transaksiStore();
     const data = {
       transaksi: JSON.stringify(transaksi.detailTransaksi),
       diskon: transaksi.diskon,
@@ -194,12 +198,14 @@ const onClickBayar = async (method) => {
       totalBayar: transaksi.totalBayar,
       no_transaksi: transaksi.no_transaksi,
     };
-    // namaPaket: "Tiket",
-    console.log("data.transaksi", data.transaksi);
-    if (store) {
+
+    if(transaksi.no_transaksi !==   undefined){
+
+      
+      console.log("data.transaksi", data.transaksi);
       // await generatePDF(data);
 
-      window.electron.createPDFStruk(data);
+      await window.electron.createPDFStruk(data);
       //   "Depok Fantasy Land",
       //   JSON.stringify(data)
       // );
@@ -211,6 +217,7 @@ const onClickBayar = async (method) => {
         color: "green",
         position: "top",
       });
+    }
       // dialogRef.value.hide();
     } else {
       const existingTransaksiGagal = ls.get("transaksi_gagal") || [];

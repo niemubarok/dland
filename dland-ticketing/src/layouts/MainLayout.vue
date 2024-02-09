@@ -101,9 +101,10 @@
 </template>
 
 <script setup>
-import { defineComponent, ref, onMounted } from "vue";
+import { defineComponent, ref, onMounted, computed } from "vue";
 import EssentialLink from "components/EssentialLink.vue";
 import { componentStore } from "src/stores/component-store";
+import { userStore } from "src/stores/user-store";
 import { useQuasar } from "quasar";
 import SettingsDialog from "src/components/SettingsDialog.vue";
 import ls from "localstorage-slim";
@@ -111,8 +112,23 @@ import Clock from "src/components/Clock.vue";
 // import LoginDialog from "src/components/LoginDialog.vue";
 
 const $q = useQuasar();
+const handleKeyDown = (event) => {
+      //event.preventDefault();
+
+   if (event.key === "Enter" || event.key === "enter") {
+    event.preventDefault();
+    return
+  }
+};
+
+const isLoginDialog = computed(()=>userStore().isLoginDialog)
+
 
 onMounted(() => {
+  //console.log("isLoginDialog", isLoginDialog)
+  //if(isLoginDialog.value === false){
+  window.addEventListener("keydown", handleKeyDown);
+  //}
   if (!ls.get("APIURL") || !ls.get("namaPrinter")) {
     const settingDialog = $q.dialog({
       component: SettingsDialog,

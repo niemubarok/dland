@@ -189,7 +189,7 @@ const filePath = path.join(directoryPath, "struk.pdf");
 
 const generateBarcode = (text) => {
   const canvas = document.createElement("canvas");
-  JsBarcode(canvas, text, { displayValue: false, format: "CODE128" });
+  JsBarcode(canvas, text, { displayValue: true, format: "CODE128" });
   return canvas.toDataURL("image/png");
 };
 
@@ -421,8 +421,9 @@ export const generatePDF = async (transaksi) => {
   );
 
   // Generate barcode
+  console.log("no_transaksi?.replace(/\//g,'')", no_transaksi?.replace(/\//g,''))
 
-  const barcodeData = generateBarcode(parseInt(no_transaksi.replace(/\//g,''),10));
+  const barcodeData = generateBarcode(no_transaksi?.replace(/\//g,''));
   // Add barcode to PDF
   if (barcodeData) {
     const barcodeImage = new Image();
@@ -518,61 +519,61 @@ async function printStruk(namaPrinter) {
 //   }
 // }
 
-async function printDirectlyToPrinter(printerName) {
-  // Membuat teks dengan format yang sesuai tata letak yang diinginkan
+// async function printDirectlyToPrinter(printerName) {
+//   // Membuat teks dengan format yang sesuai tata letak yang diinginkan
 
-  const { Printer, InMemory } = require("escpos-buffer");
+//   const { Printer, InMemory } = require("escpos-buffer");
 
-  const connection = new InMemory();
-  // console.log(connection);
-  // return;
-  const printer = await Printer.CONNECT(printerName, connection);
+//   const connection = new InMemory();
+//   // console.log(connection);
+//   // return;
+//   const printer = await Printer.CONNECT(printerName, connection);
 
-  const data = {
-    nama_perusahaan: "Nama Perusahaan Anda",
-    nama_paket: "Paket A",
-    petugas: "Nama Petugas",
-    waktu: new Date().toLocaleString("id-ID"),
-    transaksi: {
-      transaksi: [
-        { nama: "Wahana 1", qty: 2, harga: 50000 },
-        { nama: "Wahana 2", qty: 1, harga: 75000 },
-      ],
-      totalBayar: 175000,
-      diskon: 25000,
-      totalAfterDiskon: 150000,
-    },
-  };
+//   const data = {
+//     nama_perusahaan: "Nama Perusahaan Anda",
+//     nama_paket: "Paket A",
+//     petugas: "Nama Petugas",
+//     waktu: new Date().toLocaleString("id-ID"),
+//     transaksi: {
+//       transaksi: [
+//         { nama: "Wahana 1", qty: 2, harga: 50000 },
+//         { nama: "Wahana 2", qty: 1, harga: 75000 },
+//       ],
+//       totalBayar: 175000,
+//       diskon: 25000,
+//       totalAfterDiskon: 150000,
+//     },
+//   };
 
-  await printer.setColumns(56);
-  await printer.write("Nama Perusahaan: " + data.nama_perusahaan);
-  await printer.writeln("Nama Paket: " + data.nama_paket);
-  await printer.barcode(data.nama_paket, "CODE39", { width: 2, height: 100 });
-  await printer.writeln("Petugas: " + data.petugas);
-  await printer.writeln("Waktu: " + data.waktu);
-  await printer.writeln("---------------------------------------------");
-  await printer.writeln("Wahana    Qty    Harga    Ceklis");
-  await printer.writeln("---------------------------------------------");
+//   await printer.setColumns(56);
+//   await printer.write("Nama Perusahaan: " + data.nama_perusahaan);
+//   await printer.writeln("Nama Paket: " + data.nama_paket);
+//   await printer.barcode(data.nama_paket, "CODE39", { width: 2, height: 100 });
+//   await printer.writeln("Petugas: " + data.petugas);
+//   await printer.writeln("Waktu: " + data.waktu);
+//   await printer.writeln("---------------------------------------------");
+//   await printer.writeln("Wahana    Qty    Harga    Ceklis");
+//   await printer.writeln("---------------------------------------------");
 
-  data.transaksi.transaksi.forEach((item) => {
-    printer.writeln(
-      `${item.nama}    ${item.qty}    ${item.harga}    .............`
-    );
-  });
+//   data.transaksi.transaksi.forEach((item) => {
+//     printer.writeln(
+//       `${item.nama}    ${item.qty}    ${item.harga}    .............`
+//     );
+//   });
 
-  await printer.writeln("---------------------------------------------");
-  await printer.writeln(`Total: ${data.transaksi.totalBayar}`);
-  await printer.writeln(`Diskon: ${data.transaksi.diskon}`);
-  await printer.writeln(`Total Bayar: ${data.transaksi.totalAfterDiskon}`);
-  await printer.writeln("Terimakasih atas kunjungan Anda");
-  await printer.feed(6);
-  await printer.buzzer();
-  await printer.cutter();
-  await printer.drawer(Drawer.First);
+//   await printer.writeln("---------------------------------------------");
+//   await printer.writeln(`Total: ${data.transaksi.totalBayar}`);
+//   await printer.writeln(`Diskon: ${data.transaksi.diskon}`);
+//   await printer.writeln(`Total Bayar: ${data.transaksi.totalAfterDiskon}`);
+//   await printer.writeln("Terimakasih atas kunjungan Anda");
+//   await printer.feed(6);
+//   await printer.buzzer();
+//   await printer.cutter();
+//   await printer.drawer(Drawer.First);
 
-  // For buffered connection (output to stdout)
-  process.stdout.write(connection.buffer());
-}
+//   // For buffered connection (output to stdout)
+//   process.stdout.write(connection.buffer());
+// }
 
 async function getPrinters() {
   // let namaPrinter = ""
@@ -615,7 +616,7 @@ contextBridge.exposeInMainWorld("electron", {
   print: printStruk,
   createPDFStruk: generatePDF,
   getPrinters,
-  printDirectlyToPrinter,
+  // printDirectlyToPrinter,
   getHIDDevices,
   readDataFromHID,
   getHomeDir,

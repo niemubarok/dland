@@ -1,2 +1,4 @@
 #!/bin/bash
-nvm use v18 && node index.js
+
+echo "JANGAN DI TUTUP, APLIKASI UNTUK TRIPOD"
+node index.js

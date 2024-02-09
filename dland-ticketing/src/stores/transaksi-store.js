@@ -130,6 +130,22 @@ export const transaksiStore = defineStore("transaksi", {
 
       try {
         if (this.detailTransaksi.length) {
+          const  data= {
+            cara_bayar,
+            status,
+            petugas,
+            idPaket: this.isPaket ? this.idPaket : null,
+            diskon: this.diskon,
+            totalAfterDiskon: this.totalAfterDiskon,
+            transaksi: this.detailTransaksi,
+            total: this.totalBayar,
+          }
+
+          console.log("data di insertINTODB", data)
+
+
+
+          console.log()
           const response = await api.post("transaksi/create", {
             data: {
               cara_bayar,
@@ -144,7 +160,7 @@ export const transaksiStore = defineStore("transaksi", {
           });
           isSuccess = true;
           // this.detailTransaksi.splice(0);
-          console.log("insertIntoDB", response.data);
+          console.log("insertIntoDB", response);
           this.no_transaksi = response.data.no_transaksi;
           const no_transaksi = response.data.no_transaksi;
           return { isSuccess, no_transaksi };

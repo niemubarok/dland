@@ -251,19 +251,18 @@ function formatNumber(number) {
 }
 
 async function makeAPIRequest(dataBarcode) {
-  console.log("formatNumber(dataBarcode)", formatNumber(dataBarcode))
+  //await openGate();
+  console.log(formatNumber(dataBarcode))
   try {
     //   //   Ganti URL dengan endpoint API yang sesuai2233445767676
     const response = await axios.post(API_URL, {
       // barcode: "2024/01/29/00002",
      barcode: formatNumber(dataBarcode),
     });
-  console.log("response.data", response.data)
-    if (response.status === 200 && response.data === true) {
+  console.log(response.data)
+    if (response.status === 200 && response.data == true) {
       console.log(response.data);
-    await openGate();
-    }else{
-      return
+  await openGate();
     }
     //   // console.log("Data from API:", response.data);
     // const serialPort = new SerialPort({

@@ -36,7 +36,6 @@
 <script setup>
 import { useDialogPluginComponent, useQuasar } from "quasar";
 import { reportStore } from "src/stores/report-store.js";
-import { ref } from "vue";
 
 const { dialogRef, onDialogHide } = useDialogPluginComponent();
 const $q = useQuasar();
@@ -46,7 +45,8 @@ const props = defineProps({
 
 const onDelete = () => {
   reportStore().deleteTransaksiFromDB(props.no_transaksi);
-  dialogRef.hide()((reportStore().deleteReason = ""));
+  dialogRef.value.hide();
+  reportStore().deleteReason = "";
 };
 
 defineEmits([...useDialogPluginComponent.emits]);

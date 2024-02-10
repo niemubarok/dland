@@ -137,7 +137,7 @@
         :label="'Bayar'"
         class="col bg-green-9 text-white text-weight-bolder q-mt-sm"
         @click="onClickBayar('cash')"
-       @keydown.enter.prevent="return"
+        @keydown.enter.prevent="return"
       />
       <!-- <q-btn flat label="Action 2" /> -->
     </q-card-actions>
@@ -186,38 +186,35 @@ const onClickBayar = async (method) => {
     );
     const store = await transaksiStore().insertIntoDB();
 
-   
     // namaPaket: "Tiket",
-    
+
     if (store.isSuccess) {
       const transaksi = transaksiStore();
-    const data = {
-      transaksi: JSON.stringify(transaksi.detailTransaksi),
-      diskon: transaksi.diskon,
-      totalAfterDiskon: transaksi.totalAfterDiskon,
-      totalBayar: transaksi.totalBayar,
-      no_transaksi: transaksi.no_transaksi,
-    };
+      const data = {
+        transaksi: JSON.stringify(transaksi.detailTransaksi),
+        diskon: transaksi.diskon,
+        totalAfterDiskon: transaksi.totalAfterDiskon,
+        totalBayar: transaksi.totalBayar,
+        no_transaksi: transaksi.no_transaksi,
+      };
 
-    if(transaksi.no_transaksi !==   undefined){
+      if (transaksi.no_transaksi !== undefined) {
+        console.log("data.transaksi", data.transaksi);
+        // await generatePDF(data);
 
-      
-      console.log("data.transaksi", data.transaksi);
-      // await generatePDF(data);
-
-      await window.electron.createPDFStruk(data);
-      //   "Depok Fantasy Land",
-      //   JSON.stringify(data)
-      // );
-      const namaPrinter = ls.get("namaPrinter");
-      window.electron.print(namaPrinter);
-      // window.electron.printDirectlyToPrinter(namaPrinter);
-      $q.notify({
-        message: "Pembayaran Berhasil",
-        color: "green",
-        position: "top",
-      });
-    }
+        const namaPrinter = ls.get("namaPrinter");
+        await window.electron.createPDFStruk(data, namaPrinter);
+        //   "Depok Fantasy Land",
+        //   JSON.stringify(data)
+        // );
+        // window.electron.print(namaPrinter);
+        // window.electron.printDirectlyToPrinter(namaPrinter);
+        $q.notify({
+          message: "Pembayaran Berhasil",
+          color: "green",
+          position: "top",
+        });
+      }
       // dialogRef.value.hide();
     } else {
       const existingTransaksiGagal = ls.get("transaksi_gagal") || [];

@@ -369,10 +369,10 @@ const onClickPrint = async (diskon, no_transaksi, namaPaket) => {
 
   // console.log("data di daftarTransaksi", data);
   // return;
-  window.electron.createPDFStruk(data);
+  window.electron.createPDFStruk(data, ls.get("namaPrinter"));
   // generatePDF(data);
 
-  window.electron.print(ls.get("namaPrinter"));
+  // window.electron.print(ls.get("namaPrinter"));
   $q.notify({
     message: "Berhasil",
     color: "green",

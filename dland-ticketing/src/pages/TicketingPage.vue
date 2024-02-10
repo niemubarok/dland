@@ -198,7 +198,8 @@ const daftarWahana = computed(() => {
         );
       } else if (isWeekendOrHoliday) {
         return (
-          wahana.status === true && wahana.hari?.toLowerCase() === "weekend"||
+          (wahana.status === true &&
+            wahana.hari?.toLowerCase() === "weekend") ||
           (wahana.status === true && wahana.hari?.toLowerCase() === "all day")
         );
       }
@@ -308,8 +309,8 @@ const pilihPaket = async (paket) => {
     };
 
     // generatePDF(data);
-    window.electron.createPDFStruk(data);
-    window.electron.print(ls.get("namaPrinter"));
+    window.electron.createPDFStruk(data, ls.get("namaPrinter"));
+    // window.electron.print(ls.get("namaPrinter"));
     $q.notify({
       message: "Berhasil",
       color: "green",

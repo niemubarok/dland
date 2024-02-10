@@ -13,12 +13,23 @@ export default class InGateController {
     console.log(barcode);
 
     try {
+      const checkPetugas = await Database.rawQuery(
+        `SELECT * FROM petugas WHERE usernamid_petugas = '${barcode}'`
+      );
+
+      if (checkPetugas.rows?.length) {
+        response.status(200);
+        return;
+      }
+
       const checkLogs = await Database.rawQuery(
         `SELECT * FROM ingate_logs WHERE no_transaksi = '${barcode}'`
       );
 
+      console.log("checkLogs.rows?.length", checkLogs.rows?.length);
+
       if (checkLogs.rows?.length) {
-        return false;
+        response.status(403);
       } else {
         const transaksi = await Database.rawQuery(
           `SELECT no_transaksi FROM transaksi_penjualan 
@@ -34,10 +45,10 @@ export default class InGateController {
             }','${new Date().toISOString()}')`
           );
           if (storeLogs) {
-            return true;
+            response.status(200);
           }
         } else {
-          return false;
+          response.status(403);
         }
       }
     } catch (error) {

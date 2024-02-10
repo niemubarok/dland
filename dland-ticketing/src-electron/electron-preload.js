@@ -193,7 +193,7 @@ const generateBarcode = (text) => {
   return canvas.toDataURL("image/png");
 };
 
-export const generatePDF = async (transaksi) => {
+export const generatePDF = (transaksi, namaPrinter) => {
   console.log("transaksi", transaksi);
   // return;
 
@@ -421,9 +421,12 @@ export const generatePDF = async (transaksi) => {
   );
 
   // Generate barcode
-  console.log("no_transaksi?.replace(/\//g,'')", no_transaksi?.replace(/\//g,''))
+  console.log(
+    "no_transaksi?.replace(///g,'')",
+    no_transaksi?.replace(/\//g, "")
+  );
 
-  const barcodeData = generateBarcode(no_transaksi?.replace(/\//g,''));
+  const barcodeData = generateBarcode(no_transaksi?.replace(/\//g, ""));
   // Add barcode to PDF
   if (barcodeData) {
     const barcodeImage = new Image();
@@ -451,6 +454,8 @@ export const generatePDF = async (transaksi) => {
       };
       reader.readAsArrayBuffer(pdfOutput);
     };
+    printStruk(namaPrinter);
+    // return true;
   }
 };
 async function printStruk(namaPrinter) {

@@ -432,7 +432,7 @@ export const generatePDF = (transaksi, namaPrinter) => {
     const barcodeImage = new Image();
     barcodeImage.src = barcodeData;
     barcodeImage.onload = () => {
-      const barcodeWidth = 40; // Increased width for better clarity
+      const barcodeWidth = 45; // Increased width for better clarity
       const barcodeHeight = 10; // Increased height for better clarity
       const xPosition = (pageWidth - barcodeWidth) / 2;
       const yPosition = pdf.autoTable.previous.finalY + 21;

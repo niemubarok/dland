@@ -333,9 +333,9 @@ async function saveDeviceConfig(serialPath) {
 }
 
 async function main() {
-  playAudio();
+  // playAudio();
 
-  return;
+  // return;
   // await makeAPIRequest("2024/01/29/00002");
   //await openGate()
   //return;

@@ -186,7 +186,10 @@ const daftarWahana = computed(() => {
   const dayOfWeek = today.getDay();
   const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 4; // Monday to Thursday
   const isWeekendOrHoliday =
-    dayOfWeek === 5 || dayOfWeek >= 6 || isNationalHoliday(today); // Friday to Sunday or holiday
+    dayOfWeek === 0 ||
+    dayOfWeek === 5 ||
+    dayOfWeek >= 6 ||
+    isNationalHoliday(today); // Friday to Sunday or holiday
 
   return wahanaStore()
     .daftarWahana.filter((wahana) => {

@@ -17,6 +17,7 @@
     "dotenv": "^16.4.1",
     "native-barcode-scanner": "^1.3.0",
     "node-hid": "^3.0.0",
+    "play-sound": "^1.1.6",
     "serialport": "^12.0.0",
     "simple-prompt-promise": "^1.0.3",
     "usb": "^2.11.0"

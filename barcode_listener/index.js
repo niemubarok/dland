@@ -8,6 +8,7 @@ import { config as dotenvConfig } from "dotenv";
 import axios from "axios";
 import usb from "usb";
 import BarcodeScanner from "native-barcode-scanner";
+import playSound from "play-sound";
 
 // Load .env configurations
 dotenvConfig();
@@ -194,6 +195,24 @@ async function selectSerialDevice(forcePrompt = false) {
   return selectedSerialPath;
 }
 
+async function playAudio() {
+  const audio = playSound();
+  const soundFilePath = "silahkanmasuk.mp3";
+  try {
+    const playProcess = audio.play(soundFilePath, (error) => {
+      if (error) {
+        console.error(`Error playing sound: ${error.message}`);
+      }
+    });
+    playProcess.on("exit", (code) => {
+      if (code !== 0) {
+        console.error(`Audio play exited with code ${code}`);
+      }
+    });
+  } catch (err) {
+    console.error(`Error playing sound: ${err.message}`);
+  }
+}
 async function openGate() {
   const deviceConfig = JSON.parse(await fs.readFile(deviceConfigPath, "utf-8"));
   const serialPath = deviceConfig.serialPath;
@@ -219,7 +238,10 @@ async function openGate() {
       console.error("Error writing to serial port: ", err.message);
       return;
     }
-    // Menutup port setelah penulisan berhasil
+    // Play sound after successful write
+    playAudio();
+
+    // Close port after successful write
     serialPort.close((err) => {
       if (err) {
         console.error("Error closing serial port: ", err.message);
@@ -228,10 +250,6 @@ async function openGate() {
       }
     });
   });
-
-  // setTimeout(() => {
-  //   serialPort.write(process.env.OUTPUT_CODE_OFF);
-  // }, 500);
 }
 
 function formatNumber(number) {
@@ -253,7 +271,6 @@ function formatNumber(number) {
 async function makeAPIRequest(dataBarcode) {
   console.log("formatNumber(dataBarcode)", formatNumber(dataBarcode));
   try {
-    //   //   Ganti URL dengan endpoint API yang sesuai2233445767676
     const response = await axios.post(API_URL, {
       // barcode: "2024/01/29/00002",
       barcode: formatNumber(dataBarcode),
@@ -265,15 +282,6 @@ async function makeAPIRequest(dataBarcode) {
     } else {
       return;
     }
-    //   // console.log("Data from API:", response.data);
-    // const serialPort = new SerialPort({
-    //   path: serialPath,
-    //   baudRate: 9600,
-    // });
-    // serialPort.write("*OUT1ON#");
-    // setTimeout(() => {
-    //   serialPort.write("*OUT1OFF#");
-    // }, 2000);
   } catch (error) {
     console.error("Error fetching data from API:", error);
   }
@@ -325,6 +333,9 @@ async function saveDeviceConfig(serialPath) {
 }
 
 async function main() {
+  playAudio();
+
+  return;
   // await makeAPIRequest("2024/01/29/00002");
   //await openGate()
   //return;

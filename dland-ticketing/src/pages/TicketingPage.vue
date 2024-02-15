@@ -184,32 +184,28 @@ const qty = ref();
 const daftarWahana = computed(() => {
   const today = new Date();
   const dayOfWeek = today.getDay();
-  const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 4; // Monday to Thursday
-  const isWeekendOrHoliday =
-    dayOfWeek === 0 ||
-    dayOfWeek === 5 ||
-    dayOfWeek >= 6 ||
-    isNationalHoliday(today); // Friday to Sunday or holiday
-
+  const isHoliday = isNationalHoliday(today);
   return wahanaStore()
-    .daftarWahana.filter((wahana) => {
-      if (isWeekday) {
-        return (
-          (wahana.status === true &&
-            wahana.hari?.toLowerCase() === "weekday") ||
-          (wahana.status === true && wahana.hari?.toLowerCase() === "all day")
-        );
-      } else if (isWeekendOrHoliday) {
-        return (
-          (wahana.status === true &&
-            wahana.hari?.toLowerCase() === "weekend") ||
-          (wahana.status === true && wahana.hari?.toLowerCase() === "all day")
-        );
-      }
-      return false;
-    })
+    .daftarWahana.filter(wahana => wahana.status && isActiveOnCurrentDay(wahana.hari, dayOfWeek, isHoliday))
     .sort((a, b) => a.nama.localeCompare(b.nama));
 });
+
+function isActiveOnCurrentDay(wahanaDay, currentDay, isHoliday) {
+  const hari = wahanaDay?.toLowerCase();
+  const dayType = getDayType(currentDay, isHoliday);
+  const activeDays = {
+    'weekday': ['weekday','week day', 'all day', 'allday'],
+    'weekend': ['weekend', 'week end', 'all day', 'allday'],
+    // 'holiday': ['weekend', 'all day'] // assuming holidays are treated as weekends
+  };
+  return activeDays[dayType].includes(hari);
+}
+
+function getDayType(dayOfWeek, isHoliday) {
+  if (isHoliday) return 'holiday';
+  if (dayOfWeek >= 1 && dayOfWeek <= 4) return 'weekday'; // Monday to Thursday
+  return 'weekend'; // Friday to Sunday
+}
 
 function isNationalHoliday(date) {
   const nationalHolidays = [

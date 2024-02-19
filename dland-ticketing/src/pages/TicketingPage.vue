@@ -184,6 +184,7 @@ const qty = ref();
 const daftarWahana = computed(() => {
   const today = new Date();
   const dayOfWeek = today.getDay();
+  console.log("dayOfWeek", dayOfWeek)
   const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 4; // Monday to Thursday
   const isWeekendOrHoliday =
     dayOfWeek === 0 ||
@@ -193,25 +194,26 @@ const daftarWahana = computed(() => {
 
   return wahanaStore()
     .daftarWahana.filter((wahana) => {
-      if (isWeekday) {
-        return (
-          (wahana.status === true &&
-            wahana.hari?.toLowerCase() === "weekday") ||
-          (wahana.status === true && wahana.hari?.toLowerCase() === "all day")
-        );
-      } else if (isWeekendOrHoliday) {
+      console.log(isWeekendOrHoliday)
+      if (isWeekendOrHoliday) {
         return (
           (wahana.status === true &&
             wahana.hari?.toLowerCase() === "weekend") ||
           (wahana.status === true && wahana.hari?.toLowerCase() === "all day")
         );
+      } else  {
+        return (
+          (wahana.status === true &&
+            wahana.hari?.toLowerCase() === "weekday") ||
+          (wahana.status === true && wahana.hari?.toLowerCase() === "all day")
+        );
       }
-      return false;
     })
     .sort((a, b) => a.nama.localeCompare(b.nama));
 });
 
 function isNationalHoliday(date) {
+  
   const nationalHolidays = [
     // Tahun 2024
     "2024-01-01", // New Year's Day
@@ -247,6 +249,7 @@ function isNationalHoliday(date) {
     "2025-09-05", // Prophet Muhammad's Birthday
     "2025-12-25", // Christmas Day
   ];
+   date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
   const dateStr = date.toISOString().split("T")[0];
   return nationalHolidays.includes(dateStr);
 }

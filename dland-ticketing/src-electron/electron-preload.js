@@ -451,10 +451,10 @@ export const generatePDF = (transaksi, namaPrinter) => {
       reader.onload = function () {
         const buffer = this.result;
         downloadPDF(buffer, filePath);
+        printStruk(namaPrinter);
       };
       reader.readAsArrayBuffer(pdfOutput);
     };
-    printStruk(namaPrinter);
     // return true;
   }
 };

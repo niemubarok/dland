@@ -7,6 +7,7 @@ export const reportStore = defineStore("report", {
   state: () => ({
     totalPendapatan: ref(0),
     pendapatanPerHari: ref(0),
+    totalPendapatanPerHari: ref(0),
     pendapatanPerBulan: ref(0),
     kunjunganWahanaPerHari: ref(0),
     kunjunganWahanaPerBulan: ref(0),
@@ -37,10 +38,12 @@ export const reportStore = defineStore("report", {
           endDate: this.endData,
         });
         const pendapatan = res.data;
-        console.log(pendapatan);
+        console.log("pendapatan", pendapatan);
         // return pendapatan;
         this.totalPendapatan = pendapatan.totalPendapatan;
-        this.pendapatanPerHari = pendapatan.pendapatanPerHari;
+        this.pendapatanPerHari = pendapatan.detailPendapatanPerHari;
+        this.totalPendapatanPerHari = pendapatan.detailPendapatanPerHari.reduce(
+          (total, detail) => total + parseInt(detail.total),0);
         this.pendapatanPerBulan = pendapatan.pendapatanPerBulan;
       } catch (err) {
         console.log(err);

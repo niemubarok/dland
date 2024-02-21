@@ -29,6 +29,14 @@ const routes = [
         component: () => import("pages/LaporanTransaksiPage.vue"),
       },
       {
+        path: "/laporan/transaksi/per-hari",
+        meta: {
+          requireHeader: true,
+          requireSideNav: true,
+        },
+        component: () => import("pages/LaporanTransaksiPerHariPage.vue"),
+      },
+      {
         path: "/qrcode",
         meta: {
           requireHeader: false,

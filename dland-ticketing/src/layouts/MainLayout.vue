@@ -169,6 +169,12 @@ const essentialLinks = [
     link: "/laporan/transaksi",
   },
   {
+    title: "Laporan Transaksi Per Hari",
+    caption: "",
+    icon: "fact_check",
+    link: "/laporan/transaksi/per-hari",
+  },
+  {
     title: "Petugas",
     caption: "",
     icon: "person",

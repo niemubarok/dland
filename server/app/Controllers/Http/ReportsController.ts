@@ -115,6 +115,14 @@ export default class ReportsController {
       .sum("total_bayar as total")
       .then((result) => result[0].total || 0);
 
+    const detailPendapatanPerHari = await Database.query()
+  .from('transaksi_penjualan')
+  .select(Database.raw('DATE(CAST(substr(no_transaksi, 1, 10) AS DATE)) as tanggal'))
+  .sum('total_bayar as total')
+  .whereBetween(Database.raw('DATE(CAST(substr(no_transaksi, 1, 10) AS DATE))'), [startDate, endDate])
+  .groupBy('tanggal')
+  .orderBy('tanggal', 'asc');
+
     // Refactor to use query builder instead of raw query for better readability and maintainability
     const pendapatanPerBulan = await Database.from("transaksi_penjualan")
       .whereRaw(
@@ -127,6 +135,7 @@ export default class ReportsController {
     response.status(200).json({
       totalPendapatan,
       pendapatanPerHari,
+      detailPendapatanPerHari,
       pendapatanPerBulan,
     });
   }

@@ -9,6 +9,8 @@ import axios from "axios";
 import usb from "usb";
 import BarcodeScanner from "native-barcode-scanner";
 import playSound from "play-sound";
+import {Howl, Howler} from 'howler';
+import { exec } from 'child_process'
 
 // Load .env configurations
 dotenvConfig();
@@ -197,21 +199,38 @@ async function selectSerialDevice(forcePrompt = false) {
 
 async function playAudio() {
   const audio = playSound();
-  const soundFilePath = "silahkanmasuk.mp3";
+  const soundFilePath = "./silahkanmasuk.mp3";
   try {
     const playProcess = audio.play(soundFilePath, (error) => {
       if (error) {
         console.error(`Error playing sound: ${error.message}`);
       }
+
+      // setTimeout(()=>{
+      //   exec('taskkill /im wmplayer.exe', (err, stdout, stderr) => {
+      //     if (err) {
+      //       console.error(`Error executing CLI command: ${err.message}`);
+      //     }
+      //     // Handle success or other outcomes as needed
+      //   });
+      // },2000)
+     
     });
+  
     playProcess.on("exit", (code) => {
       if (code !== 0) {
         console.error(`Audio play exited with code ${code}`);
       }
+     
     });
+  
+    // Execute the CLI command to kill the Windows Media Player process
+    
+    
   } catch (err) {
-    console.error(`Error playing sound: ${err.message}`);
+    console.error(`Error playing sound: ${err}`);
   }
+  
 }
 async function openGate() {
   const deviceConfig = JSON.parse(await fs.readFile(deviceConfigPath, "utf-8"));

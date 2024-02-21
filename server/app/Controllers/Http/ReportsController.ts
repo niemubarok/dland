@@ -86,6 +86,7 @@ export default class ReportsController {
   public async pendapatan({ request, response }: HttpContextContract) {
     const { startDate: startDateParam, endDate: endDateParam } = request.body();
     const today = new Date();
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
     const startDate = startDateParam
       ? startDateParam
       : today.toISOString().split("T")[0].replace(/-/g, "/");
@@ -115,13 +116,13 @@ export default class ReportsController {
       .sum("total_bayar as total")
       .then((result) => result[0].total || 0);
 
-    const detailPendapatanPerHari = await Database.query()
-  .from('transaksi_penjualan')
-  .select(Database.raw('DATE(CAST(substr(no_transaksi, 1, 10) AS DATE)) as tanggal'))
-  .sum('total_bayar as total')
-  .whereBetween(Database.raw('DATE(CAST(substr(no_transaksi, 1, 10) AS DATE))'), [startDate, endDate])
-  .groupBy('tanggal')
-  .orderBy('tanggal', 'asc');
+      const detailPendapatanPerHari = await Database.from('transaksi_penjualan')
+      .select(Database.raw('CAST(substr(no_transaksi, 1, 10) AS DATE) as tanggal'))
+      .sum('total_bayar as total')
+      .whereBetween(Database.raw('CAST(substr(no_transaksi, 1, 10) AS DATE)'), [startDate, endDate])
+      .groupBy('tanggal')
+      .orderBy('tanggal', 'asc')
+      .then((result) => result || []);
 
     // Refactor to use query builder instead of raw query for better readability and maintainability
     const pendapatanPerBulan = await Database.from("transaksi_penjualan")

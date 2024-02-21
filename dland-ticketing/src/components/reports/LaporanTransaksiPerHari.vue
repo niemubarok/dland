@@ -190,7 +190,7 @@ let data = reportStore().pendapatanPerHari.map((item, index) => [
 ]);
 
 // Calculate total pendapatan
-let totalPendapatan = reportStore().pendapatanPerHari.reduce((sum, item) => sum + item.total, 0);
+let totalPendapatan = reportStore().totalPendapatanPerHari;
 
 // Add total row at the bottom
 data.push(["", "Total Keseluruhan", formatCurrency(totalPendapatan)]);
@@ -312,7 +312,7 @@ const todayBtn = async () => {
   // today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
   reportStore().startDate = "";
   reportStore().endDate = "";
-  await store.getLaporanTransaksiFromDB();
+  await reportStore().getLaporanPendapatan(startDate.value, endDate.value);
 };
 
 const dayLabel = (dateValue) => {
@@ -389,7 +389,7 @@ const save = async (type) => {
     console.log("endate", endDate.value);
     // reportStore().endDate = endDate.value;
   }
-  await store.getLaporanTransaksiFromDB(startDate.value, endDate.value);
+  await reportStore().getLaporanPendapatan(startDate.value, endDate.value);
 };
 
 onMounted(async () => {

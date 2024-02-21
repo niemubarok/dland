@@ -31,11 +31,11 @@ export const reportStore = defineStore("report", {
   },
 
   actions: {
-    async getLaporanPendapatan() {
+    async getLaporanPendapatan(startDate, endDate) {
       try {
         const res = await api.post("reports/pendapatan", {
-          startDate: this.startDate,
-          endDate: this.endData,
+          startDate:startDate|| this.startDate,
+          endDate: endDate|| this.endData,
         });
         const pendapatan = res.data;
         console.log("pendapatan", pendapatan);
@@ -43,7 +43,7 @@ export const reportStore = defineStore("report", {
         this.totalPendapatan = pendapatan.totalPendapatan;
         this.pendapatanPerHari = pendapatan.detailPendapatanPerHari;
         this.totalPendapatanPerHari = pendapatan.detailPendapatanPerHari.reduce(
-          (total, detail) => total + parseInt(detail.total),0);
+          (total, detail) => parseInt(total) + parseInt(detail.total),0);
         this.pendapatanPerBulan = pendapatan.pendapatanPerBulan;
       } catch (err) {
         console.log(err);
